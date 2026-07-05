@@ -204,7 +204,7 @@ namespace Duniverse
         {
             Console.WriteLine(DividerLine);
             Console.WriteLine(" DUNIVERSE ARCHIVES  |  Query Terminal");
-            Console.WriteLine(" Welcome to the records of the Chapterhouse Keep.");
+            Console.WriteLine(" Welcome to all historically verified/complete records of the Chapterhouse Keep.");
             Console.WriteLine(" All information preserved and maintained by the Order of the Bene Gesserit.");
             Console.WriteLine(DividerLine);
             Console.WriteLine(" Enter an Entity ID or Name to retrieve related records.");
