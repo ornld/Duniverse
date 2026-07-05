@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Duniverse.Models
 {
     /// <summary>
@@ -16,10 +14,5 @@ namespace Duniverse.Models
         /// The primary outcomes or lingering impacts of the event on the universe.
         /// </summary>
         public string? LastingImpact { get; set; }
-
-        /// <summary>
-        /// A list of IDs representing the primary factions involved in the event.
-        /// </summary>
-        public List<string> InvolvedFactionsIds { get; set; } = new List<string>();
     }
 }

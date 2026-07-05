@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/luke/vscode/Duniverse/Duniverse/Duniverse.csproj": {}
+    "/Users/luke/ryder/Duniverse/Duniverse/Duniverse.csproj": {}
   },
   "projects": {
-    "/Users/luke/vscode/Duniverse/Duniverse/Duniverse.csproj": {
+    "/Users/luke/ryder/Duniverse/Duniverse/Duniverse.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/luke/vscode/Duniverse/Duniverse/Duniverse.csproj",
+        "projectUniqueName": "/Users/luke/ryder/Duniverse/Duniverse/Duniverse.csproj",
         "projectName": "Duniverse",
-        "projectPath": "/Users/luke/vscode/Duniverse/Duniverse/Duniverse.csproj",
+        "projectPath": "/Users/luke/ryder/Duniverse/Duniverse/Duniverse.csproj",
         "packagesPath": "/Users/luke/.nuget/packages/",
-        "outputPath": "/Users/luke/vscode/Duniverse/Duniverse/obj/",
+        "outputPath": "/Users/luke/ryder/Duniverse/Duniverse/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/luke/.nuget/NuGet/NuGet.Config"
