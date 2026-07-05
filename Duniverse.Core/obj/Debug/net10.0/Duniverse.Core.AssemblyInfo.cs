@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Duniverse.Core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+29057c59e924020b8fd17b19e64857cdabe8d61d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fba900ab203cb7feb59798970472910adede2147")]
 [assembly: System.Reflection.AssemblyProductAttribute("Duniverse.Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Duniverse.Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
