@@ -8,43 +8,55 @@ namespace Duniverse
 {
     class Program
     {
+        private const string DividerLine = "----------------------------------------------------------------";
+
         static void Main(string[] args)
         {
-            Console.WriteLine("Booting up the Duniverse Databanks...");
+            PrintBootBanner();
 
             var registry = new EntityRegistry();
 
-            registry.RegisterEntities(ArtifactSeeder.GetArtifacts());
-            registry.RegisterEntities(DisciplineSeeder.GetDisciplines());
-            registry.RegisterEntities(PersonaSeeder.GetPersonas());
-            registry.RegisterEntities(WorldSeeder.GetWorlds());
-            registry.RegisterEntities(HouseSeeder.GetHouses());
-            registry.RegisterEntities(OrganizationSeeder.GetOrganizations());
-            registry.RegisterEntities(VehicleSeeder.GetVehicles());
-            registry.RegisterEntities(TheologicalSystemSeeder.GetTheologicalSystems());
-            registry.RegisterEntities(HistoricalEventSeeder.GetHistoricalEvents());
-            registry.RegisterEntities(FloraFaunaSeeder.GetFloraFaunas());
+            var artifacts = ArtifactSeeder.GetArtifacts();
+            var disciplines = DisciplineSeeder.GetDisciplines();
+            var personas = PersonaSeeder.GetPersonas();
+            var worlds = WorldSeeder.GetWorlds();
+            var houses = HouseSeeder.GetHouses();
+            var organizations = OrganizationSeeder.GetOrganizations();
+            var vehicles = VehicleSeeder.GetVehicles();
+            var theologicalSystems = TheologicalSystemSeeder.GetTheologicalSystems();
+            var historicalEvents = HistoricalEventSeeder.GetHistoricalEvents();
+            var floraFaunas = FloraFaunaSeeder.GetFloraFaunas();
+
+            registry.RegisterEntities(artifacts);
+            registry.RegisterEntities(disciplines);
+            registry.RegisterEntities(personas);
+            registry.RegisterEntities(worlds);
+            registry.RegisterEntities(houses);
+            registry.RegisterEntities(organizations);
+            registry.RegisterEntities(vehicles);
+            registry.RegisterEntities(theologicalSystems);
+            registry.RegisterEntities(historicalEvents);
+            registry.RegisterEntities(floraFaunas);
+
+            int totalRecords = artifacts.Count + disciplines.Count + personas.Count + worlds.Count
+                + houses.Count + organizations.Count + vehicles.Count + theologicalSystems.Count
+                + historicalEvents.Count + floraFaunas.Count;
+            const int categoryCount = 10;
 
             Console.Clear();
-            Console.WriteLine("Encyclopedia data loaded successfully!\n");
+            PrintReadyBanner(totalRecords, categoryCount);
 
             bool isRunning = true;
             while (isRunning)
             {
-                Console.WriteLine("=====================================================");
-                Console.WriteLine("               DUNIVERSE ENCYCLOPEDIA                ");
-                Console.WriteLine("=====================================================");
-                Console.WriteLine("Enter an Entity ID or Name to find related records.");
-                Console.WriteLine("(Examples: char_PaulAtreides, Paul Atreides, org_BeneGesserit, Arrakis)");
-                Console.WriteLine("Type 'exit' to close the databanks.");
-                Console.Write("\nSearch > ");
+                PrintQueryHeader();
 
                 string searchInput = Console.ReadLine()?.Trim().ToLower();
 
                 if (searchInput == "exit")
                 {
                     isRunning = false;
-                    Console.WriteLine("Shutting down...");
+                    PrintExitBanner();
                     continue;
                 }
 
@@ -54,14 +66,15 @@ namespace Duniverse
                     continue;
                 }
 
-                // Try an exact ID match first; if that misses, fall back to a name search
+                // Try an exact ID match first; if that misses, fall back to a name search;
+                // if that also misses, fall back to fuzzy "did you mean" suggestions
                 var primaryEntity = registry.GetEntity(searchInput);
                 if (primaryEntity == null)
                 {
                     var nameMatches = registry.SearchByName(searchInput).ToList();
                     if (nameMatches.Count > 1)
                     {
-                        Console.WriteLine($"\nMultiple entries match '{searchInput}'. Search again using one of these IDs:\n");
+                        Console.WriteLine($"\n{nameMatches.Count} records match '{searchInput}'. Refine your query using one of the IDs below:\n");
                         foreach (var match in nameMatches)
                         {
                             Console.WriteLine($" * {match.Name} -> {match.Id}");
@@ -77,9 +90,34 @@ namespace Duniverse
                         primaryEntity = nameMatches[0];
                         searchInput = primaryEntity.Id.ToLower();
                     }
+                    else
+                    {
+                        var suggestions = registry.FindClosestByName(searchInput);
+                        if (suggestions.Count == 1)
+                        {
+                            var suggestion = suggestions[0];
+                            Console.WriteLine($"\nNo exact match for '{searchInput}' — did you mean '{suggestion.Name}'? Showing that entry.");
+                            primaryEntity = suggestion;
+                            searchInput = suggestion.Id.ToLower();
+                        }
+                        else if (suggestions.Count > 1)
+                        {
+                            Console.WriteLine($"\nNo exact match for '{searchInput}'. Did you mean one of these?\n");
+                            foreach (var suggestion in suggestions)
+                            {
+                                Console.WriteLine($" * {suggestion.Name} -> {suggestion.Id}");
+                            }
+                            Console.WriteLine("\nPress Enter to continue...");
+                            Console.ReadLine();
+                            Console.Clear();
+                            continue;
+                        }
+                    }
                 }
 
-                Console.WriteLine($"\n--- SEARCH RESULTS FOR: '{searchInput}' ---\n");
+                Console.WriteLine($"\n{DividerLine}");
+                Console.WriteLine($" QUERY RESULTS: '{searchInput}'");
+                Console.WriteLine($"{DividerLine}\n");
 
                 bool foundRecords = false;
 
@@ -106,6 +144,13 @@ namespace Duniverse
                     Console.WriteLine();
                 }
 
+                if (primaryEntity != null)
+                {
+                    Console.WriteLine(DividerLine);
+                    Console.WriteLine(" Connected relationships throughout the Duniverse");
+                    Console.WriteLine($"{DividerLine}\n");
+                }
+
                 // Fetch all related entities of every category based on user input
                 PrintRelated(registry.GetRelatedEntities<Persona>(searchInput), "PERSONAS", ref foundRecords);
                 PrintRelated(registry.GetRelatedEntities<House>(searchInput), "HOUSES", ref foundRecords);
@@ -120,13 +165,62 @@ namespace Duniverse
 
                 if (!foundRecords)
                 {
-                    Console.WriteLine("No records found linked to that ID or name. Please check your spelling and try again.\n");
+                    Console.WriteLine("No matching records found. Verify the ID or name and try again.\n");
                 }
 
                 Console.WriteLine("Press Enter to continue...");
                 Console.ReadLine();
                 Console.Clear();
             }
+        }
+
+        /// <summary>
+        /// Prints the splash banner shown while the archive is still initializing.
+        /// </summary>
+        private static void PrintBootBanner()
+        {
+            Console.WriteLine(DividerLine);
+            Console.WriteLine(" DUNIVERSE ARCHIVES  |  Imperial Records Division");
+            Console.WriteLine(DividerLine);
+            Console.WriteLine("Initializing archive index...");
+        }
+
+        /// <summary>
+        /// Prints the readiness summary once every seeder has been registered.
+        /// </summary>
+        private static void PrintReadyBanner(int totalRecords, int categoryCount)
+        {
+            Console.WriteLine(DividerLine);
+            Console.WriteLine(" DUNIVERSE ARCHIVES  |  Imperial Records Division");
+            Console.WriteLine(DividerLine);
+            Console.WriteLine($" Archive index initialized: {totalRecords} records across {categoryCount} categories.");
+            Console.WriteLine(" System ready. Awaiting query.\n");
+        }
+
+        /// <summary>
+        /// Prints the recurring query prompt shown at the top of every search.
+        /// </summary>
+        private static void PrintQueryHeader()
+        {
+            Console.WriteLine(DividerLine);
+            Console.WriteLine(" DUNIVERSE ARCHIVES  |  Query Terminal");
+            Console.WriteLine(" Welcome to the records of the Chapterhouse Keep.");
+            Console.WriteLine(" All information preserved and maintained by the Order of the Bene Gesserit.");
+            Console.WriteLine(DividerLine);
+            Console.WriteLine(" Enter an Entity ID or Name to retrieve related records.");
+            Console.WriteLine(" Type 'exit' to close the session.");
+            Console.Write("\nQuery > ");
+        }
+
+        /// <summary>
+        /// Prints the closing banner shown when the user ends the session.
+        /// </summary>
+        private static void PrintExitBanner()
+        {
+            Console.WriteLine(DividerLine);
+            Console.WriteLine(" Closing session. All records secured.");
+            Console.WriteLine(" Thank you for consulting the Chapterhouse Archives.");
+            Console.WriteLine(DividerLine);
         }
 
         /// <summary>
