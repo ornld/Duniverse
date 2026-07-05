@@ -1,11 +1,30 @@
 {
   "version": 3,
   "targets": {
-    "net10.0": {}
+    "net10.0": {
+      "Duniverse.Core/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v10.0",
+        "compile": {
+          "bin/placeholder/Duniverse.Core.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Duniverse.Core.dll": {}
+        }
+      }
+    }
   },
-  "libraries": {},
+  "libraries": {
+    "Duniverse.Core/1.0.0": {
+      "type": "project",
+      "path": "Duniverse.Core/Duniverse.Core.csproj",
+      "msbuildProject": "Duniverse.Core/Duniverse.Core.csproj"
+    }
+  },
   "projectFileDependencyGroups": {
-    "net10.0": []
+    "net10.0": [
+      "Duniverse.Core >= 1.0.0"
+    ]
   },
   "packageFolders": {
     "/Users/luke/.nuget/packages/": {}
@@ -31,7 +50,11 @@
       "frameworks": {
         "net10.0": {
           "targetAlias": "net10.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "/Users/luke/ryder/Duniverse/Duniverse/Duniverse.Core/Duniverse.Core.csproj": {
+              "projectPath": "/Users/luke/ryder/Duniverse/Duniverse/Duniverse.Core/Duniverse.Core.csproj"
+            }
+          }
         }
       },
       "warningProperties": {

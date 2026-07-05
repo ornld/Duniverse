@@ -1,0 +1,22 @@
+@if (Items is not null && Items.Any())
+{
+    <div class="related-section">
+        <h3>@Title</h3>
+        <ul>
+            @foreach (var item in Items)
+            {
+                <li>
+                    <a href="@($"/entity/{item.Id}")">@item.Name</a>: <span class="muted">@item.ShortDescription</span>
+                </li>
+            }
+        </ul>
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = "";
+
+    [Parameter, EditorRequired]
+    public IEnumerable<DuneEntity>? Items { get; set; }
+}

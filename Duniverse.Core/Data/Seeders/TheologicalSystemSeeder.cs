@@ -60,7 +60,7 @@ namespace Duniverse.Data.Seeders
                     ShortDescription = "The state religion built around Paul Atreides following his jihad.",
                     DetailedHistory = "Institutionalized through the Qizarate after Paul's conquest of the Imperial throne, the Church of Muad'Dib spread his image and doctrine across the galaxy, often through the same jihad it claimed to sanctify.",
                     ImagePath = "images/theology/muaddib_church.jpg",
-                    RelatedEntityIds = new List<string> { "char_PaulAtreides", "org_Qizarate", "loc_Onn", "event_MuadDibJihad" },
+                    RelatedEntityIds = new List<string> { "char_PaulAtreides", "org_Qizarate", "loc_Onn", "event_MuadDibJihad", "char_BronsoOfIx" },
                     CoreTenets = "Paul Atreides as messiah and emperor whose rule is divinely ordained",
                     FoundationalTexts = new List<string> { "The sermons and proclamations of Muad'Dib" }
                 },

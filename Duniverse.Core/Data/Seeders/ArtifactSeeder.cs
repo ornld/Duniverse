@@ -82,7 +82,7 @@ namespace Duniverse.Data.Seeders
                     ShortDescription = "The poisonous liquid excreted by a drowning sandworm.",
                     DetailedHistory = "Only a Reverend Mother can transmute this lethal substance into a safe form, allowing her to gain access to Other Memory.",
                     ImagePath = "images/artifacts/water_of_life.jpg",
-                    RelatedEntityIds = new List<string> { "org_BeneGesserit", "org_Fremen", "char_LadyJessica" },
+                    RelatedEntityIds = new List<string> { "org_BeneGesserit", "org_Fremen", "char_LadyJessica", "char_RaquellaBertoAnirul", "event_ReverendMotherBreakthrough" },
                     PrimaryMaterial = "Sandworm secretion",
                     Functionality = "Psychoactive catalyst/Rite of passage"
                 },

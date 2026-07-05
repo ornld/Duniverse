@@ -1,0 +1,55 @@
+@page "/category/{Slug}"
+@inject EntityRegistry Registry
+
+<PageTitle>@categoryTitle - Duniverse Archives</PageTitle>
+
+<a class="back-link" href="/">&larr; Back to Main Menu</a>
+
+@if (items.Count > 0)
+{
+    <h1>@categoryTitle</h1>
+    <p class="tagline">@items.Count records. Select one to see its full entry and connections.</p>
+
+    <div class="category-grid">
+        @foreach (var item in items)
+        {
+            <a class="category-tile" href="@($"/entity/{item.Id}")">
+                <strong>@item.Name</strong>
+                <span class="muted">@item.ShortDescription</span>
+            </a>
+        }
+    </div>
+}
+else
+{
+    <h1>Unknown category</h1>
+    <p>"@Slug" doesn't match a known category.</p>
+}
+
+@code {
+    [Parameter]
+    public string Slug { get; set; } = "";
+
+    private string categoryTitle = "";
+    private List<DuneEntity> items = new();
+
+    protected override void OnParametersSet()
+    {
+        (categoryTitle, IEnumerable<DuneEntity> found) = Slug.ToLowerInvariant() switch
+        {
+            "artifacts" => ("Artifacts", Registry.GetAllEntities<Artifact>()),
+            "disciplines" => ("Disciplines", Registry.GetAllEntities<Discipline>()),
+            "flora-fauna" => ("Flora & Fauna", Registry.GetAllEntities<FloraFauna>()),
+            "historical-events" => ("Historical Events", Registry.GetAllEntities<HistoricalEvent>()),
+            "houses" => ("Houses", Registry.GetAllEntities<House>()),
+            "organizations" => ("Organizations", Registry.GetAllEntities<Organization>()),
+            "personas" => ("Personas", Registry.GetAllEntities<Persona>()),
+            "theological-systems" => ("Theological Systems", Registry.GetAllEntities<TheologicalSystem>()),
+            "vehicles" => ("Vehicles", Registry.GetAllEntities<Vehicle>()),
+            "worlds" => ("Worlds & Locations", Registry.GetAllEntities<World>()),
+            _ => ("", Enumerable.Empty<DuneEntity>())
+        };
+
+        items = found.OrderBy(item => item.Name).ToList();
+    }
+}

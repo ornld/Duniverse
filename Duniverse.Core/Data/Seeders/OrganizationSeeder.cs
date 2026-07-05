@@ -16,7 +16,7 @@ namespace Duniverse.Data.Seeders
                     ShortDescription = "An ancient sisterhood pursuing political, genetic, and spiritual control across the Imperium.",
                     DetailedHistory = "Through selective breeding, physical and mental conditioning, and the covert seeding of protective religions via the Missionaria Protectiva, the Bene Gesserit worked for millennia toward the creation of the Kwisatz Haderach.",
                     ImagePath = "images/organizations/bene_gesserit.jpg",
-                    RelatedEntityIds = new List<string> { "loc_WallachIX", "disc_BeneGesseritTraining", "char_LadyJessica", "char_GaiusHelenMohiam", "theo_OtherMemoryPhilosophy", "theo_MahdiProphecy", "char_Taraza", "char_DarwiOdrade", "char_Murbella", "char_MilesTeg", "char_NormaCenva", "org_HonoredMatres", "loc_Chapterhouse" },
+                    RelatedEntityIds = new List<string> { "loc_WallachIX", "disc_BeneGesseritTraining", "char_LadyJessica", "char_GaiusHelenMohiam", "theo_OtherMemoryPhilosophy", "theo_MahdiProphecy", "char_Taraza", "char_DarwiOdrade", "char_Murbella", "char_MilesTeg", "char_NormaCenva", "org_HonoredMatres", "loc_Chapterhouse", "char_RaquellaBertoAnirul", "event_ReverendMotherBreakthrough" },
                     Headquarters = "Wallach IX",
                     PrimaryDirective = "Guide humanity's genetic and religious development toward the Kwisatz Haderach"
                 },
@@ -71,7 +71,7 @@ namespace Duniverse.Data.Seeders
                     ShortDescription = "The priesthood-bureaucracy that administers the Church of Muad'Dib.",
                     DetailedHistory = "Formed to institutionalize Paul Atreides' religion after his jihad, the Qizarate grew into a sprawling, often corrupt bureaucracy wielding as much power as any Great House.",
                     ImagePath = "images/organizations/qizarate.jpg",
-                    RelatedEntityIds = new List<string> { "theo_ChurchOfMuadDib", "char_PaulAtreides", "char_Korba", "loc_Onn" },
+                    RelatedEntityIds = new List<string> { "theo_ChurchOfMuadDib", "char_PaulAtreides", "char_Korba", "loc_Onn", "char_BronsoOfIx" },
                     Headquarters = "Arrakis",
                     PrimaryDirective = "Propagate and administer the state religion of Muad'Dib"
                 },
@@ -126,7 +126,7 @@ namespace Duniverse.Data.Seeders
                     ShortDescription = "A militant matriarchal order returning from the Scattering to conquer the Old Imperium.",
                     DetailedHistory = "Forged somewhere beyond the Scattering by an unseen, greater threat, the Honored Matres wield sexual imprinting to enslave men absolutely, sweeping across known space in a campaign of conquest that puts them on a collision course with the Bene Gesserit.",
                     ImagePath = "images/organizations/honored_matres.jpg",
-                    RelatedEntityIds = new List<string> { "char_Murbella", "char_DarwiOdrade", "disc_HonoredMatreImprinting", "org_BeneGesserit", "event_DestructionOfRakis" },
+                    RelatedEntityIds = new List<string> { "char_Murbella", "char_DarwiOdrade", "disc_HonoredMatreImprinting", "org_BeneGesserit", "event_DestructionOfRakis", "bio_Futar" },
                     Headquarters = "Unknown (beyond the Scattering)",
                     PrimaryDirective = "Conquest and domination of the Old Imperium's remaining powers"
                 },
@@ -173,6 +173,17 @@ namespace Duniverse.Data.Seeders
                     RelatedEntityIds = new List<string> { "char_Omnius", "char_Erasmus", "event_ButlerianJihad", "theo_ButlerianDoctrine" },
                     Headquarters = "Corrin",
                     PrimaryDirective = "Expand machine rule across human-settled space"
+                },
+                new Organization
+                {
+                    Id = "org_MentatSchool",
+                    Name = "Mentat School",
+                    ShortDescription = "The institution that trains human minds to replace the thinking machines destroyed in the Jihad.",
+                    DetailedHistory = "Founded by Gilbertus Albans in the uneasy aftermath of the Butlerian Jihad, the Mentat School turned human intellect itself into a computational discipline, producing the analysts and advisors - like Thufir Hawat - who would serve the Great Houses for ten thousand years.",
+                    ImagePath = "images/organizations/mentat_school.jpg",
+                    RelatedEntityIds = new List<string> { "char_GilbertusAlbans", "disc_Mentat", "char_ThufirHawat", "event_ButlerianJihad" },
+                    Headquarters = "Lampadas",
+                    PrimaryDirective = "Train Mentats to serve as human computers for the Great Houses"
                 }
             };
         }

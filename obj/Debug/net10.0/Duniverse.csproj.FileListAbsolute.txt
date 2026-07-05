@@ -56,3 +56,7 @@
 /Users/luke/ryder/Duniverse/Duniverse/obj/Debug/net10.0/Duniverse.pdb
 /Users/luke/ryder/Duniverse/Duniverse/obj/Debug/net10.0/Duniverse.genruntimeconfig.cache
 /Users/luke/ryder/Duniverse/Duniverse/obj/Debug/net10.0/ref/Duniverse.dll
+/Users/luke/ryder/Duniverse/Duniverse/bin/Debug/net10.0/Duniverse.Core.dll
+/Users/luke/ryder/Duniverse/Duniverse/bin/Debug/net10.0/Duniverse.Core.pdb
+/Users/luke/ryder/Duniverse/Duniverse/obj/Debug/net10.0/Duniverse.csproj.AssemblyReference.cache
+/Users/luke/ryder/Duniverse/Duniverse/obj/Debug/net10.0/Duniverse.csproj.Up2Date

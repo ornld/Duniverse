@@ -103,7 +103,7 @@ namespace Duniverse.Data.Seeders
                     ShortDescription = "Swordmaster of the Ginaz and fiercely loyal retainer to House Atreides.",
                     DetailedHistory = "He died defending Paul and Jessica from Sardaukar on Arrakis. His body was recovered by the Tleilaxu and resurrected as the ghola 'Hayt', eventually regaining his original memories. Over the millennia that followed, the Tleilaxu would regrow him again and again, entangling his many lives with Leto II's Golden Path and, generations later, the Bene Gesserit's war against the Honored Matres.",
                     ImagePath = "",
-                    RelatedEntityIds = new List<string> { "char_DukeLetoAtreides", "char_PaulAtreides", "char_LadyJessica", "char_Scytale", "char_MilesTeg", "char_DarwiOdrade", "char_Murbella", "char_SionaAtreides", "disc_GholaCultivation" },
+                    RelatedEntityIds = new List<string> { "char_DukeLetoAtreides", "char_PaulAtreides", "char_LadyJessica", "char_Scytale", "char_MilesTeg", "char_DarwiOdrade", "char_Murbella", "char_SionaAtreides", "disc_GholaCultivation", "bio_Futar" },
                     Affiliation = "House Atreides",
                     Role = "Swordmaster",
                     NotableQuotes = new List<string>()
@@ -175,7 +175,7 @@ namespace Duniverse.Data.Seeders
                     ShortDescription = "Eldest daughter of Shaddam IV, chronicler of the Atreides Empire.",
                     DetailedHistory = "She became Paul's wife in name only to secure his claim to the throne. Though she conspired against him in Messiah, she ultimately became fiercely loyal to his children.",
                     ImagePath = "",
-                    RelatedEntityIds = new List<string> { "char_ShaddamIV", "char_PaulAtreides", "char_GaiusHelenMohiam" },
+                    RelatedEntityIds = new List<string> { "char_ShaddamIV", "char_PaulAtreides", "char_GaiusHelenMohiam", "char_BronsoOfIx" },
                     Affiliation = "House Corrino",
                     Role = "Princess / Historian",
                     NotableQuotes = new List<string> { "A beginning is the time for taking the most delicate care that the balances are correct." }
@@ -421,7 +421,7 @@ namespace Duniverse.Data.Seeders
                     ShortDescription = "A retired Bene Gesserit Bashar recalled to protect a new Duncan Idaho ghola from the Honored Matres.",
                     DetailedHistory = "One of the finest military minds the Sisterhood ever produced, Teg was drawn out of retirement to guard a young Duncan Idaho ghola from Tleilaxu and Honored Matre schemes. Captured and tortured, he unlocked a latent ability for superhuman speed, becoming something closer to a living weapon than a man.",
                     ImagePath = "",
-                    RelatedEntityIds = new List<string> { "char_DarwiOdrade", "char_DuncanIdaho", "org_BeneGesserit", "org_HonoredMatres" },
+                    RelatedEntityIds = new List<string> { "char_DarwiOdrade", "char_DuncanIdaho", "org_BeneGesserit", "org_HonoredMatres", "char_Schwangyu" },
                     Affiliation = "Bene Gesserit",
                     Role = "Bashar",
                     NotableQuotes = new List<string>()
@@ -545,7 +545,7 @@ namespace Duniverse.Data.Seeders
                     ShortDescription = "A diminutive genius whose discovery of the Holtzman effect reshaped the Imperium.",
                     DetailedHistory = "Norma Cenva's breakthrough into what became known as the Holtzman effect made possible both personal defense shields and the folding of space, laying the technological foundation later inherited by the Spacing Guild and, through her own bloodline, the Bene Gesserit.",
                     ImagePath = "",
-                    RelatedEntityIds = new List<string> { "art_ShieldGenerator", "vehicle_Heighliner", "org_SpacingGuild", "org_BeneGesserit" },
+                    RelatedEntityIds = new List<string> { "art_ShieldGenerator", "vehicle_Heighliner", "org_SpacingGuild", "org_BeneGesserit", "char_JosefVenport" },
                     Affiliation = "League of Nobles",
                     Role = "Inventor / Mystic",
                     NotableQuotes = new List<string>()
@@ -670,6 +670,70 @@ namespace Duniverse.Data.Seeders
                     RelatedEntityIds = new List<string> { "char_BaronHarkonnen", "house_Harkonnen", "loc_Lankiveil" },
                     Affiliation = "House Harkonnen",
                     Role = "Exiled Patriarch",
+                    NotableQuotes = new List<string>()
+                },
+
+                // ---- Great Schools of Dune (post-Jihad founding era) ----
+                new Persona
+                {
+                    Id = "char_RaquellaBertoAnirul",
+                    Name = "Raquella Berto-Anirul",
+                    ShortDescription = "The first Mother Superior of the Bene Gesserit and originator of the Reverend Mother transformation.",
+                    DetailedHistory = "Facing death from a plague her proctors could not cure, Raquella's desperate acolytes forced upon her a poison distillation that, against all odds, she transmuted rather than died from - the first true Reverend Mother transformation, and the founding miracle upon which the entire Bene Gesserit Sisterhood was built.",
+                    ImagePath = "",
+                    RelatedEntityIds = new List<string> { "org_BeneGesserit", "art_WaterOfLife", "event_ReverendMotherBreakthrough", "disc_BeneGesseritTraining" },
+                    Affiliation = "Bene Gesserit",
+                    Role = "Mother Superior (Founding)",
+                    NotableQuotes = new List<string>()
+                },
+                new Persona
+                {
+                    Id = "char_GilbertusAlbans",
+                    Name = "Gilbertus Albans",
+                    ShortDescription = "Founder of the Mentat School, raised and tutored in logic by the robot Erasmus.",
+                    DetailedHistory = "Orphaned during the Jihad and secretly raised by Erasmus as a living experiment, Gilbertus Albans turned that unlikely education into the foundation of the Mentat School, training human minds to replace the very thinking machines that shaped his own childhood.",
+                    ImagePath = "",
+                    RelatedEntityIds = new List<string> { "org_MentatSchool", "disc_Mentat", "char_Erasmus", "event_ButlerianJihad" },
+                    Affiliation = "Mentat School",
+                    Role = "Founder / Headmaster",
+                    NotableQuotes = new List<string>()
+                },
+                new Persona
+                {
+                    Id = "char_JosefVenport",
+                    Name = "Josef Venport",
+                    ShortDescription = "A descendant of Norma Cenva who built a commercial empire trading melange and Holtzman technology.",
+                    DetailedHistory = "Leveraging his family's foundational role in Holtzman research, Josef Venport expanded a private trading concern into a commercial power that shaped the melange trade and interstellar transport routes later folded into the Spacing Guild and CHOAM's spheres of influence.",
+                    ImagePath = "",
+                    RelatedEntityIds = new List<string> { "char_NormaCenva", "org_SpacingGuild", "org_CHOAM", "bio_Melange" },
+                    Affiliation = "Venport Holdings",
+                    Role = "Director",
+                    NotableQuotes = new List<string>()
+                },
+
+                // ---- Heretics of Dune / Chapterhouse: Dune (deeper cuts) ----
+                new Persona
+                {
+                    Id = "char_Schwangyu",
+                    Name = "Schwangyu",
+                    ShortDescription = "A reactionary Bene Gesserit proctor who opposed Miles Teg's unconventional upbringing of a new Duncan Idaho ghola.",
+                    DetailedHistory = "Convinced that tradition and caution should govern the Sisterhood's handling of the recovered Duncan Idaho ghola, Schwangyu clashed repeatedly with Miles Teg's more instinctive methods, embodying the internal factionalism that persisted even within the disciplined Bene Gesserit order.",
+                    ImagePath = "",
+                    RelatedEntityIds = new List<string> { "char_MilesTeg", "char_DuncanIdaho", "org_BeneGesserit" },
+                    Affiliation = "Bene Gesserit",
+                    Role = "Proctor",
+                    NotableQuotes = new List<string>()
+                },
+                new Persona
+                {
+                    Id = "char_BronsoOfIx",
+                    Name = "Bronso of Ix",
+                    ShortDescription = "A rival historian who challenged the official legend of Muad'Dib.",
+                    DetailedHistory = "Raised alongside Paul Atreides but disillusioned by the jihad waged in his name, Bronso wrote a dissenting history of Muad'Dib's rule, defying the Qizarate's sanctioned narrative and Princess Irulan's own chronicles at considerable personal risk.",
+                    ImagePath = "",
+                    RelatedEntityIds = new List<string> { "char_PaulAtreides", "char_PrincessIrulan", "theo_ChurchOfMuadDib", "org_Qizarate" },
+                    Affiliation = "Ix",
+                    Role = "Dissident Historian",
                     NotableQuotes = new List<string>()
                 }
             };

@@ -32,6 +32,16 @@ namespace Duniverse.Services
         }
 
         /// <summary>
+        /// Retrieves every registered entity of a given category (e.g., every Persona),
+        /// regardless of how they relate to anything else. Used for category browse pages,
+        /// as opposed to GetRelatedEntities which only returns entities connected to one ID.
+        /// </summary>
+        public IEnumerable<T> GetAllEntities<T>() where T : DuneEntity
+        {
+            return _database.Values.OfType<T>();
+        }
+
+        /// <summary>
         /// Finds every entity whose Name contains the given query. Names and queries are
         /// normalized (punctuation stripped, case folded) first, so "muaddib" still matches
         /// "Muad'Dib" despite the apostrophe.
@@ -115,6 +125,44 @@ namespace Duniverse.Services
         }
 
         /// <summary>
+        /// Resolves a free-form query (an exact ID, a full or partial name, or a typo) down to
+        /// either a single matching entity or a list of candidates to disambiguate between.
+        /// Tries an exact ID match first, then a substring name search, then falls back to
+        /// closest-edit-distance suggestions - the same tiered resolution used by the console
+        /// app, factored out so any UI (web included) gets identical behavior for free.
+        /// </summary>
+        public ResolveResult Resolve(string query)
+        {
+            var exact = GetEntity(query);
+            if (exact != null)
+            {
+                return new ResolveResult(exact, Array.Empty<DuneEntity>());
+            }
+
+            var nameMatches = SearchByName(query).ToList();
+            if (nameMatches.Count == 1)
+            {
+                return new ResolveResult(nameMatches[0], Array.Empty<DuneEntity>());
+            }
+            if (nameMatches.Count > 1)
+            {
+                return new ResolveResult(null, nameMatches);
+            }
+
+            var suggestions = FindClosestByName(query);
+            if (suggestions.Count == 1)
+            {
+                return new ResolveResult(suggestions[0], Array.Empty<DuneEntity>());
+            }
+            if (suggestions.Count > 1)
+            {
+                return new ResolveResult(null, suggestions);
+            }
+
+            return new ResolveResult(null, Array.Empty<DuneEntity>());
+        }
+
+        /// <summary>
         /// Retrieves all entities of a specific category (e.g., Artifact) that are connected
         /// to the given ID, in either direction: entities that list this ID in their own
         /// RelatedEntityIds (reverse), plus entities that this ID's own RelatedEntityIds points
@@ -165,4 +213,10 @@ namespace Duniverse.Services
                 .DistinctBy(house => house.Id, StringComparer.OrdinalIgnoreCase);
         }
     }
+
+    /// <summary>
+    /// The outcome of resolving a search query: either a single Entity, or a list of
+    /// Candidates to disambiguate between. Exactly one of the two is populated.
+    /// </summary>
+    public readonly record struct ResolveResult(DuneEntity? Entity, IReadOnlyList<DuneEntity> Candidates);
 }

@@ -1,0 +1,101 @@
+@page "/archives"
+@inject EntityRegistry Registry
+@inject NavigationManager Nav
+
+<PageTitle>Duniverse Archives</PageTitle>
+
+<div class="hero">
+    <h1>Duniverse Archives</h1>
+    <p class="tagline">
+        Search anyone or anything in the Dune universe, then follow the threads to
+        everything connected to it.
+    </p>
+
+    <div class="search-box">
+        <input @bind="query" @bind:event="oninput" @onkeyup="HandleKeyUp"
+               placeholder="Search a name or ID... e.g. Paul Atreides, Arrakis, Bene Gesserit" />
+        <button @onclick="HandleSearch">Search</button>
+    </div>
+
+    @if (notFound)
+    {
+        <p class="no-results">No matching records found for "@lastQuery". Check the spelling and try again.</p>
+    }
+
+    @if (candidates.Count > 0)
+    {
+        <div class="candidates">
+            <p>@candidates.Count records match "@lastQuery" - did you mean:</p>
+            <ul>
+                @foreach (var candidate in candidates)
+                {
+                    <li>
+                        <a href="@($"/entity/{candidate.Id}")">@candidate.Name</a>
+                        <span class="muted">@candidate.ShortDescription</span>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+
+    <div class="examples">
+        <span class="examples-label">Try:</span>
+        @foreach (var example in Examples)
+        {
+            <a class="chip" href="@($"/entity/{example.Id}")">@example.Label</a>
+        }
+    </div>
+</div>
+
+@code {
+    private string query = "";
+    private string lastQuery = "";
+    private bool notFound;
+    private List<DuneEntity> candidates = new();
+
+    private static readonly (string Label, string Id)[] Examples =
+    {
+        ("Paul Atreides", "char_PaulAtreides"),
+        ("Arrakis", "loc_Arrakis"),
+        ("Bene Gesserit", "org_BeneGesserit"),
+        ("House Atreides", "house_Atreides"),
+        ("Shai-Hulud", "bio_ShaiHulud"),
+        ("The Butlerian Jihad", "event_ButlerianJihad"),
+    };
+
+    private void HandleKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            HandleSearch();
+        }
+    }
+
+    private void HandleSearch()
+    {
+        notFound = false;
+        candidates = new List<DuneEntity>();
+        lastQuery = query.Trim();
+
+        if (string.IsNullOrWhiteSpace(lastQuery))
+        {
+            return;
+        }
+
+        var result = Registry.Resolve(lastQuery);
+
+        if (result.Entity is not null)
+        {
+            Nav.NavigateTo($"/entity/{result.Entity.Id}");
+            return;
+        }
+
+        if (result.Candidates.Count > 0)
+        {
+            candidates = result.Candidates.ToList();
+            return;
+        }
+
+        notFound = true;
+    }
+}

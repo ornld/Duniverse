@@ -1,0 +1,136 @@
+@page "/entity/{Id}"
+@inject EntityRegistry Registry
+@inject NavigationManager Nav
+
+<PageTitle>@(entity?.Name ?? "Not Found") - Duniverse Archives</PageTitle>
+
+<a class="back-link" href="/archives">&larr; Back to Duniverse Archive</a>
+
+@if (entity is not null)
+{
+    <div class="entity-card front">
+        <h1>@entity.Name</h1>
+        <p class="short-desc">@entity.ShortDescription</p>
+        @if (!string.IsNullOrEmpty(entity.DetailedHistory))
+        {
+            <p class="detailed-history">@entity.DetailedHistory</p>
+        }
+        @if (entity is House && rivals.Count > 0)
+        {
+            <p class="rivalries">
+                <strong>Historical Rivalries:</strong> @string.Join(", ", rivals.Select(rival => rival.Name))
+            </p>
+        }
+    </div>
+
+    <div class="connections-divider">
+        <span>Connected relationships throughout the Duniverse</span>
+    </div>
+
+    <div class="entity-card back">
+        <RelatedSection Title="Personas" Items="relatedPersonas" />
+        <RelatedSection Title="Houses" Items="relatedHouses" />
+        <RelatedSection Title="Organizations" Items="relatedOrganizations" />
+        <RelatedSection Title="Worlds & Locations" Items="relatedWorlds" />
+        <RelatedSection Title="Artifacts" Items="relatedArtifacts" />
+        <RelatedSection Title="Vehicles" Items="relatedVehicles" />
+        <RelatedSection Title="Disciplines" Items="relatedDisciplines" />
+        <RelatedSection Title="Theological Systems" Items="relatedTheologicalSystems" />
+        <RelatedSection Title="Historical Events" Items="relatedHistoricalEvents" />
+        <RelatedSection Title="Flora & Fauna" Items="relatedFloraFauna" />
+
+        @if (!hasAnyConnections)
+        {
+            <p class="muted">No connected records found.</p>
+        }
+    </div>
+}
+else if (candidates.Count > 0)
+{
+    <div class="entity-card front">
+        <h2>@candidates.Count records match "@Id"</h2>
+        <p>Did you mean:</p>
+        <ul>
+            @foreach (var candidate in candidates)
+            {
+                <li>
+                    <a href="@($"/entity/{candidate.Id}")">@candidate.Name</a>
+                    <span class="muted">@candidate.ShortDescription</span>
+                </li>
+            }
+        </ul>
+    </div>
+}
+else
+{
+    <div class="entity-card front">
+        <h2>No record found for "@Id"</h2>
+        <p>Verify the ID or name and try again.</p>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string Id { get; set; } = "";
+
+    private DuneEntity? entity;
+    private List<House> rivals = new();
+    private List<DuneEntity> candidates = new();
+    private bool hasAnyConnections;
+
+    private List<Persona> relatedPersonas = new();
+    private List<House> relatedHouses = new();
+    private List<Organization> relatedOrganizations = new();
+    private List<World> relatedWorlds = new();
+    private List<Artifact> relatedArtifacts = new();
+    private List<Vehicle> relatedVehicles = new();
+    private List<Discipline> relatedDisciplines = new();
+    private List<TheologicalSystem> relatedTheologicalSystems = new();
+    private List<HistoricalEvent> relatedHistoricalEvents = new();
+    private List<FloraFauna> relatedFloraFauna = new();
+
+    protected override void OnParametersSet()
+    {
+        var result = Registry.Resolve(Id);
+        entity = result.Entity;
+        candidates = result.Candidates.ToList();
+
+        if (entity is null)
+        {
+            return;
+        }
+
+        // If the URL used a name or a typo rather than the canonical ID, normalize the
+        // address bar so links and bookmarks always point at the real ID.
+        if (!string.Equals(entity.Id, Id, StringComparison.OrdinalIgnoreCase))
+        {
+            Nav.NavigateTo($"/entity/{entity.Id}", replace: true);
+            return;
+        }
+
+        rivals = entity is House house ? Registry.GetRivalHouses(house.Id).ToList() : new List<House>();
+
+        relatedPersonas = Registry.GetRelatedEntities<Persona>(entity.Id).ToList();
+        relatedHouses = Registry.GetRelatedEntities<House>(entity.Id).ToList();
+        relatedOrganizations = Registry.GetRelatedEntities<Organization>(entity.Id).ToList();
+        relatedWorlds = Registry.GetRelatedEntities<World>(entity.Id).ToList();
+        relatedArtifacts = Registry.GetRelatedEntities<Artifact>(entity.Id).ToList();
+        relatedVehicles = Registry.GetRelatedEntities<Vehicle>(entity.Id).ToList();
+        relatedDisciplines = Registry.GetRelatedEntities<Discipline>(entity.Id).ToList();
+        relatedTheologicalSystems = Registry.GetRelatedEntities<TheologicalSystem>(entity.Id).ToList();
+        relatedHistoricalEvents = Registry.GetRelatedEntities<HistoricalEvent>(entity.Id).ToList();
+        relatedFloraFauna = Registry.GetRelatedEntities<FloraFauna>(entity.Id).ToList();
+
+        hasAnyConnections =
+            relatedPersonas.Count > 0 ||
+            relatedHouses.Count > 0 ||
+            relatedOrganizations.Count > 0 ||
+            relatedWorlds.Count > 0 ||
+            relatedArtifacts.Count > 0 ||
+            relatedVehicles.Count > 0 ||
+            relatedDisciplines.Count > 0 ||
+            relatedTheologicalSystems.Count > 0 ||
+            relatedHistoricalEvents.Count > 0 ||
+            relatedFloraFauna.Count > 0;
+    }
+}

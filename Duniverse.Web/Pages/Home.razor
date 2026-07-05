@@ -1,0 +1,123 @@
+@page "/"
+@inject EntityRegistry Registry
+
+<PageTitle>Duniverse Archives</PageTitle>
+
+<div class="hero">
+    <h1>Welcome to the Duniverse</h1>
+    <p class="tagline">
+        An unofficial encyclopedia of Frank Herbert's Dune - a story of desert planets,
+        prophecy, empire, and ecology that reshaped what science fiction could be.
+    </p>
+</div>
+
+<section class="home-section">
+    <h2>Why Dune Matters</h2>
+    <p>
+        Published in 1965, <em>Dune</em> is widely considered one of the most influential science
+        fiction novels ever written. Rather than ray guns and rockets, Frank Herbert built a
+        story around ecology, religion, resource scarcity, and the danger of charismatic
+        leaders - a desert planet whose only precious resource, the spice melange, made it
+        the center of an entire empire's politics. That premise - a single vital resource
+        controlling the fate of civilizations - gave science fiction a new kind of epic:
+        one about environments and power as much as heroes and villains.
+    </p>
+    <p>
+        Its fingerprints are all over the science fiction that followed. Critics and fans have
+        drawn many parallels between Arrakis and Tatooine, and between Paul Atreides' rise and
+        the "chosen one" arc George Lucas would later give Luke Skywalker in <em>Star Wars</em> -
+        Dune is frequently cited among the works that helped shape that generation of space epics.
+        Herbert himself was more interested in warning against messiahs than creating one: Paul's
+        story is a hero's journey deliberately built to make readers uneasy about following heroes
+        at all.
+    </p>
+</section>
+
+<section class="home-section">
+    <h2>About Frank Herbert</h2>
+    <p>
+        Frank Herbert (1920-1986) was an American journalist and science fiction author.
+        Before <em>Dune</em> made him famous, he worked for years as a newspaper reporter and
+        editor - a background that shows in the novel's dense, research-driven world-building.
+        He would go on to write five sequels to <em>Dune</em> himself (<em>Dune Messiah</em>,
+        <em>Children of Dune</em>, <em>God Emperor of Dune</em>, <em>Heretics of Dune</em>, and
+        <em>Chapterhouse: Dune</em>), expanding the saga across ten thousand years of future
+        history before his death in 1986.
+    </p>
+</section>
+
+<section class="home-section">
+    <h2>How Dune Was Born</h2>
+    <p>
+        The seed of <em>Dune</em> was, quite literally, sand. In the late 1950s, Herbert set out
+        to write a magazine article about a U.S. Department of Agriculture project using
+        grasses to stabilize the shifting sand dunes along the Oregon coast. The article was
+        never finished, but the research stuck with him: the idea of sand as a force that could
+        swallow roads, towns, and rivers took root and grew, over the next six years, into an
+        entire desert planet, its ecology, its religion, and the people who had learned to
+        survive it.
+    </p>
+    <p>
+        The finished novel was serialized in <em>Analog Science Fiction</em> magazine before
+        being turned down by roughly twenty publishers, who considered it too long and too
+        strange for the market. It finally found a home in 1965 with Chilton Books - a
+        publisher best known for auto repair manuals. <em>Dune</em> went on to win the Hugo and
+        the inaugural Nebula Award, and remains one of the best-selling science fiction novels
+        of all time.
+    </p>
+</section>
+
+@if (quotes.Count > 0)
+{
+    <section class="home-section">
+        <h2>Words From the Duniverse</h2>
+        <div class="quote-grid">
+            @foreach (var quote in quotes)
+            {
+                <a class="quote-card" href="@($"/entity/{quote.Id}")">
+                    <p class="quote-text">"@quote.Quote"</p>
+                    <span class="quote-author">- @quote.Name</span>
+                </a>
+            }
+        </div>
+    </section>
+}
+
+<section class="home-section">
+    <h2>Explore by Category</h2>
+    <p>New to Dune or a lifelong fan - browse everything the archive holds, one category at a time.</p>
+    <div class="category-grid">
+        <a class="category-tile" href="/category/personas"><strong>Personas</strong><span class="muted">The people of the Imperium</span></a>
+        <a class="category-tile" href="/category/houses"><strong>Houses</strong><span class="muted">The Great and Minor Houses</span></a>
+        <a class="category-tile" href="/category/worlds"><strong>Worlds & Locations</strong><span class="muted">Planets, cities, and sietches</span></a>
+        <a class="category-tile" href="/category/organizations"><strong>Organizations</strong><span class="muted">Factions, orders, and guilds</span></a>
+    </div>
+    <p class="cta">
+        Or jump straight into the <a href="/archives">Duniverse Archive</a> and search for anyone
+        or anything in the universe.
+    </p>
+</section>
+
+@code {
+    private record FeaturedQuote(string Id, string Name, string Quote);
+
+    private List<FeaturedQuote> quotes = new();
+
+    private static readonly string[] FeaturedPersonaIds =
+    {
+        "char_PaulAtreides",
+        "char_LadyJessica",
+        "char_PrincessIrulan",
+        "char_LietKynes",
+        "char_PiterDeVries",
+    };
+
+    protected override void OnInitialized()
+    {
+        quotes = FeaturedPersonaIds
+            .Select(id => Registry.GetEntity(id) as Persona)
+            .Where(persona => persona is not null && persona.NotableQuotes.Count > 0)
+            .Select(persona => new FeaturedQuote(persona!.Id, persona.Name, persona.NotableQuotes[0]))
+            .ToList();
+    }
+}

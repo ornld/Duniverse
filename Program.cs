@@ -147,7 +147,7 @@ namespace Duniverse
                 if (primaryEntity != null)
                 {
                     Console.WriteLine(DividerLine);
-                    Console.WriteLine(" Connected relationships throughout the Duniverse");
+                    Console.WriteLine(" Connected relationships throughout the Duniverse:");
                     Console.WriteLine($"{DividerLine}\n");
                 }
 

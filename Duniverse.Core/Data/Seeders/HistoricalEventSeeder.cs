@@ -188,6 +188,17 @@ namespace Duniverse.Data.Seeders
                     RelatedEntityIds = new List<string> { "char_DukePaulusAtreides", "char_DukeLetoAtreides", "house_Harkonnen", "house_Atreides" },
                     Timeframe = "Years before Duke Leto's arrival on Arrakis",
                     LastingImpact = "Placed Leto Atreides in command of House Atreides and deepened the Atreides-Harkonnen blood feud"
+                },
+                new HistoricalEvent
+                {
+                    Id = "event_ReverendMotherBreakthrough",
+                    Name = "The First Reverend Mother Transformation",
+                    ShortDescription = "The crisis in which Raquella Berto-Anirul's proctors first achieved the Reverend Mother transformation.",
+                    DetailedHistory = "Dying of a plague no medicine could cure, Raquella Berto-Anirul was given a last-resort poison distillation by her acolytes. Against all expectation, she transmuted it rather than died, becoming the first true Reverend Mother and giving the fledgling Bene Gesserit Sisterhood the defining ability upon which its entire order would be built.",
+                    ImagePath = "images/events/reverend_mother_breakthrough.jpg",
+                    RelatedEntityIds = new List<string> { "char_RaquellaBertoAnirul", "org_BeneGesserit", "art_WaterOfLife", "disc_BeneGesseritTraining" },
+                    Timeframe = "In the founding decades of the Bene Gesserit, following the Butlerian Jihad",
+                    LastingImpact = "Established the Reverend Mother transformation as the core rite of the Bene Gesserit Sisterhood"
                 }
             };
         }

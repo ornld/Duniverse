@@ -118,6 +118,17 @@ namespace Duniverse.Data.Seeders
                     RelatedEntityIds = new List<string> { "char_GurneyHalleck" },
                     BiologicalClassification = "Tonewood tree (flora)",
                     DerivedProducts = "Soundboards and bodies for balisets and other stringed instruments"
+                },
+                new FloraFauna
+                {
+                    Id = "bio_Futar",
+                    Name = "Futar",
+                    ShortDescription = "A bred human-feline hybrid hunter used to track down Bene Gesserit operatives and gholas.",
+                    DetailedHistory = "Engineered by Tleilaxu science on behalf of the Honored Matres, Futars combine animal senses with trained cunning, making them uniquely suited to hunting Duncan Idaho gholas and Bene Gesserit adepts who might otherwise evade ordinary pursuit.",
+                    ImagePath = "images/biology/futar.jpg",
+                    RelatedEntityIds = new List<string> { "org_HonoredMatres", "org_BeneTleilax", "char_DuncanIdaho" },
+                    BiologicalClassification = "Genetically engineered human-feline hybrid (fauna)",
+                    DerivedProducts = "None; bred exclusively as trackers and hunters"
                 }
             };
         }

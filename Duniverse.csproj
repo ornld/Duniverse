@@ -4,6 +4,11 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <DefaultItemExcludes>$(DefaultItemExcludes);Duniverse.Core/**;Duniverse.Web/**</DefaultItemExcludes>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="Duniverse.Core/Duniverse.Core.csproj" />
+  </ItemGroup>
 
 </Project>

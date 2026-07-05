@@ -27,7 +27,7 @@ namespace Duniverse.Data.Seeders
                     ShortDescription = "Human computer logic and analytical processing.",
                     DetailedHistory = "Formed to replace thinking machines after the Butlerian Jihad, Mentats are trained to synthesize vast data points into precise strategic predictions.",
                     ImagePath = "images/disciplines/mentat_training.jpg",
-                    RelatedEntityIds = new List<string> { "char_ThufirHawat", "char_PiterDeVries" },
+                    RelatedEntityIds = new List<string> { "char_ThufirHawat", "char_PiterDeVries", "char_GilbertusAlbans", "org_MentatSchool" },
                     Requirements = "Exceptional intellect, focus training",
                     Mechanics = "Super-logic, data synthesis, probability calculation"
                 },
