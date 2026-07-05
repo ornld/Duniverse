@@ -7,17 +7,19 @@
 
 @if (items.Count > 0)
 {
-    <h1>@categoryTitle</h1>
-    <p class="tagline">@items.Count records. Select one to see its full entry and connections.</p>
+    <div class="hero" style="@heroStyle">
+        <h1>@categoryTitle</h1>
+        <p class="tagline">@items.Count records. Select one to see its full entry and connections.</p>
 
-    <div class="category-grid">
-        @foreach (var item in items)
-        {
-            <a class="category-tile" href="@($"/entity/{item.Id}")">
-                <strong>@item.Name</strong>
-                <span class="muted">@item.ShortDescription</span>
-            </a>
-        }
+        <div class="category-grid">
+            @foreach (var item in items)
+            {
+                <a class="category-tile" href="@($"/entity/{item.Id}")">
+                    <strong>@item.Name</strong>
+                    <span class="muted">@item.ShortDescription</span>
+                </a>
+            }
+        </div>
     </div>
 }
 else
@@ -31,11 +33,28 @@ else
     public string Slug { get; set; } = "";
 
     private string categoryTitle = "";
+    private string heroStyle = "";
     private List<DuneEntity> items = new();
+
+    private static readonly Dictionary<string, string> CategoryBackgrounds = new()
+    {
+        ["artifacts"] = "artifacts.webp",
+        ["disciplines"] = "disciplines.jpg",
+        ["flora-fauna"] = "flora-fauna.webp",
+        ["historical-events"] = "historical-events.webp",
+        ["houses"] = "houses.jpg",
+        ["organizations"] = "organizations.jpg",
+        ["personas"] = "personas.jpg",
+        ["theological-systems"] = "theological-systems.jpg",
+        ["vehicles"] = "vehicles.jpg",
+        ["worlds"] = "worlds.webp",
+    };
 
     protected override void OnParametersSet()
     {
-        (categoryTitle, IEnumerable<DuneEntity> found) = Slug.ToLowerInvariant() switch
+        var slug = Slug.ToLowerInvariant();
+
+        (categoryTitle, IEnumerable<DuneEntity> found) = slug switch
         {
             "artifacts" => ("Artifacts", Registry.GetAllEntities<Artifact>()),
             "disciplines" => ("Disciplines", Registry.GetAllEntities<Discipline>()),
@@ -51,5 +70,9 @@ else
         };
 
         items = found.OrderBy(item => item.Name).ToList();
+
+        heroStyle = CategoryBackgrounds.TryGetValue(slug, out var file)
+            ? $"background-image: linear-gradient(rgba(23, 19, 16, 0.82), rgba(23, 19, 16, 0.88)), url('/images/categories/{file}');"
+            : "";
     }
 }
