@@ -157,10 +157,41 @@ a {
     border-top: 1px solid var(--dune-border);
 }
 
+.hero {
+    background-size: cover;
+    background-position: center;
+    border: 1px solid var(--dune-border);
+    border-radius: 8px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+}
+
 .hero h1 {
     font-size: 2.2rem;
+    margin-top: 0;
     margin-bottom: 0.25rem;
 }
+
+.search-hero {
+    min-height: 75vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 3rem;
+}
+
+    .search-hero h1 {
+        font-size: 3rem;
+    }
+
+    .search-hero .tagline {
+        font-size: 1.15rem;
+        max-width: 40rem;
+    }
+
+    .search-hero .search-box {
+        max-width: 40rem;
+    }
 
 .tagline {
     color: var(--dune-muted);
