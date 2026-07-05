@@ -32,13 +32,86 @@ namespace Duniverse.Services
         }
 
         /// <summary>
-        /// Finds every entity whose Name contains the given query, case-insensitive. Lets a
-        /// caller search by a familiar name (e.g. "Paul Atreides") without knowing the exact ID.
+        /// Finds every entity whose Name contains the given query. Names and queries are
+        /// normalized (punctuation stripped, case folded) first, so "muaddib" still matches
+        /// "Muad'Dib" despite the apostrophe.
         /// </summary>
         public IEnumerable<DuneEntity> SearchByName(string query)
         {
+            var normalizedQuery = Normalize(query);
             return _database.Values
-                .Where(entity => entity.Name.Contains(query, StringComparison.OrdinalIgnoreCase));
+                .Where(entity => Normalize(entity.Name).Contains(normalizedQuery, StringComparison.Ordinal));
+        }
+
+        /// <summary>
+        /// Finds the entities whose Name is the closest edit-distance match to the given query,
+        /// for suggesting corrections when an exact ID and a substring name search both come up
+        /// empty (e.g. a typo like "Pull Atriedes"). The allowed distance scales with the
+        /// query's length so short queries don't end up matching everything. Returns every
+        /// entity tied for the closest distance found, or an empty list if nothing is close
+        /// enough to be a reasonable suggestion.
+        /// </summary>
+        public IReadOnlyList<DuneEntity> FindClosestByName(string query)
+        {
+            var normalizedQuery = Normalize(query);
+            if (normalizedQuery.Length == 0)
+            {
+                return Array.Empty<DuneEntity>();
+            }
+
+            int maxDistance = Math.Max(2, normalizedQuery.Length / 3);
+
+            var withinRange = _database.Values
+                .Select(entity => (Entity: entity, Distance: LevenshteinDistance(normalizedQuery, Normalize(entity.Name))))
+                .Where(scored => scored.Distance <= maxDistance)
+                .OrderBy(scored => scored.Distance)
+                .ToList();
+
+            if (withinRange.Count == 0)
+            {
+                return Array.Empty<DuneEntity>();
+            }
+
+            int closestDistance = withinRange[0].Distance;
+            return withinRange
+                .Where(scored => scored.Distance == closestDistance)
+                .Select(scored => scored.Entity)
+                .ToList();
+        }
+
+        /// <summary>
+        /// Lowercases and strips punctuation so that names differing only by an apostrophe,
+        /// hyphen, or letter case are treated as equivalent for search purposes.
+        /// </summary>
+        private static string Normalize(string value)
+        {
+            var letters = value.Where(c => char.IsLetterOrDigit(c) || char.IsWhiteSpace(c));
+            return new string(letters.ToArray()).ToLowerInvariant();
+        }
+
+        /// <summary>
+        /// Computes the Levenshtein distance (minimum single-character insertions, deletions,
+        /// or substitutions needed to turn one string into the other) between two strings.
+        /// </summary>
+        private static int LevenshteinDistance(string a, string b)
+        {
+            var distances = new int[a.Length + 1, b.Length + 1];
+
+            for (int i = 0; i <= a.Length; i++) distances[i, 0] = i;
+            for (int j = 0; j <= b.Length; j++) distances[0, j] = j;
+
+            for (int i = 1; i <= a.Length; i++)
+            {
+                for (int j = 1; j <= b.Length; j++)
+                {
+                    int substitutionCost = a[i - 1] == b[j - 1] ? 0 : 1;
+                    distances[i, j] = Math.Min(
+                        Math.Min(distances[i - 1, j] + 1, distances[i, j - 1] + 1),
+                        distances[i - 1, j - 1] + substitutionCost);
+                }
+            }
+
+            return distances[a.Length, b.Length];
         }
 
         /// <summary>

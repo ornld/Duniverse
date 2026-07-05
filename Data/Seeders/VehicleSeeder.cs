@@ -71,7 +71,7 @@ namespace Duniverse.Data.Seeders
                     ShortDescription = "The colossal Spacing Guild vessels that ferry travelers and cargo between the stars.",
                     DetailedHistory = "Piloted by prescient Guild Navigators who fold space after consuming vast quantities of melange, Heighliners are so large they carry entire fleets of smaller ships, frigates, and cargo within their holds.",
                     ImagePath = "images/vehicles/heighliner.jpg",
-                    RelatedEntityIds = new List<string> { "org_SpacingGuild", "disc_GuildNavigation", "bio_Melange" },
+                    RelatedEntityIds = new List<string> { "org_SpacingGuild", "disc_GuildNavigation", "bio_Melange", "char_NormaCenva" },
                     OperatingEnvironment = "Deep space, folded-space transit",
                     Capacity = "Entire fleets, cargo holds, and thousands of passengers per voyage"
                 },
@@ -118,6 +118,28 @@ namespace Duniverse.Data.Seeders
                     RelatedEntityIds = new List<string> { "org_Sardaukar", "house_Corrino", "house_Harkonnen", "event_FallOfHouseAtreides" },
                     OperatingEnvironment = "Orbit-to-surface assault deployment",
                     Capacity = "A full company of Sardaukar troops"
+                },
+                new Vehicle
+                {
+                    Id = "vehicle_NoShip",
+                    Name = "No-Ship",
+                    ShortDescription = "A vessel shielded by no-field technology, rendering it invisible to prescient sight.",
+                    DetailedHistory = "Developed by the Ixians and adopted by the Bene Gesserit, no-ships block all forms of detection - including the prescience of Guild Navigators - making them essential tools for hiding from the Honored Matres during the long war that followed the Scattering.",
+                    ImagePath = "images/vehicles/no_ship.jpg",
+                    RelatedEntityIds = new List<string> { "org_BeneGesserit", "loc_Ix", "org_HonoredMatres", "org_SpacingGuild" },
+                    OperatingEnvironment = "Deep space, undetectable by prescience or conventional sensors",
+                    Capacity = "Varies; used for covert transport of key Bene Gesserit personnel and ghola cargo"
+                },
+                new Vehicle
+                {
+                    Id = "vehicle_CymekWalker",
+                    Name = "Cymek Walker",
+                    ShortDescription = "A mechanical combat body piloted by a preserved human brain.",
+                    DetailedHistory = "The war machines of the Titans, cymek walkers let figures like Agamemnon extend their preserved minds into powerful mechanical frames, granting them combat dominance during their conquest of the Old Empire before Omnius's thinking machines eclipsed them.",
+                    ImagePath = "images/vehicles/cymek_walker.jpg",
+                    RelatedEntityIds = new List<string> { "char_AgamemnonTitan", "org_SynchronizedWorlds", "event_ButlerianJihad" },
+                    OperatingEnvironment = "Ground combat, adaptable to hostile and vacuum environments",
+                    Capacity = "Single pilot (a preserved human brain integrated into the mechanical frame)"
                 }
             };
         }

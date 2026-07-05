@@ -16,7 +16,7 @@ namespace Duniverse.Data.Seeders
                     ShortDescription = "The generations-long crusade that destroyed all thinking machines.",
                     DetailedHistory = "A galaxy-spanning revolt against computers and robots that had come to dominate humanity, the Butlerian Jihad ended with the total prohibition of thinking machines, giving rise to Mentats, Guild Navigators, and the Bene Gesserit as human replacements for computation and prescience.",
                     ImagePath = "images/events/butlerian_jihad.jpg",
-                    RelatedEntityIds = new List<string> { "disc_Mentat", "org_SpacingGuild", "org_BeneGesserit", "theo_ButlerianDoctrine" },
+                    RelatedEntityIds = new List<string> { "disc_Mentat", "org_SpacingGuild", "org_BeneGesserit", "theo_ButlerianDoctrine", "char_VorianAtreides", "char_SerenaButler", "char_Omnius", "char_Erasmus", "char_XavierHarkonnen", "char_AgamemnonTitan", "org_LeagueOfNobles", "org_SynchronizedWorlds" },
                     Timeframe = "Roughly 10,000 years before the birth of Paul Atreides",
                     LastingImpact = "Permanent ban on thinking machines; rise of Mentats, Guild Navigators, and the Bene Gesserit"
                 },
@@ -118,6 +118,76 @@ namespace Duniverse.Data.Seeders
                     RelatedEntityIds = new List<string> { "org_SpacingGuild", "bio_Melange", "event_ButlerianJihad" },
                     Timeframe = "In the aftermath of the Butlerian Jihad",
                     LastingImpact = "Created the Spacing Guild's enduring monopoly on space travel and cemented melange as the most valuable substance in the universe"
+                },
+
+                // ---- Children of Dune / God Emperor of Dune / Heretics & Chapterhouse ----
+                new HistoricalEvent
+                {
+                    Id = "event_TigerAssassinationAttempt",
+                    Name = "The Tiger Assassination Attempt",
+                    ShortDescription = "An attempt on the lives of the Atreides twins using genetically bred Laza tigers.",
+                    DetailedHistory = "Orchestrated by Wensicia Corrino and the traitor Javid, trained Laza tigers were set loose on young Leto II and Ghanima in a bid to end the Atreides line and clear the way for a Corrino restoration. The plot failed and exposed the conspiracy.",
+                    ImagePath = "images/events/tiger_assassination.jpg",
+                    RelatedEntityIds = new List<string> { "char_LetoIIAtreides", "char_GhanimaAtreides", "bio_LazaTiger", "char_WensiciaCorrino", "char_Javid" },
+                    Timeframe = "During the Atreides twins' childhood",
+                    LastingImpact = "Exposed the Corrino restoration conspiracy and hardened Leto II's resolve toward the Golden Path"
+                },
+                new HistoricalEvent
+                {
+                    Id = "event_DeathOfTheGodEmperor",
+                    Name = "Death of the God Emperor",
+                    ShortDescription = "Leto II's death at the Hidden Ford, releasing the sandtrout and ending his 3,500-year reign.",
+                    DetailedHistory = "Drawn into a confrontation orchestrated in part by Siona and a Duncan Idaho ghola, Leto II's worm-bound body was destroyed, scattering sandtrout back into the wild and beginning Arrakis's slow reversion into the desert world later known as Rakis.",
+                    ImagePath = "images/events/death_of_god_emperor.jpg",
+                    RelatedEntityIds = new List<string> { "char_LetoIIAtreides", "char_SionaAtreides", "char_DuncanIdaho", "bio_Sandtrout", "loc_Rakis" },
+                    Timeframe = "The end of the God Emperor's reign",
+                    LastingImpact = "Ended the Golden Path's enforced peace, triggered the desert's return, and set the stage for the Scattering"
+                },
+                new HistoricalEvent
+                {
+                    Id = "event_TheScattering",
+                    Name = "The Scattering",
+                    ShortDescription = "Humanity's mass exodus beyond the reach of any single power following the God Emperor's death.",
+                    DetailedHistory = "Freed from Leto II's rigid control, uncounted numbers of humans fled into unknown space, founding hidden civilizations beyond Imperial or Guild oversight - among them, eventually, the Honored Matres, whose return would upend the Old Imperium generations later.",
+                    ImagePath = "images/events/the_scattering.jpg",
+                    RelatedEntityIds = new List<string> { "event_DeathOfTheGodEmperor", "org_HonoredMatres", "org_SpacingGuild" },
+                    Timeframe = "Following the death of the God Emperor",
+                    LastingImpact = "Seeded the unknown civilizations - including the Honored Matres - that would return to threaten the Old Imperium"
+                },
+                new HistoricalEvent
+                {
+                    Id = "event_DestructionOfRakis",
+                    Name = "Destruction of Rakis",
+                    ShortDescription = "The Honored Matres' annihilation of the former Arrakis, ending its role as the source of spice.",
+                    DetailedHistory = "In their war against the Bene Gesserit, the Honored Matres destroyed Rakis outright, wiping out its sandworms and its spice production and forcing the Sisterhood to gamble everything on transplanting the ecology to their hidden world of Chapterhouse.",
+                    ImagePath = "images/events/destruction_of_rakis.jpg",
+                    RelatedEntityIds = new List<string> { "loc_Rakis", "org_HonoredMatres", "loc_Chapterhouse", "char_Sheeana", "bio_ShaiHulud" },
+                    Timeframe = "During the Bene Gesserit-Honored Matre war",
+                    LastingImpact = "Ended Rakis as the source of melange and forced the transplantation of sandworms to Chapterhouse"
+                },
+
+                // ---- Prelude to Dune (House trilogy) ----
+                new HistoricalEvent
+                {
+                    Id = "event_IxianCoup",
+                    Name = "The Ixian Coup",
+                    ShortDescription = "The Tleilaxu-backed overthrow of House Vernius's rule on Ix.",
+                    DetailedHistory = "With covert Imperial approval, the Tleilaxu seized control of Ix, driving Earl Dominic Vernius into exile and scattering his family - his son Rhombur finding refuge with House Atreides while the technological heart of Ix fell under new, secretive management.",
+                    ImagePath = "images/events/ixian_coup.jpg",
+                    RelatedEntityIds = new List<string> { "house_Vernius", "loc_Ix", "char_DominicVernius", "char_RhomburVernius", "org_BeneTleilax" },
+                    Timeframe = "Prior to the events of Dune",
+                    LastingImpact = "Exiled House Vernius, placed Ix under Tleilaxu-linked control, and forged Rhombur's lifelong bond with House Atreides"
+                },
+                new HistoricalEvent
+                {
+                    Id = "event_DeathOfDukePaulus",
+                    Name = "Death of Duke Paulus Atreides",
+                    ShortDescription = "The bullring accident, secretly engineered by House Harkonnen, that killed Leto's father.",
+                    DetailedHistory = "Duke Paulus Atreides was killed by a bull deliberately drugged and sabotaged at Harkonnen instigation, a quiet act of sabotage that placed young Leto in power years before his own fateful acceptance of the Arrakis fief.",
+                    ImagePath = "images/events/death_of_duke_paulus.jpg",
+                    RelatedEntityIds = new List<string> { "char_DukePaulusAtreides", "char_DukeLetoAtreides", "house_Harkonnen", "house_Atreides" },
+                    Timeframe = "Years before Duke Leto's arrival on Arrakis",
+                    LastingImpact = "Placed Leto Atreides in command of House Atreides and deepened the Atreides-Harkonnen blood feud"
                 }
             };
         }

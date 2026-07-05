@@ -115,9 +115,31 @@ namespace Duniverse.Data.Seeders
                     ShortDescription = "The Bene Gesserit's secret multi-generational genetic project.",
                     DetailedHistory = "A long-term project designed to produce a male capable of accessing both male and female ancestral memories and seeing through space and time.",
                     ImagePath = "images/disciplines/breeding.jpg",
-                    RelatedEntityIds = new List<string> { "org_BeneGesserit", "char_PaulAtreides" },
+                    RelatedEntityIds = new List<string> { "org_BeneGesserit", "char_PaulAtreides", "char_HasimirFenring" },
                     Requirements = "Strict lineage control, genetic manipulation",
                     Mechanics = "Genetic synthesis, prescient awakening"
+                },
+                new Discipline
+                {
+                    Id = "disc_HonoredMatreImprinting",
+                    Name = "Honored Matre Imprinting",
+                    ShortDescription = "A sexual-conditioning technique the Honored Matres use to bind men in absolute loyalty.",
+                    DetailedHistory = "Distinct from - and cruder than - the Bene Gesserit's own subtleties, Honored Matre imprinting creates an inescapable devotion in its subjects, a tool of conquest that the Sisterhood found both abhorrent and, eventually, worth partially adopting.",
+                    ImagePath = "images/disciplines/honored_matre_imprinting.jpg",
+                    RelatedEntityIds = new List<string> { "org_HonoredMatres", "char_Murbella", "org_BeneGesserit" },
+                    Requirements = "Training within the Honored Matre order; willingness to use intimacy as a weapon",
+                    Mechanics = "Neurological/hormonal conditioning delivered through sexual contact"
+                },
+                new Discipline
+                {
+                    Id = "disc_GholaCultivation",
+                    Name = "Ghola Cultivation",
+                    ShortDescription = "The Tleilaxu practice of regrowing the dead from preserved cellular material.",
+                    DetailedHistory = "Using axlotl tanks, the Tleilaxu can regrow a deceased person's body from a cell sample, producing a ghola who can - under the right conditions - recover the original's memories and identity, a process that returned Duncan Idaho to service again and again across the centuries.",
+                    ImagePath = "images/disciplines/ghola_cultivation.jpg",
+                    RelatedEntityIds = new List<string> { "org_BeneTleilax", "char_DuncanIdaho", "char_MilesTeg", "char_Scytale" },
+                    Requirements = "A viable cell sample from the deceased; Tleilaxu axlotl tank technology",
+                    Mechanics = "Cellular regrowth followed by a triggering process to recover original memories"
                 }
             };
         }

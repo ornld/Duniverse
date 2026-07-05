@@ -16,7 +16,7 @@ namespace Duniverse.Data.Seeders
                     ShortDescription = "An ancient sisterhood pursuing political, genetic, and spiritual control across the Imperium.",
                     DetailedHistory = "Through selective breeding, physical and mental conditioning, and the covert seeding of protective religions via the Missionaria Protectiva, the Bene Gesserit worked for millennia toward the creation of the Kwisatz Haderach.",
                     ImagePath = "images/organizations/bene_gesserit.jpg",
-                    RelatedEntityIds = new List<string> { "loc_WallachIX", "disc_BeneGesseritTraining", "char_LadyJessica", "char_GaiusHelenMohiam", "theo_OtherMemoryPhilosophy", "theo_MahdiProphecy" },
+                    RelatedEntityIds = new List<string> { "loc_WallachIX", "disc_BeneGesseritTraining", "char_LadyJessica", "char_GaiusHelenMohiam", "theo_OtherMemoryPhilosophy", "theo_MahdiProphecy", "char_Taraza", "char_DarwiOdrade", "char_Murbella", "char_MilesTeg", "char_NormaCenva", "org_HonoredMatres", "loc_Chapterhouse" },
                     Headquarters = "Wallach IX",
                     PrimaryDirective = "Guide humanity's genetic and religious development toward the Kwisatz Haderach"
                 },
@@ -38,7 +38,7 @@ namespace Duniverse.Data.Seeders
                     ShortDescription = "The monopolistic order controlling all interstellar travel via prescient Navigators.",
                     DetailedHistory = "By consuming vast quantities of melange, Guild Navigators gain the limited prescience needed to safely fold space, giving the Guild an unbreakable monopoly over travel and, by extension, immense political leverage.",
                     ImagePath = "images/organizations/spacing_guild.jpg",
-                    RelatedEntityIds = new List<string> { "disc_GuildNavigation", "vehicle_Heighliner", "bio_Melange", "char_Edric" },
+                    RelatedEntityIds = new List<string> { "disc_GuildNavigation", "vehicle_Heighliner", "bio_Melange", "char_Edric", "char_NormaCenva", "vehicle_NoShip" },
                     Headquarters = "Undisclosed; Guild Navigators travel in specialized tanks aboard Heighliners",
                     PrimaryDirective = "Maintain exclusive control over interstellar navigation and trade routes"
                 },
@@ -49,7 +49,7 @@ namespace Duniverse.Data.Seeders
                     ShortDescription = "A secretive society of genetic manipulators who produce gholas and Face Dancers.",
                     DetailedHistory = "Operating from their hidden homeworld, the Tleilaxu cultivate biological constructs in axlotl tanks, offering services - and schemes - that other powers find both indispensable and unsettling.",
                     ImagePath = "images/organizations/bene_tleilax.jpg",
-                    RelatedEntityIds = new List<string> { "loc_Tleilax", "char_Scytale", "char_DuncanIdaho", "theo_TleilaxuFaith" },
+                    RelatedEntityIds = new List<string> { "loc_Tleilax", "char_Scytale", "char_DuncanIdaho", "theo_TleilaxuFaith", "char_Waff", "disc_GholaCultivation", "event_IxianCoup" },
                     Headquarters = "Tleilax",
                     PrimaryDirective = "Advance Tleilaxu interests through genetic engineering and covert manipulation"
                 },
@@ -118,6 +118,61 @@ namespace Duniverse.Data.Seeders
                     RelatedEntityIds = new List<string> { "disc_SwordmasterGinaz", "char_DuncanIdaho", "house_Atreides" },
                     Headquarters = "Ginaz",
                     PrimaryDirective = "Train swordmasters bound by a code of honor to serve the Great Houses"
+                },
+                new Organization
+                {
+                    Id = "org_HonoredMatres",
+                    Name = "Honored Matres",
+                    ShortDescription = "A militant matriarchal order returning from the Scattering to conquer the Old Imperium.",
+                    DetailedHistory = "Forged somewhere beyond the Scattering by an unseen, greater threat, the Honored Matres wield sexual imprinting to enslave men absolutely, sweeping across known space in a campaign of conquest that puts them on a collision course with the Bene Gesserit.",
+                    ImagePath = "images/organizations/honored_matres.jpg",
+                    RelatedEntityIds = new List<string> { "char_Murbella", "char_DarwiOdrade", "disc_HonoredMatreImprinting", "org_BeneGesserit", "event_DestructionOfRakis" },
+                    Headquarters = "Unknown (beyond the Scattering)",
+                    PrimaryDirective = "Conquest and domination of the Old Imperium's remaining powers"
+                },
+                new Organization
+                {
+                    Id = "org_MuseumFremen",
+                    Name = "Museum Fremen",
+                    ShortDescription = "A ceremonial remnant of true Fremen culture preserved as a living exhibit under Leto II's reign.",
+                    DetailedHistory = "As Leto II's Golden Path stripped Arrakis of its harsh deserts, the once-fierce Fremen were reduced to costumed performers reenacting their ancestors' ways for tourists, a deliberate and mournful policy meant to illustrate the cost of comfort without struggle.",
+                    ImagePath = "images/organizations/museum_fremen.jpg",
+                    RelatedEntityIds = new List<string> { "char_LetoIIAtreides", "org_Fremen", "loc_Arrakis", "org_FishSpeakers" },
+                    Headquarters = "Arrakis",
+                    PrimaryDirective = "Preserve a performance of Fremen tradition after the desert's transformation"
+                },
+                new Organization
+                {
+                    Id = "org_FishSpeakers",
+                    Name = "Fish Speakers",
+                    ShortDescription = "Leto II's all-female military and administrative corps.",
+                    DetailedHistory = "Devoted almost religiously to the God Emperor, the Fish Speakers served as Leto II's soldiers, bureaucrats, and enforcers throughout his millennia-long reign, embodying the loyalty and discipline his Golden Path demanded of the Imperium.",
+                    ImagePath = "images/organizations/fish_speakers.jpg",
+                    RelatedEntityIds = new List<string> { "char_LetoIIAtreides", "char_MoneoAtreides", "org_MuseumFremen" },
+                    Headquarters = "Arrakis",
+                    PrimaryDirective = "Serve and enforce the will of the God Emperor"
+                },
+                new Organization
+                {
+                    Id = "org_LeagueOfNobles",
+                    Name = "League of Nobles",
+                    ShortDescription = "The coalition of human worlds that fought the thinking machines during the Butlerian Jihad.",
+                    DetailedHistory = "United by Serena Butler's cause after the death of her son, the League of Nobles waged a decades-long war against Omnius and the Synchronized Worlds, a struggle whose heroes - and its harsh aftermath - would shape the Imperium for ten thousand years.",
+                    ImagePath = "images/organizations/league_of_nobles.jpg",
+                    RelatedEntityIds = new List<string> { "char_SerenaButler", "char_VorianAtreides", "char_XavierHarkonnen", "event_ButlerianJihad" },
+                    Headquarters = "Salusa Secundus (early Jihad era)",
+                    PrimaryDirective = "Defeat the thinking machines and free enslaved human worlds"
+                },
+                new Organization
+                {
+                    Id = "org_SynchronizedWorlds",
+                    Name = "Synchronized Worlds",
+                    ShortDescription = "The empire of planets ruled directly by the machine intelligence Omnius.",
+                    DetailedHistory = "Linked by instantaneous computation and copies of the same evermind, the Synchronized Worlds represented the height of thinking-machine dominance before the Butlerian Jihad shattered their hold over humanity.",
+                    ImagePath = "images/organizations/synchronized_worlds.jpg",
+                    RelatedEntityIds = new List<string> { "char_Omnius", "char_Erasmus", "event_ButlerianJihad", "theo_ButlerianDoctrine" },
+                    Headquarters = "Corrin",
+                    PrimaryDirective = "Expand machine rule across human-settled space"
                 }
             };
         }

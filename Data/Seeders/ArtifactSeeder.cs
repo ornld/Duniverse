@@ -104,7 +104,7 @@ namespace Duniverse.Data.Seeders
                     ShortDescription = "A protective device creating a suspensor-field.",
                     DetailedHistory = "Deflects fast-moving projectiles, forcing combatants to use slow-motion knife fighting techniques to bypass the barrier.",
                     ImagePath = "images/artifacts/shield.jpg",
-                    RelatedEntityIds = new List<string> { "house_Atreides", "house_Harkonnen" },
+                    RelatedEntityIds = new List<string> { "house_Atreides", "house_Harkonnen", "char_NormaCenva" },
                     PrimaryMaterial = "Suspensor film",
                     Functionality = "Personal defense"
                 },

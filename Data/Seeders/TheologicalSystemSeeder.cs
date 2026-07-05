@@ -38,7 +38,7 @@ namespace Duniverse.Data.Seeders
                     ShortDescription = "The Fremen veneration of the sandworm as a divine manifestation.",
                     DetailedHistory = "Central to Fremen religious life, the worship of Shai-Hulud ties directly into the Water of Life ritual, the transformation of Reverend Mothers, and the eventual recognition of Paul Atreides as the prophesied Lisan al-Gaib.",
                     ImagePath = "images/theology/shai_hulud.jpg",
-                    RelatedEntityIds = new List<string> { "bio_ShaiHulud", "org_Fremen", "art_WaterOfLife", "theo_MahdiProphecy" },
+                    RelatedEntityIds = new List<string> { "bio_ShaiHulud", "org_Fremen", "art_WaterOfLife", "theo_MahdiProphecy", "char_Sheeana", "loc_Rakis" },
                     CoreTenets = "The sandworm as the physical embodiment of the divine on Arrakis",
                     FoundationalTexts = new List<string> { "Oral Fremen liturgy passed through the sietches" }
                 },
@@ -82,7 +82,7 @@ namespace Duniverse.Data.Seeders
                     ShortDescription = "The universal commandment against thinking machines, born of the Butlerian Jihad.",
                     DetailedHistory = "Enshrined after the Great Revolt against thinking machines, this doctrine forbids the creation of any machine in the likeness of a human mind, shaping every subsequent institution - Mentats, Guild Navigators, and the Bene Gesserit alike - built to replace the computers humanity destroyed.",
                     ImagePath = "images/theology/butlerian.jpg",
-                    RelatedEntityIds = new List<string> { "event_ButlerianJihad", "disc_Mentat", "loc_Ix" },
+                    RelatedEntityIds = new List<string> { "event_ButlerianJihad", "disc_Mentat", "loc_Ix", "char_Omnius", "char_Erasmus", "char_SerenaButler", "org_LeagueOfNobles", "org_SynchronizedWorlds" },
                     CoreTenets = "Thou shalt not make a machine in the likeness of a human mind",
                     FoundationalTexts = new List<string> { "The Great Convention's prohibitions on computers" }
                 },

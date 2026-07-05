@@ -152,6 +152,70 @@ namespace Duniverse.Data.Seeders
                     EnvironmentalData = "A concealed rock warren with cavern reservoirs for reclaimed water.",
                     RulingHouse = "Naib Stilgar (nominally under House Atreides)",
                     LocalCustoms = new List<string> { "Strict water discipline and communal cisterns", "Naib-led tribal council" }
+                },
+
+                // ---- God Emperor of Dune / Heretics of Dune / Chapterhouse: Dune ----
+                new World
+                {
+                    Id = "loc_Rakis",
+                    Name = "Rakis",
+                    ShortDescription = "The desert-reverted name for Arrakis following the death of the God Emperor.",
+                    DetailedHistory = "After Leto II's death released the sandtrout back into the wild, the planet's terraforming unraveled and the deserts - along with the sandworms and spice - returned, restoring the world once known as Arrakis to something closer to its ancient, harsher self, now renamed Rakis.",
+                    ImagePath = "images/worlds/rakis.jpg",
+                    RelatedEntityIds = new List<string> { "loc_Arrakis", "char_Sheeana", "bio_ShaiHulud", "event_DestructionOfRakis" },
+                    EnvironmentalData = "A reverting desert world, its dunes and worm cycles restored after millennia of engineered greenery.",
+                    RulingHouse = "Bene Gesserit stewardship",
+                    LocalCustoms = new List<string> { "Renewed worm-worship centered on Sheeana", "Bene Gesserit oversight of the reborn desert ecology" }
+                },
+                new World
+                {
+                    Id = "loc_Gammu",
+                    Name = "Gammu",
+                    ShortDescription = "The renamed Giedi Prime, later used as a Bene Gesserit training and archival world.",
+                    DetailedHistory = "Long after House Harkonnen's fall, its industrial homeworld was renamed Gammu and repurposed by the Bene Gesserit as a base for training and for safeguarding troves of historical records, its grim Harkonnen architecture repurposed for the Sisterhood's own ends.",
+                    ImagePath = "images/worlds/gammu.jpg",
+                    RelatedEntityIds = new List<string> { "loc_GiediPrime", "house_Harkonnen", "org_BeneGesserit" },
+                    EnvironmentalData = "Heavily industrialized terrain inherited from its Harkonnen past, gradually repurposed by its new stewards.",
+                    RulingHouse = "Bene Gesserit",
+                    LocalCustoms = new List<string> { "Bene Gesserit training cadres", "Archival preservation of pre-Scattering records" }
+                },
+                new World
+                {
+                    Id = "loc_Chapterhouse",
+                    Name = "Chapterhouse",
+                    ShortDescription = "The secret backup homeworld of the Bene Gesserit, later terraformed to host transplanted sandworms.",
+                    DetailedHistory = "Kept hidden as insurance against catastrophe, Chapterhouse became essential after the destruction of Rakis, as the Sisterhood raced to establish a new spice cycle by introducing sandworms to its soil - a desperate gamble to preserve melange production and their own survival.",
+                    ImagePath = "images/worlds/chapterhouse.jpg",
+                    RelatedEntityIds = new List<string> { "org_BeneGesserit", "bio_ShaiHulud", "event_DestructionOfRakis", "char_DarwiOdrade", "char_Murbella" },
+                    EnvironmentalData = "A temperate world undergoing deliberate, accelerated desertification to sustain transplanted sandworms.",
+                    RulingHouse = "Bene Gesserit",
+                    LocalCustoms = new List<string> { "Strict secrecy regarding the planet's true purpose", "Careful ecological engineering to cultivate a new spice cycle" }
+                },
+
+                // ---- Prelude to Dune (House trilogy) ----
+                new World
+                {
+                    Id = "loc_Lankiveil",
+                    Name = "Lankiveil",
+                    ShortDescription = "A cold, ocean-covered world tied to House Harkonnen's origins, known for whale-fur trading.",
+                    DetailedHistory = "The ancestral world where Abulurd Harkonnen was exiled after being deemed unfit to lead, Lankiveil's harsh, whale-fur economy stood in stark contrast to the industrial excess his son Vladimir would later build on Giedi Prime.",
+                    ImagePath = "images/worlds/lankiveil.jpg",
+                    RelatedEntityIds = new List<string> { "char_AbulurdHarkonnen", "house_Harkonnen" },
+                    EnvironmentalData = "Cold, ocean-dominated world with a modest whale-fur trading economy.",
+                    RulingHouse = "House Harkonnen (minor holding)",
+                    LocalCustoms = new List<string> { "Whale-fur harvesting traditions", "A modest, unpretentious way of life atypical of House Harkonnen's later reputation" }
+                },
+                new World
+                {
+                    Id = "loc_Richese",
+                    Name = "Richese",
+                    ShortDescription = "A Great House world renowned for miniaturized technology and clever devices.",
+                    DetailedHistory = "Long a commercial and technological rival to Ix, Richese built its fortunes on intricate gadgets and probes, its inventive culture repeatedly outmaneuvered - and occasionally rescued - by the shifting fortunes of House Vernius and the wider Landsraad.",
+                    ImagePath = "images/worlds/richese.jpg",
+                    RelatedEntityIds = new List<string> { "house_Richese", "loc_Ix" },
+                    EnvironmentalData = "A world whose economy centers on precision manufacturing and technological invention.",
+                    RulingHouse = "House Richese",
+                    LocalCustoms = new List<string> { "Competitive innovation culture", "Guarded trade secrets in gadgetry and probes" }
                 }
             };
         }

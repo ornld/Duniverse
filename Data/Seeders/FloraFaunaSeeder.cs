@@ -16,7 +16,7 @@ namespace Duniverse.Data.Seeders
                     ShortDescription = "The colossal, near-immortal sandworms of Arrakis, source of the spice cycle and objects of Fremen worship.",
                     DetailedHistory = "Reaching lengths of hundreds of meters, these territorial creatures are drawn by rhythmic vibration and are both the deadliest hazard on Arrakis and the sacred heart of Fremen religion, their pre-spice mass excretions forming melange itself.",
                     ImagePath = "images/biology/shai_hulud.jpg",
-                    RelatedEntityIds = new List<string> { "loc_Arrakis", "org_Fremen", "bio_Melange", "bio_Sandtrout", "theo_CultOfShaiHulud", "art_Thumper", "art_Crysknife" },
+                    RelatedEntityIds = new List<string> { "loc_Arrakis", "org_Fremen", "bio_Melange", "bio_Sandtrout", "theo_CultOfShaiHulud", "art_Thumper", "art_Crysknife", "loc_Rakis", "loc_Chapterhouse" },
                     BiologicalClassification = "Giant subterranean annelid-like organism (fauna)",
                     DerivedProducts = "Pre-spice mass and melange; crysknife teeth"
                 },
