@@ -260,6 +260,32 @@ a {
         border-color: var(--dune-accent);
     }
 
+.surprise-line {
+    margin-top: 1rem;
+    color: var(--dune-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.surprise-btn {
+    padding: 0.55rem 1.15rem;
+    background: transparent;
+    border: 1px solid var(--dune-accent);
+    border-radius: 999px;
+    color: var(--dune-accent-bright);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+    .surprise-btn:hover {
+        background: var(--dune-accent);
+        color: #201408;
+    }
+
 .no-results, .candidates {
     margin-top: 1.25rem;
     padding: 1rem;
@@ -398,6 +424,48 @@ a {
     margin-top: 1rem;
     padding-top: 0.75rem;
     border-top: 1px solid var(--dune-border);
+}
+
+.entity-meta {
+    margin: 1.1rem 0 0;
+    display: grid;
+    gap: 0.4rem;
+}
+
+    .entity-meta .meta-row {
+        display: flex;
+        gap: 0.7rem;
+        align-items: baseline;
+    }
+
+    .entity-meta dt {
+        flex: 0 0 6.5rem;
+        margin: 0;
+        color: var(--dune-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-size: 0.72rem;
+    }
+
+    .entity-meta dd {
+        margin: 0;
+        color: var(--dune-text);
+    }
+
+.entity-quotes {
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--dune-border);
+    display: grid;
+    gap: 0.75rem;
+}
+
+.entity-quote {
+    margin: 0;
+    padding-left: 0.9rem;
+    border-left: 3px solid var(--dune-accent);
+    font-style: italic;
+    color: var(--dune-accent-bright);
 }
 
 .connections-divider {

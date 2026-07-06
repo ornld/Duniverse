@@ -1,4 +1,6 @@
 @page "/"
+@inject EntityRegistry Registry
+@inject NavigationManager Nav
 
 <PageTitle>Duniverse</PageTitle>
 
@@ -7,6 +9,9 @@
     <p class="tagline">
         An unofficial encyclopedia of Frank Herbert's Dune. It is a story of desert planets,
         prophecy, empire, and ecology, and it changed what science fiction was allowed to be.
+    </p>
+    <p class="cta">
+        <button class="surprise-btn" @onclick="RandomJump">Drop me somewhere in the Dune universe</button>
     </p>
 
 <section class="home-section">
@@ -89,6 +94,15 @@
 </div>
 
 @code {
+    private void RandomJump()
+    {
+        var entity = Registry.GetRandomEntity();
+        if (entity is not null)
+        {
+            Nav.NavigateTo($"/entity/{entity.Id}");
+        }
+    }
+
     private record AuthorQuote(string Text, string Source);
 
     private static readonly List<AuthorQuote> AuthorQuotes = new()

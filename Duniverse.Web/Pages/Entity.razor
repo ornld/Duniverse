@@ -11,10 +11,42 @@
     <div class="entity-card front">
         <h1>@entity.Name</h1>
         <p class="short-desc">@entity.ShortDescription</p>
+
+        @if (entity is Persona metaPersona && (!string.IsNullOrWhiteSpace(metaPersona.Role) || !string.IsNullOrWhiteSpace(metaPersona.Affiliation)))
+        {
+            <dl class="entity-meta">
+                @if (!string.IsNullOrWhiteSpace(metaPersona.Role))
+                {
+                    <div class="meta-row">
+                        <dt>Role</dt>
+                        <dd>@metaPersona.Role</dd>
+                    </div>
+                }
+                @if (!string.IsNullOrWhiteSpace(metaPersona.Affiliation))
+                {
+                    <div class="meta-row">
+                        <dt>Affiliation</dt>
+                        <dd>@metaPersona.Affiliation</dd>
+                    </div>
+                }
+            </dl>
+        }
+
         @if (!string.IsNullOrEmpty(entity.DetailedHistory))
         {
             <p class="detailed-history">@entity.DetailedHistory</p>
         }
+
+        @if (entity is Persona quotedPersona && quotedPersona.NotableQuotes.Count > 0)
+        {
+            <div class="entity-quotes">
+                @foreach (var quote in quotedPersona.NotableQuotes)
+                {
+                    <blockquote class="entity-quote">"@quote"</blockquote>
+                }
+            </div>
+        }
+
         @if (entity is House && rivals.Count > 0)
         {
             <p class="rivalries">

@@ -42,6 +42,22 @@ namespace Duniverse.Services
         }
 
         /// <summary>
+        /// Returns a single entity chosen at random from the whole databank, or null if the
+        /// databank is empty. Backs the "Surprise me" control, which drops a reader on an
+        /// arbitrary entity page as a starting point for exploring the archive.
+        /// </summary>
+        public DuneEntity? GetRandomEntity()
+        {
+            if (_database.Count == 0)
+            {
+                return null;
+            }
+
+            int index = Random.Shared.Next(_database.Count);
+            return _database.Values.ElementAt(index);
+        }
+
+        /// <summary>
         /// Finds every entity whose Name contains the given query. Names and queries are
         /// normalized (punctuation stripped, case folded) first, so "muaddib" still matches
         /// "Muad'Dib" despite the apostrophe.

@@ -45,6 +45,11 @@
             <a class="chip" href="@($"/entity/{example.Id}")">@example.Label</a>
         }
     </div>
+
+    <p class="surprise-line">
+        Not sure where to start?
+        <button class="surprise-btn" @onclick="RandomJump">Surprise me</button>
+    </p>
 </div>
 
 @code {
@@ -68,6 +73,15 @@
         if (e.Key == "Enter")
         {
             HandleSearch();
+        }
+    }
+
+    private void RandomJump()
+    {
+        var entity = Registry.GetRandomEntity();
+        if (entity is not null)
+        {
+            Nav.NavigateTo($"/entity/{entity.Id}");
         }
     }
 
