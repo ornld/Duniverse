@@ -1,0 +1,60 @@
+@inject EntityRegistry Registry
+@inject GraphLayoutService LayoutService
+@inject NavigationManager Nav
+
+@if (graph is not null && graph.Nodes.Count > 1)
+{
+    <div class="graph-wrapper">
+        <svg class="relationship-graph" viewBox="0 0 @Width @Height" preserveAspectRatio="xMidYMid meet">
+            <g class="graph-edges">
+                @foreach (var edge in graph.Edges)
+                {
+                    var source = nodesById[edge.SourceId];
+                    var target = nodesById[edge.TargetId];
+                    <line x1="@source.X.ToString(Inv)" y1="@source.Y.ToString(Inv)"
+                          x2="@target.X.ToString(Inv)" y2="@target.Y.ToString(Inv)" />
+                }
+            </g>
+            <g class="graph-nodes">
+                @foreach (var node in graph.Nodes)
+                {
+                    <g class="graph-node category-@node.Category @(node.IsCenter ? "is-center" : "")"
+                       transform="translate(@node.X.ToString(Inv), @node.Y.ToString(Inv))"
+                       @onclick="() => GoTo(node.Id)">
+                        <circle r="@(node.IsCenter ? 20 : 11)" />
+                        <text y="@(node.IsCenter ? 34 : 24)">@Truncate(node.Name)</text>
+                        <title>@node.Name: @node.ShortDescription</title>
+                    </g>
+                }
+            </g>
+        </svg>
+        <p class="graph-hint muted">Click any node to re-center the web of connections on it.</p>
+    </div>
+}
+
+@code {
+    private static readonly System.Globalization.CultureInfo Inv = System.Globalization.CultureInfo.InvariantCulture;
+
+    [Parameter, EditorRequired]
+    public string CenterId { get; set; } = "";
+
+    private const double Width = 760;
+    private const double Height = 460;
+
+    private EntityGraph? graph;
+    private Dictionary<string, GraphNode> nodesById = new();
+
+    protected override void OnParametersSet()
+    {
+        graph = LayoutService.BuildEgoGraph(Registry, CenterId, maxDepth: 2);
+        LayoutService.ApplyForceDirectedLayout(graph, Width, Height);
+        nodesById = graph.Nodes.ToDictionary(n => n.Id, StringComparer.OrdinalIgnoreCase);
+    }
+
+    private void GoTo(string id)
+    {
+        Nav.NavigateTo($"/entity/{id}");
+    }
+
+    private static string Truncate(string name) => name.Length > 18 ? name[..17] + "…" : name;
+}

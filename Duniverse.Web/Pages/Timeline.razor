@@ -1,0 +1,39 @@
+@page "/timeline"
+@inject EntityRegistry Registry
+
+<PageTitle>Timeline - Duniverse Archives</PageTitle>
+
+<div class="hero" style="background-image: linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/categories/historical-events.webp');">
+    <h1>The Duniverse Timeline</h1>
+    <p class="tagline">
+        Ten thousand years of empire, prophecy, and consequence - from the Butlerian Jihad
+        to the fall of Rakis. Select any point to read its full record.
+    </p>
+
+    <div class="timeline">
+        @for (int i = 0; i < events.Count; i++)
+        {
+            var evt = events[i];
+            var side = i % 2 == 0 ? "left" : "right";
+            <div class="timeline-item @side">
+                <div class="timeline-dot"></div>
+                <a class="timeline-card" href="@($"/entity/{evt.Id}")">
+                    <span class="timeline-era">@evt.Timeframe</span>
+                    <h3>@evt.Name</h3>
+                    <p class="muted">@evt.ShortDescription</p>
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private List<HistoricalEvent> events = new();
+
+    protected override void OnInitialized()
+    {
+        events = Registry.GetAllEntities<HistoricalEvent>()
+            .OrderBy(e => e.SortOrder)
+            .ToList();
+    }
+}
