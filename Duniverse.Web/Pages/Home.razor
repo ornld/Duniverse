@@ -1,7 +1,6 @@
 @page "/"
-@inject EntityRegistry Registry
 
-<PageTitle>Duniverse Archives</PageTitle>
+<PageTitle>Duniverse</PageTitle>
 
 <div class="hero" style="background-image: linear-gradient(rgba(23, 19, 16, 0.82), rgba(23, 19, 16, 0.88)), url('/images/main-menu-background.jpg');">
     <h1>Welcome to the Duniverse</h1>
@@ -14,18 +13,18 @@
     <h2>Why Dune Matters</h2>
     <p>
         Published in 1965, <em>Dune</em> is widely considered one of the most influential science
-        fiction novels ever written. Rather than ray guns and rockets, Frank Herbert built a
-        story around ecology, religion, resource scarcity, and the danger of charismatic
+        fiction novels ever written. Rather than unbelievable space adventures, Frank Herbert built 
+        a story around ecology, religion, resource scarcity, and the danger of charismatic
         leaders - a desert planet whose only precious resource, the spice melange, made it
         the center of an entire empire's politics. That premise - a single vital resource
         controlling the fate of civilizations - gave science fiction a new kind of epic:
         one about environments and power as much as heroes and villains.
     </p>
     <p>
-        Its fingerprints are all over the science fiction that followed. Critics and fans have
+        Its fingerprints are all over the science fiction that followed its inception. Critics have
         drawn many parallels between Arrakis and Tatooine, and between Paul Atreides' rise and
         the "chosen one" arc George Lucas would later give Luke Skywalker in <em>Star Wars</em> -
-        Dune is frequently cited among the works that helped shape that generation of space epics.
+        Dune is frequently cited among the works that pioneered that generation of space epics.
         Herbert himself was more interested in warning against messiahs than creating one: Paul's
         story is a hero's journey deliberately built to make readers uneasy about following heroes
         at all.
@@ -66,59 +65,36 @@
     </p>
 </section>
 
-@if (quotes.Count > 0)
-{
-    <section class="home-section">
-        <h2>Words From the Duniverse</h2>
-        <div class="quote-grid">
-            @foreach (var quote in quotes)
-            {
-                <a class="quote-card" href="@($"/entity/{quote.Id}")">
-                    <p class="quote-text">"@quote.Quote"</p>
-                    <span class="quote-author">- @quote.Name</span>
-                </a>
-            }
-        </div>
-    </section>
-}
-
 <section class="home-section">
-    <h2>Explore by Category</h2>
-    <p>New to Dune or a lifelong fan - browse everything the archive holds, one category at a time.</p>
-    <div class="category-grid">
-        <a class="category-tile" href="/category/personas"><strong>Personas</strong><span class="muted">The people of the Imperium</span></a>
-        <a class="category-tile" href="/category/houses"><strong>Houses</strong><span class="muted">The Great and Minor Houses</span></a>
-        <a class="category-tile" href="/category/worlds"><strong>Worlds & Locations</strong><span class="muted">Planets, cities, and sietches</span></a>
-        <a class="category-tile" href="/category/organizations"><strong>Organizations</strong><span class="muted">Factions, orders, and guilds</span></a>
-    </div>
-    <p class="cta">
-        Or jump straight into the <a href="/archives">Duniverse Archive</a> and search for anyone
-        or anything in the universe.
+    <h2>In Frank Herbert's Own Words</h2>
+    <p>
+        Beyond the novel, Herbert spoke and wrote at length about the real dangers he saw in
+        charismatic leaders, unchecked power, and technology used without thought - the same
+        warnings <em>Dune</em> was built to dramatize.
     </p>
+    <div class="quote-grid">
+        @foreach (var quote in AuthorQuotes)
+        {
+            <div class="quote-card">
+                <p class="quote-text">"@quote.Text"</p>
+                <span class="quote-author">- @quote.Source</span>
+            </div>
+        }
+    </div>
 </section>
 
 </div>
 
 @code {
-    private record FeaturedQuote(string Id, string Name, string Quote);
+    private record AuthorQuote(string Text, string Source);
 
-    private List<FeaturedQuote> quotes = new();
-
-    private static readonly string[] FeaturedPersonaIds =
+    private static readonly List<AuthorQuote> AuthorQuotes = new()
     {
-        "char_PaulAtreides",
-        "char_LadyJessica",
-        "char_PrincessIrulan",
-        "char_LietKynes",
-        "char_PiterDeVries",
+        new("Don't give over all of your critical faculties to people in power, no matter how admirable those people may appear to be.", "Dune Genesis, Omni magazine, 1980"),
+        new("People tend to give over every decision-making capacity to any leader who can wrap himself in the myth fabric of the society.", "Dune Genesis, Omni magazine, 1980"),
+        new("Dune was aimed at this whole idea of the infallible leader because my view of history says mistakes made by a leader (or made in a leader's name) are amplified by the numbers who follow without question.", "Dune Genesis, Omni magazine, 1980"),
+        new("Heroes are painful, superheroes are a catastrophe. The mistakes of superheroes involve too many of us in disaster.", "Dune Genesis, Omni magazine, 1980"),
+        new("It is demonstrable that power structures tend to attract people who want power for power's sake.", "Dune Genesis, Omni magazine, 1980"),
+        new("Technology is both a tool for helping humans and for destroying them. This is the paradox of our times which we're compelled to face.", "Conversations in Port Townsend, interview with Tim O'Reilly, 1983"),
     };
-
-    protected override void OnInitialized()
-    {
-        quotes = FeaturedPersonaIds
-            .Select(id => Registry.GetEntity(id) as Persona)
-            .Where(persona => persona is not null && persona.NotableQuotes.Count > 0)
-            .Select(persona => new FeaturedQuote(persona!.Id, persona.Name, persona.NotableQuotes[0]))
-            .ToList();
-    }
 }

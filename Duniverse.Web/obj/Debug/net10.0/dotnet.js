@@ -5,7 +5,7 @@ var e=!1;const t=async()=>WebAssembly.validate(new Uint8Array([0,97,115,109,1,0,
   "mainAssemblyName": "Duniverse.Web",
   "applicationEnvironment": "Development",
   "resources": {
-    "hash": "sha256-csMm/on0fKTpvAmmQDpi8of+RoWFvbGh/TUR5p5BKbs=",
+    "hash": "sha256-fQCYQfDaFElAvd6CMZ82l9sBgdcYlAegSEJaF/36DRE=",
     "jsModuleNative": [
       {
         "name": "dotnet.native.mx9wzm9o5h.js"
@@ -1242,28 +1242,28 @@ var e=!1;const t=async()=>WebAssembly.validate(new Uint8Array([0,97,115,109,1,0,
       },
       {
         "virtualPath": "Duniverse.Core.wasm",
-        "name": "Duniverse.Core.zhiyx9703s.wasm",
-        "integrity": "sha256-2XhNUyVG68LoyDKZus1F58F+1uP67LWjICw+GOdDcB0=",
+        "name": "Duniverse.Core.gd4rnk46wp.wasm",
+        "integrity": "sha256-HKp0XrFDJ3CCACJ+asdZHH9AnalKFkd9e/GPD8Y8s70=",
         "cache": "force-cache"
       },
       {
         "virtualPath": "Duniverse.Web.wasm",
-        "name": "Duniverse.Web.z2qs71qqp4.wasm",
-        "integrity": "sha256-9WFaQYoRErKQZUMFaJGMZ/J5YWkkAivE42GhZVaPrV8=",
+        "name": "Duniverse.Web.wc5ueeq075.wasm",
+        "integrity": "sha256-oNyjJKNphoUEkMRWYoiiNKzbQD+Q+pKrweTWosYuZBw=",
         "cache": "force-cache"
       }
     ],
     "pdb": [
       {
         "virtualPath": "Duniverse.Core.pdb",
-        "name": "Duniverse.Core.1lze6u5zjj.pdb",
-        "integrity": "sha256-pblAL9twQv4OPSSq3xZi9pJWv6+1x+Vin+Vn5VSAPxc=",
+        "name": "Duniverse.Core.ph2ysmtfwl.pdb",
+        "integrity": "sha256-43qBPtedz9eFkJOjepMm8OxbjVnVd7Y48sifZKjBJ34=",
         "cache": "force-cache"
       },
       {
         "virtualPath": "Duniverse.Web.pdb",
-        "name": "Duniverse.Web.5zg1py0wgq.pdb",
-        "integrity": "sha256-MY3LbUwQBbxnsu9RTSjqHl5N/eV52YwqUsSTva4oKBw=",
+        "name": "Duniverse.Web.9vfzvoccy0.pdb",
+        "integrity": "sha256-6yX7Nd/HsZfQXQpjDeg0WgLKRFcJ5NhP+YzLhgufiDk=",
         "cache": "force-cache"
       }
     ],
