@@ -149,10 +149,10 @@ a {
 
 .site-body {
     flex: 1;
-    max-width: 860px;
+    max-width: 1600px;
     width: 100%;
     margin: 0 auto;
-    padding: 2rem 1.5rem 3rem;
+    padding: 2rem 2.5rem 3rem;
 }
 
 .site-footer {
@@ -296,7 +296,7 @@ a {
 
 .entity-card.graph-card {
     border-left: 4px dashed var(--dune-accent);
-    background-image: linear-gradient(rgba(23, 19, 16, 0.9), rgba(23, 19, 16, 0.94)), url('/images/entity-back-background.png');
+    background-image: linear-gradient(rgba(23, 19, 16, 0.9), rgba(23, 19, 16, 0.94)), url('/images/entity-graph-background.jpg');
     padding: 1.25rem 1rem;
 }
 
