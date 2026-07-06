@@ -7,18 +7,48 @@ namespace Duniverse.Services
 {
     public class EntityRegistry
     {
-        // The master databank holding every entity. 
+        // The master databank holding every entity.
         // StringComparer.OrdinalIgnoreCase makes it forgiving if someone types a lowercase letter!
         private readonly Dictionary<string, DuneEntity> _database = new Dictionary<string, DuneEntity>(StringComparer.OrdinalIgnoreCase);
 
+        // Reverse-link index: for each ID, the IDs of every entity whose RelatedEntityIds points
+        // at it. Maintained at registration time so relationship lookups only touch actual
+        // neighbors instead of scanning the whole databank on every page view.
+        private readonly Dictionary<string, HashSet<string>> _inboundLinks = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>The total number of registered entities.</summary>
+        public int Count => _database.Count;
+
         /// <summary>
-        /// Loads a list of entities into the master dictionary.
+        /// Loads a list of entities into the master dictionary and indexes their outgoing links.
         /// </summary>
         public void RegisterEntities<T>(IEnumerable<T> entities) where T : DuneEntity
         {
             foreach (var entity in entities)
             {
+                // If an ID is re-registered, drop the old entity's links before indexing the new ones.
+                if (_database.TryGetValue(entity.Id, out var replaced))
+                {
+                    foreach (var targetId in replaced.RelatedEntityIds)
+                    {
+                        if (_inboundLinks.TryGetValue(targetId, out var referrers))
+                        {
+                            referrers.Remove(replaced.Id);
+                        }
+                    }
+                }
+
                 _database[entity.Id] = entity;
+
+                foreach (var targetId in entity.RelatedEntityIds)
+                {
+                    if (!_inboundLinks.TryGetValue(targetId, out var referrers))
+                    {
+                        referrers = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                        _inboundLinks[targetId] = referrers;
+                    }
+                    referrers.Add(entity.Id);
+                }
             }
         }
 
@@ -189,21 +219,7 @@ namespace Duniverse.Services
         /// </summary>
         public IEnumerable<T> GetRelatedEntities<T>(string relatedId) where T : DuneEntity
         {
-            var reverseMatches = _database.Values
-                .OfType<T>()
-                .Where(entity => entity.RelatedEntityIds.Contains(relatedId, StringComparer.OrdinalIgnoreCase));
-
-            var forwardMatches = Enumerable.Empty<T>();
-            if (_database.TryGetValue(relatedId, out var sourceEntity))
-            {
-                forwardMatches = sourceEntity.RelatedEntityIds
-                    .Select(GetEntity)
-                    .OfType<T>();
-            }
-
-            return reverseMatches
-                .Concat(forwardMatches)
-                .DistinctBy(entity => entity.Id, StringComparer.OrdinalIgnoreCase);
+            return GetDirectlyRelated(relatedId).OfType<T>();
         }
 
         /// <summary>
@@ -229,11 +245,14 @@ namespace Duniverse.Services
                 }
             }
 
-            foreach (var candidate in _database.Values)
+            if (_inboundLinks.TryGetValue(source.Id, out var referrers))
             {
-                if (candidate.RelatedEntityIds.Contains(id, StringComparer.OrdinalIgnoreCase) && seen.Add(candidate.Id))
+                foreach (var referrerId in referrers)
                 {
-                    yield return candidate;
+                    if (_database.TryGetValue(referrerId, out var referrer) && seen.Add(referrer.Id))
+                    {
+                        yield return referrer;
+                    }
                 }
             }
         }

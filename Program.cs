@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using Duniverse.Services;
-using Duniverse.Data.Seeders;
+using Duniverse.Data;
 using Duniverse.Models;
 
 namespace Duniverse
@@ -14,44 +14,18 @@ namespace Duniverse
         {
             PrintBootBanner();
 
-            var registry = new EntityRegistry();
-
-            var artifacts = ArtifactSeeder.GetArtifacts();
-            var disciplines = DisciplineSeeder.GetDisciplines();
-            var personas = PersonaSeeder.GetPersonas();
-            var worlds = WorldSeeder.GetWorlds();
-            var houses = HouseSeeder.GetHouses();
-            var organizations = OrganizationSeeder.GetOrganizations();
-            var vehicles = VehicleSeeder.GetVehicles();
-            var theologicalSystems = TheologicalSystemSeeder.GetTheologicalSystems();
-            var historicalEvents = HistoricalEventSeeder.GetHistoricalEvents();
-            var floraFaunas = FloraFaunaSeeder.GetFloraFaunas();
-
-            registry.RegisterEntities(artifacts);
-            registry.RegisterEntities(disciplines);
-            registry.RegisterEntities(personas);
-            registry.RegisterEntities(worlds);
-            registry.RegisterEntities(houses);
-            registry.RegisterEntities(organizations);
-            registry.RegisterEntities(vehicles);
-            registry.RegisterEntities(theologicalSystems);
-            registry.RegisterEntities(historicalEvents);
-            registry.RegisterEntities(floraFaunas);
-
-            int totalRecords = artifacts.Count + disciplines.Count + personas.Count + worlds.Count
-                + houses.Count + organizations.Count + vehicles.Count + theologicalSystems.Count
-                + historicalEvents.Count + floraFaunas.Count;
+            var registry = RegistryFactory.CreateSeeded();
             const int categoryCount = 10;
 
             Console.Clear();
-            PrintReadyBanner(totalRecords, categoryCount);
+            PrintReadyBanner(registry.Count, categoryCount);
 
             bool isRunning = true;
             while (isRunning)
             {
                 PrintQueryHeader();
 
-                string searchInput = Console.ReadLine()?.Trim().ToLower();
+                string? searchInput = Console.ReadLine()?.Trim().ToLower();
 
                 if (searchInput == "exit")
                 {

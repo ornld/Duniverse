@@ -3,9 +3,9 @@
 @inject NavigationManager Nav
 @inject SpoilerSettings Spoiler
 
-<PageTitle>@((entity is not null && isGated && !revealed) ? "Spoiler-protected entry" : (entity?.Name ?? "Not Found")) - Duniverse Archives</PageTitle>
+<PageTitle>@((entity is not null && isGated && !revealed) ? "Spoiler-protected entry" : (entity?.Name ?? "Not Found")) - Duniverse</PageTitle>
 
-<a class="back-link" href="/archives">&larr; Back to Duniverse Archive</a>
+<a class="back-link" href="/archives">&larr; Back to Archives</a>
 
 @if (entity is not null && isGated && !revealed)
 {
@@ -83,16 +83,10 @@ else if (entity is not null)
     }
 
     <div class="entity-card back">
-        <RelatedSection Title="Personas" Items="relatedPersonas" />
-        <RelatedSection Title="Houses" Items="relatedHouses" />
-        <RelatedSection Title="Organizations" Items="relatedOrganizations" />
-        <RelatedSection Title="Worlds & Locations" Items="relatedWorlds" />
-        <RelatedSection Title="Artifacts" Items="relatedArtifacts" />
-        <RelatedSection Title="Vehicles" Items="relatedVehicles" />
-        <RelatedSection Title="Disciplines" Items="relatedDisciplines" />
-        <RelatedSection Title="Theological Systems" Items="relatedTheologicalSystems" />
-        <RelatedSection Title="Historical Events" Items="relatedHistoricalEvents" />
-        <RelatedSection Title="Flora & Fauna" Items="relatedFloraFauna" />
+        @foreach (var group in Sections)
+        {
+            <RelatedSection Title="@group.Title" Items="related.Where(group.Matches)" />
+        }
 
         @if (!hasAnyConnections)
         {
@@ -133,18 +127,24 @@ else
     private bool revealed;
     private List<House> rivals = new();
     private List<DuneEntity> candidates = new();
+    private List<DuneEntity> related = new();
     private bool hasAnyConnections;
 
-    private List<Persona> relatedPersonas = new();
-    private List<House> relatedHouses = new();
-    private List<Organization> relatedOrganizations = new();
-    private List<World> relatedWorlds = new();
-    private List<Artifact> relatedArtifacts = new();
-    private List<Vehicle> relatedVehicles = new();
-    private List<Discipline> relatedDisciplines = new();
-    private List<TheologicalSystem> relatedTheologicalSystems = new();
-    private List<HistoricalEvent> relatedHistoricalEvents = new();
-    private List<FloraFauna> relatedFloraFauna = new();
+    // The display order of the "connected records" sections. Every entity category appears
+    // here, so a single relationship lookup can be fanned out into the right headings.
+    private static readonly (string Title, Func<DuneEntity, bool> Matches)[] Sections =
+    {
+        ("Personas", e => e is Persona),
+        ("Houses", e => e is House),
+        ("Organizations", e => e is Organization),
+        ("Worlds & Locations", e => e is World),
+        ("Artifacts", e => e is Artifact),
+        ("Vehicles", e => e is Vehicle),
+        ("Disciplines", e => e is Discipline),
+        ("Theological Systems", e => e is TheologicalSystem),
+        ("Historical Events", e => e is HistoricalEvent),
+        ("Flora & Fauna", e => e is FloraFauna),
+    };
 
     protected override void OnParametersSet()
     {
@@ -177,28 +177,8 @@ else
             ? Registry.GetRivalHouses(house.Id).Where(Spoiler.IsVisible).ToList()
             : new List<House>();
 
-        relatedPersonas = Registry.GetRelatedEntities<Persona>(entity.Id).Where(Spoiler.IsVisible).ToList();
-        relatedHouses = Registry.GetRelatedEntities<House>(entity.Id).Where(Spoiler.IsVisible).ToList();
-        relatedOrganizations = Registry.GetRelatedEntities<Organization>(entity.Id).Where(Spoiler.IsVisible).ToList();
-        relatedWorlds = Registry.GetRelatedEntities<World>(entity.Id).Where(Spoiler.IsVisible).ToList();
-        relatedArtifacts = Registry.GetRelatedEntities<Artifact>(entity.Id).Where(Spoiler.IsVisible).ToList();
-        relatedVehicles = Registry.GetRelatedEntities<Vehicle>(entity.Id).Where(Spoiler.IsVisible).ToList();
-        relatedDisciplines = Registry.GetRelatedEntities<Discipline>(entity.Id).Where(Spoiler.IsVisible).ToList();
-        relatedTheologicalSystems = Registry.GetRelatedEntities<TheologicalSystem>(entity.Id).Where(Spoiler.IsVisible).ToList();
-        relatedHistoricalEvents = Registry.GetRelatedEntities<HistoricalEvent>(entity.Id).Where(Spoiler.IsVisible).ToList();
-        relatedFloraFauna = Registry.GetRelatedEntities<FloraFauna>(entity.Id).Where(Spoiler.IsVisible).ToList();
-
-        hasAnyConnections =
-            relatedPersonas.Count > 0 ||
-            relatedHouses.Count > 0 ||
-            relatedOrganizations.Count > 0 ||
-            relatedWorlds.Count > 0 ||
-            relatedArtifacts.Count > 0 ||
-            relatedVehicles.Count > 0 ||
-            relatedDisciplines.Count > 0 ||
-            relatedTheologicalSystems.Count > 0 ||
-            relatedHistoricalEvents.Count > 0 ||
-            relatedFloraFauna.Count > 0;
+        related = Registry.GetDirectlyRelated(entity.Id).Where(Spoiler.IsVisible).ToList();
+        hasAnyConnections = related.Count > 0;
     }
 
     private void Reveal()

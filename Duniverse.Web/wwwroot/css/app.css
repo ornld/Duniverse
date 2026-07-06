@@ -142,11 +142,6 @@ a {
     color: var(--dune-accent-bright);
 }
 
-.site-subtitle {
-    color: var(--dune-muted);
-    font-size: 0.9rem;
-}
-
 .site-body {
     flex: 1;
     max-width: 1230px;
@@ -164,12 +159,41 @@ a {
 }
 
 .hero {
+    position: relative;
+    overflow: hidden;
     background-size: cover;
     background-position: center;
     border: 1px solid var(--dune-border);
     border-radius: 8px;
     padding: 2rem;
     margin-bottom: 1.5rem;
+}
+
+/* Some source pictures have a frame baked into their own pixels (vehicles.jpg has a white
+   border, worlds.webp a dark edge line). Repaint the background on a slightly oversized
+   layer so those baked-in edges fall outside the card and are clipped, keeping the visible
+   picture flush with the card. The images themselves stay untouched. */
+.hero::before {
+    content: "";
+    position: absolute;
+    inset: -3%;
+    z-index: 0;
+    background: inherit;
+}
+
+.hero > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* On desktop, sparsely filled categories (few records) would otherwise leave the card
+   ending partway down the screen. Stretch the card to reach near the bottom of the
+   viewport; fuller categories already grow past this on their own. The 200px accounts
+   for the header, nav, back link, and page padding above the card. */
+@media (min-width: 900px) {
+    .category-hero {
+        min-height: calc(100vh - 200px);
+    }
 }
 
 .hero h1 {

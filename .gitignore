@@ -1,0 +1,12 @@
+# Build output
+bin/
+obj/
+release/
+
+# IDE and tooling
+.idea/
+*.DotSettings.user
+*.lscache
+
+# macOS
+.DS_Store

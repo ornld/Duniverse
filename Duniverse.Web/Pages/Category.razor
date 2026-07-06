@@ -2,13 +2,13 @@
 @inject EntityRegistry Registry
 @inject SpoilerSettings Spoiler
 
-<PageTitle>@categoryTitle - Duniverse Archives</PageTitle>
+<PageTitle>@categoryTitle - Duniverse</PageTitle>
 
 <a class="back-link" href="/">&larr; Back to Main Menu</a>
 
 @if (items.Count > 0)
 {
-    <div class="hero" style="@heroStyle">
+    <div class="hero category-hero" style="@heroStyle">
         <h1>@categoryTitle</h1>
         <p class="tagline">@items.Count records. Select one to see its full entry and connections.</p>
 

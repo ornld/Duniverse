@@ -38,9 +38,6 @@ namespace Duniverse.Web.Services
         /// <summary>True once the initial read from localStorage has completed.</summary>
         public bool Loaded { get; private set; }
 
-        /// <summary>Raised whenever the settings change, so open pages can re-filter in place.</summary>
-        public event Action? OnChange;
-
         /// <summary>
         /// Reads any saved preferences out of localStorage. Idempotent: the first call does the
         /// work, later calls return immediately, so every page can safely await it on init.
@@ -76,7 +73,8 @@ namespace Duniverse.Web.Services
         }
 
         /// <summary>
-        /// Applies a new set of preferences, saves them to localStorage, and notifies subscribers.
+        /// Applies a new set of preferences and saves them to localStorage. Pages that need to
+        /// re-filter in place listen for the OnChanged callback on SpoilerControl instead.
         /// </summary>
         public async Task UpdateAsync(bool enabled, SpoilerTier novelProgress, bool includeExpandedUniverse)
         {
@@ -93,8 +91,6 @@ namespace Duniverse.Web.Services
             {
                 // If persistence fails the in-memory settings still apply for this session.
             }
-
-            OnChange?.Invoke();
         }
 
         /// <summary>Whether an entity of the given tier should currently be shown to the reader.</summary>
