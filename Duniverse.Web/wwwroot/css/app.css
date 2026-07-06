@@ -353,6 +353,7 @@ a {
 .top-nav {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 0.4rem 0.9rem;
     padding: 0.6rem 2rem;
     background: var(--dune-panel);
@@ -400,13 +401,16 @@ a {
     }
 
 .quote-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 1rem;
 }
 
 .quote-card {
     display: block;
+    flex: 1 1 220px;
+    max-width: 320px;
     background: var(--dune-panel);
     border: 1px solid var(--dune-border);
     border-left: 3px solid var(--dune-accent);
@@ -437,8 +441,9 @@ a {
 /* ---- Category browse ---- */
 
 .category-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 1rem;
     margin-top: 1.25rem;
 }
@@ -446,6 +451,8 @@ a {
 .category-tile {
     display: flex;
     flex-direction: column;
+    flex: 1 1 220px;
+    max-width: 320px;
     gap: 0.3rem;
     background: var(--dune-panel);
     border: 1px solid var(--dune-border);
@@ -491,8 +498,9 @@ a {
             font-size: 2.2rem;
         }
 
-    .category-grid,
-    .quote-grid {
-        grid-template-columns: 1fr;
+    .category-tile,
+    .quote-card {
+        flex-basis: 100%;
+        max-width: 100%;
     }
 }
