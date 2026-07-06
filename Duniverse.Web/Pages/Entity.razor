@@ -27,6 +27,13 @@
         <span>Connected relationships throughout the Duniverse</span>
     </div>
 
+    @if (hasAnyConnections)
+    {
+        <div class="entity-card graph-card">
+            <RelationshipGraph CenterId="@entity.Id" />
+        </div>
+    }
+
     <div class="entity-card back">
         <RelatedSection Title="Personas" Items="relatedPersonas" />
         <RelatedSection Title="Houses" Items="relatedHouses" />

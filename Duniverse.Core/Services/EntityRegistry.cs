@@ -189,6 +189,38 @@ namespace Duniverse.Services
         }
 
         /// <summary>
+        /// Retrieves every entity directly connected to the given ID, in either direction and
+        /// regardless of type - the untyped counterpart to GetRelatedEntities&lt;T&gt;, used by
+        /// the relationship graph to walk the web of connections one hop at a time without
+        /// needing to know in advance what categories it will find.
+        /// </summary>
+        public IEnumerable<DuneEntity> GetDirectlyRelated(string id)
+        {
+            if (!_database.TryGetValue(id, out var source))
+            {
+                yield break;
+            }
+
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { id };
+
+            foreach (var relatedId in source.RelatedEntityIds)
+            {
+                if (_database.TryGetValue(relatedId, out var target) && seen.Add(target.Id))
+                {
+                    yield return target;
+                }
+            }
+
+            foreach (var candidate in _database.Values)
+            {
+                if (candidate.RelatedEntityIds.Contains(id, StringComparer.OrdinalIgnoreCase) && seen.Add(candidate.Id))
+                {
+                    yield return candidate;
+                }
+            }
+        }
+
+        /// <summary>
         /// Retrieves every House locked in a historical rivalry with the given House ID, in
         /// either direction: Houses that list this ID in their own HistoricalRivalries, plus
         /// Houses that this ID's own HistoricalRivalries points at. A rivalry only needs to be

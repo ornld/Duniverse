@@ -18,6 +18,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "images/events/butlerian_jihad.jpg",
                     RelatedEntityIds = new List<string> { "disc_Mentat", "org_SpacingGuild", "org_BeneGesserit", "theo_ButlerianDoctrine", "char_VorianAtreides", "char_SerenaButler", "char_Omnius", "char_Erasmus", "char_XavierHarkonnen", "char_AgamemnonTitan", "org_LeagueOfNobles", "org_SynchronizedWorlds" },
                     Timeframe = "Roughly 10,000 years before the birth of Paul Atreides",
+                    SortOrder = 10,
                     LastingImpact = "Permanent ban on thinking machines; rise of Mentats, Guild Navigators, and the Bene Gesserit"
                 },
                 new HistoricalEvent
@@ -29,6 +30,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "images/events/kwisatz_haderach_birth.jpg",
                     RelatedEntityIds = new List<string> { "org_BeneGesserit", "char_LadyJessica", "char_PaulAtreides", "disc_KwisatzHaderachProcess" },
                     Timeframe = "Approximately 15 years before the fall of House Atreides",
+                    SortOrder = 60,
                     LastingImpact = "Produced a male capable of prescience and access to both male and female ancestral memory, disrupting Bene Gesserit control"
                 },
                 new HistoricalEvent
@@ -40,6 +42,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "images/events/fall_of_atreides.jpg",
                     RelatedEntityIds = new List<string> { "house_Atreides", "house_Harkonnen", "house_Corrino", "char_WellingtonYueh" },
                     Timeframe = "Year of the Atreides' arrival on Arrakis",
+                    SortOrder = 70,
                     LastingImpact = "Ended House Atreides' open rule of Arrakis and drove Paul into the Fremen, setting his rise into motion"
                 },
                 new HistoricalEvent
@@ -51,6 +54,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "images/events/battle_of_arrakeen.jpg",
                     RelatedEntityIds = new List<string> { "org_Fremen", "house_Corrino", "house_Harkonnen", "char_PaulAtreides" },
                     Timeframe = "Culmination of Paul's desert campaign",
+                    SortOrder = 80,
                     LastingImpact = "Overthrew Shaddam IV, installed Paul Atreides as Emperor, and began the Jihad of Muad'Dib"
                 },
                 new HistoricalEvent
@@ -62,6 +66,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "images/events/throne_duel.jpg",
                     RelatedEntityIds = new List<string> { "char_PaulAtreides", "char_FeydRautha", "house_Harkonnen", "house_Atreides" },
                     Timeframe = "Immediately following the Battle of Arrakeen",
+                    SortOrder = 90,
                     LastingImpact = "Ended the Harkonnen line of succession and secured Paul's ascension to Emperor"
                 },
                 new HistoricalEvent
@@ -73,6 +78,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "images/events/muaddib_jihad.jpg",
                     RelatedEntityIds = new List<string> { "org_Fremen", "theo_ChurchOfMuadDib", "char_PaulAtreides" },
                     Timeframe = "The first decade of Paul Atreides' reign",
+                    SortOrder = 100,
                     LastingImpact = "Spread the Church of Muad'Dib across the Imperium at immense human cost; cemented Fremen military dominance"
                 },
                 new HistoricalEvent
@@ -84,6 +90,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "images/events/messiah_conspiracy.jpg",
                     RelatedEntityIds = new List<string> { "char_GaiusHelenMohiam", "char_Edric", "char_Scytale", "char_DuncanIdaho", "org_BeneTleilax", "org_BeneGesserit", "org_SpacingGuild" },
                     Timeframe = "Roughly twelve years into Paul's reign",
+                    SortOrder = 110,
                     LastingImpact = "Blinded Paul Atreides and precipitated his eventual disappearance into the desert, paving the way for Alia's regency"
                 },
                 new HistoricalEvent
@@ -95,6 +102,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "images/events/alia_regency.jpg",
                     RelatedEntityIds = new List<string> { "char_AliaAtreides", "char_BaronHarkonnen", "char_LetoIIAtreides", "char_GhanimaAtreides", "house_Atreides" },
                     Timeframe = "The years following Paul Atreides' disappearance",
+                    SortOrder = 120,
                     LastingImpact = "Exposed the danger of Abomination among pre-born Atreides children and set the stage for Leto II's transformation"
                 },
                 new HistoricalEvent
@@ -106,6 +114,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "images/events/golden_path_begins.jpg",
                     RelatedEntityIds = new List<string> { "char_LetoIIAtreides", "bio_Sandtrout", "theo_GoldenPath", "house_Atreides" },
                     Timeframe = "Following Alia's regency",
+                    SortOrder = 140,
                     LastingImpact = "Began the millennia-long reign of the God Emperor and the eventual Scattering of humanity"
                 },
                 new HistoricalEvent
@@ -117,6 +126,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "images/events/guild_founding.jpg",
                     RelatedEntityIds = new List<string> { "org_SpacingGuild", "bio_Melange", "event_ButlerianJihad" },
                     Timeframe = "In the aftermath of the Butlerian Jihad",
+                    SortOrder = 30,
                     LastingImpact = "Created the Spacing Guild's enduring monopoly on space travel and cemented melange as the most valuable substance in the universe"
                 },
 
@@ -130,6 +140,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "images/events/tiger_assassination.jpg",
                     RelatedEntityIds = new List<string> { "char_LetoIIAtreides", "char_GhanimaAtreides", "bio_LazaTiger", "char_WensiciaCorrino", "char_Javid" },
                     Timeframe = "During the Atreides twins' childhood",
+                    SortOrder = 130,
                     LastingImpact = "Exposed the Corrino restoration conspiracy and hardened Leto II's resolve toward the Golden Path"
                 },
                 new HistoricalEvent
@@ -141,6 +152,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "images/events/death_of_god_emperor.jpg",
                     RelatedEntityIds = new List<string> { "char_LetoIIAtreides", "char_SionaAtreides", "char_DuncanIdaho", "bio_Sandtrout", "loc_Rakis" },
                     Timeframe = "The end of the God Emperor's reign",
+                    SortOrder = 150,
                     LastingImpact = "Ended the Golden Path's enforced peace, triggered the desert's return, and set the stage for the Scattering"
                 },
                 new HistoricalEvent
@@ -152,6 +164,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "images/events/the_scattering.jpg",
                     RelatedEntityIds = new List<string> { "event_DeathOfTheGodEmperor", "org_HonoredMatres", "org_SpacingGuild" },
                     Timeframe = "Following the death of the God Emperor",
+                    SortOrder = 160,
                     LastingImpact = "Seeded the unknown civilizations - including the Honored Matres - that would return to threaten the Old Imperium"
                 },
                 new HistoricalEvent
@@ -163,6 +176,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "images/events/destruction_of_rakis.jpg",
                     RelatedEntityIds = new List<string> { "loc_Rakis", "org_HonoredMatres", "loc_Chapterhouse", "char_Sheeana", "bio_ShaiHulud" },
                     Timeframe = "During the Bene Gesserit-Honored Matre war",
+                    SortOrder = 170,
                     LastingImpact = "Ended Rakis as the source of melange and forced the transplantation of sandworms to Chapterhouse"
                 },
 
@@ -176,6 +190,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "images/events/ixian_coup.jpg",
                     RelatedEntityIds = new List<string> { "house_Vernius", "loc_Ix", "char_DominicVernius", "char_RhomburVernius", "org_BeneTleilax" },
                     Timeframe = "Prior to the events of Dune",
+                    SortOrder = 40,
                     LastingImpact = "Exiled House Vernius, placed Ix under Tleilaxu-linked control, and forged Rhombur's lifelong bond with House Atreides"
                 },
                 new HistoricalEvent
@@ -187,6 +202,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "images/events/death_of_duke_paulus.jpg",
                     RelatedEntityIds = new List<string> { "char_DukePaulusAtreides", "char_DukeLetoAtreides", "house_Harkonnen", "house_Atreides" },
                     Timeframe = "Years before Duke Leto's arrival on Arrakis",
+                    SortOrder = 50,
                     LastingImpact = "Placed Leto Atreides in command of House Atreides and deepened the Atreides-Harkonnen blood feud"
                 },
                 new HistoricalEvent
@@ -198,6 +214,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "images/events/reverend_mother_breakthrough.jpg",
                     RelatedEntityIds = new List<string> { "char_RaquellaBertoAnirul", "org_BeneGesserit", "art_WaterOfLife", "disc_BeneGesseritTraining" },
                     Timeframe = "In the founding decades of the Bene Gesserit, following the Butlerian Jihad",
+                    SortOrder = 20,
                     LastingImpact = "Established the Reverend Mother transformation as the core rite of the Bene Gesserit Sisterhood"
                 }
             };

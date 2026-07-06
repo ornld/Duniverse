@@ -294,6 +294,97 @@ a {
     background-image: linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/entity-back-background.png');
 }
 
+.entity-card.graph-card {
+    border-left: 4px dashed var(--dune-accent);
+    background-image: linear-gradient(rgba(23, 19, 16, 0.9), rgba(23, 19, 16, 0.94)), url('/images/entity-back-background.png');
+    padding: 1.25rem 1rem;
+}
+
+/* ---- Relationship graph ---- */
+
+.graph-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.relationship-graph {
+    width: 100%;
+    height: auto;
+    max-height: 520px;
+}
+
+.graph-edges line {
+    stroke: var(--dune-border);
+    stroke-width: 1;
+    opacity: 0.8;
+}
+
+.graph-node {
+    cursor: pointer;
+}
+
+    .graph-node circle {
+        fill: currentColor;
+        stroke: var(--dune-bg);
+        stroke-width: 2px;
+        transform-box: fill-box;
+        transform-origin: center;
+        transition: transform 0.2s ease, filter 0.2s ease;
+    }
+
+    .graph-node text {
+        fill: var(--dune-text);
+        font-size: 11px;
+        text-anchor: middle;
+        pointer-events: none;
+        paint-order: stroke;
+        stroke: var(--dune-bg);
+        stroke-width: 3px;
+        stroke-linejoin: round;
+        opacity: 0;
+        transition: opacity 0.15s ease;
+    }
+
+    .graph-node:hover circle {
+        transform: scale(1.3);
+        filter: drop-shadow(0 0 6px currentColor);
+    }
+
+    .graph-node:hover text {
+        opacity: 1;
+    }
+
+    .graph-node.is-center circle {
+        stroke: var(--dune-accent-bright);
+        stroke-width: 2.5px;
+    }
+
+    .graph-node.is-center text {
+        font-weight: 700;
+        font-size: 13px;
+        fill: var(--dune-accent-bright);
+        opacity: 1;
+    }
+
+.graph-node.category-artifacts { color: #e0a458; }
+.graph-node.category-disciplines { color: #7fb3b0; }
+.graph-node.category-flora-fauna { color: #8fae5c; }
+.graph-node.category-historical-events { color: #c76b3f; }
+.graph-node.category-houses { color: #d4494f; }
+.graph-node.category-organizations { color: #9b6dc4; }
+.graph-node.category-personas { color: #f4c07c; }
+.graph-node.category-theological-systems { color: #b98fd1; }
+.graph-node.category-vehicles { color: #6f97b5; }
+.graph-node.category-worlds { color: #d9a441; }
+.graph-node.category-unknown { color: var(--dune-muted); }
+
+.graph-hint {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
 .entity-card h1 {
     margin-top: 0;
 }
@@ -536,6 +627,101 @@ a {
     }
 }
 
+/* ---- Timeline ---- */
+
+.timeline {
+    position: relative;
+    margin-top: 2rem;
+    padding: 1rem 0;
+}
+
+    .timeline::before {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: linear-gradient(to bottom, transparent, var(--dune-accent) 4%, var(--dune-accent) 96%, transparent);
+        transform: translateX(-50%);
+    }
+
+.timeline-item {
+    position: relative;
+    width: 50%;
+    padding: 0 2.5rem 2.5rem;
+}
+
+    .timeline-item.left {
+        left: 0;
+        text-align: right;
+    }
+
+    .timeline-item.right {
+        left: 50%;
+        text-align: left;
+    }
+
+.timeline-dot {
+    position: absolute;
+    top: 0.4rem;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--dune-accent);
+    box-shadow: 0 0 0 4px var(--dune-bg), 0 0 10px rgba(224, 164, 88, 0.6);
+}
+
+    .timeline-item.left .timeline-dot {
+        right: -7px;
+    }
+
+    .timeline-item.right .timeline-dot {
+        left: -7px;
+    }
+
+.timeline-card {
+    display: inline-block;
+    max-width: 100%;
+    background-color: rgba(36, 28, 22, 0.75);
+    border: 1px solid var(--dune-border);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    text-decoration: none;
+    color: var(--dune-text);
+    text-align: left;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+    .timeline-card:hover {
+        transform: translateY(-2px);
+        border-color: transparent;
+        background:
+            linear-gradient(rgba(36, 28, 22, 0.75), rgba(36, 28, 22, 0.75)) padding-box,
+            linear-gradient(120deg, #8a4a2a, #e0a458 30%, #f4c07c 50%, #c76b3f 70%, #8a4a2a) border-box;
+        background-size: 100% 100%, 300% 300%;
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35), 0 0 16px rgba(224, 164, 88, 0.35);
+        animation: spice-shimmer 2.5s ease infinite;
+    }
+
+    .timeline-card h3 {
+        margin: 0 0 0.4rem;
+    }
+
+.timeline-era {
+    display: block;
+    color: var(--dune-accent-bright);
+    font-size: 0.8rem;
+    font-style: italic;
+    margin-bottom: 0.3rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .timeline-card:hover {
+        animation: none;
+    }
+}
+
 /* ---- Small screens ---- */
 
 @media (max-width: 600px) {
@@ -568,5 +754,28 @@ a {
     .quote-card {
         flex-basis: 100%;
         max-width: 100%;
+    }
+
+    .timeline::before {
+        left: 20px;
+    }
+
+    .timeline-item,
+    .timeline-item.left,
+    .timeline-item.right {
+        width: 100%;
+        left: 0;
+        text-align: left;
+        padding: 0 0.5rem 1.75rem 2.75rem;
+    }
+
+    .timeline-item.left .timeline-dot,
+    .timeline-item.right .timeline-dot {
+        left: 13px;
+        right: auto;
+    }
+
+    .graph-card {
+        padding: 1rem 0.5rem;
     }
 }
