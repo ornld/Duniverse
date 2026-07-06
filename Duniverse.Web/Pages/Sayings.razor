@@ -1,0 +1,41 @@
+@page "/sayings"
+@inject SpoilerSettings Spoiler
+
+<PageTitle>Collected Sayings - Duniverse</PageTitle>
+
+<div class="hero" style="background-image: linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/entity-front-background.jpg');">
+    <h1>Collected Sayings</h1>
+    <p class="tagline">
+        The epigraphs and famous lines of the saga, credited the way Frank Herbert credited
+        them: to the histories of the Princess Irulan, the rites of the Sisterhood, and the
+        voices of the Duniverse itself.
+    </p>
+
+    @foreach (var group in groups)
+    {
+        <section class="sayings-group">
+            <h2 class="sayings-source">@group.Key</h2>
+            @foreach (var epigraph in group)
+            {
+                <blockquote class="epigraph">
+                    <p class="epigraph-text">@epigraph.Text</p>
+                </blockquote>
+            }
+        </section>
+    }
+</div>
+
+@code {
+    private List<IGrouping<string, Epigraph>> groups = new();
+
+    protected override void OnInitialized()
+    {
+        // Group order follows the seeder: Irulan's histories first, then the Sisterhood,
+        // scripture, spoken lines, and the later books. Spoiler-gated sayings drop out, and a
+        // source heading with nothing left under it disappears with them.
+        groups = EpigraphSeeder.GetEpigraphs()
+            .Where(epigraph => Spoiler.IsVisible(epigraph.Tier))
+            .GroupBy(epigraph => epigraph.Work)
+            .ToList();
+    }
+}

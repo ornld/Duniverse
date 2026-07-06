@@ -15,6 +15,14 @@
         <button class="surprise-btn" @onclick="RandomJump">Drop me somewhere in the Dune universe</button>
     </p>
 
+    @if (dailySaying is not null)
+    {
+        <blockquote class="epigraph daily-saying">
+            <p class="epigraph-text">@dailySaying.Text</p>
+            <footer class="epigraph-source">from @dailySaying.Work &middot; <a href="/sayings">more sayings</a></footer>
+        </blockquote>
+    }
+
 <section class="home-section">
     <h2>Why Dune Matters</h2>
     <p>
@@ -95,6 +103,22 @@
 </div>
 
 @code {
+    private Epigraph? dailySaying;
+
+    protected override void OnInitialized()
+    {
+        // One saying per day, chosen by date rather than chance, so everyone visiting on the
+        // same day sees the same line. Only spoiler-safe sayings enter the rotation.
+        var pool = EpigraphSeeder.GetEpigraphs()
+            .Where(epigraph => Spoiler.IsVisible(epigraph.Tier))
+            .ToList();
+
+        if (pool.Count > 0)
+        {
+            dailySaying = pool[DateTime.Now.DayOfYear % pool.Count];
+        }
+    }
+
     private void RandomJump()
     {
         var entity = Registry.GetRandomEntity(Spoiler.IsVisible);

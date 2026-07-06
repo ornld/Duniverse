@@ -12,8 +12,15 @@
                 {
                     var source = nodesById[edge.SourceId];
                     var target = nodesById[edge.TargetId];
+                    var tip = EdgeTip(edge);
                     <line x1="@source.X.ToString(Inv)" y1="@source.Y.ToString(Inv)"
-                          x2="@target.X.ToString(Inv)" y2="@target.Y.ToString(Inv)" />
+                          x2="@target.X.ToString(Inv)" y2="@target.Y.ToString(Inv)"
+                          class="@(tip is null ? null : "has-label")">
+                        @if (tip is not null)
+                        {
+                            <title>@tip</title>
+                        }
+                    </line>
                 }
             </g>
             <g class="graph-nodes">
@@ -24,7 +31,7 @@
                        @onclick="() => GoTo(node.Id)">
                         <circle r="@(node.IsCenter ? 20 : 11)" />
                         <text y="@(node.IsCenter ? 34 : 24)">@Truncate(node.Name)</text>
-                        <title>@node.Name: @node.ShortDescription</title>
+                        <title>@NodeTip(node)</title>
                     </g>
                 }
             </g>
@@ -58,4 +65,42 @@
     }
 
     private static string Truncate(string name) => name.Length > 18 ? name[..17] + "…" : name;
+
+    // Spoiler-checked role phrase describing what otherId is to viewedId, or null.
+    private string? VisibleRole(string viewedId, string otherId)
+    {
+        return Registry.GetRelationshipLabel(viewedId, otherId) is { } label && Spoiler.IsVisible(label.Tier)
+            ? label.Role
+            : null;
+    }
+
+    // Hover text for an edge: both sides of the relationship when the pair has one.
+    // "Lady Jessica: Mother / Paul Atreides: Son", collapsing to a single phrase when
+    // the label reads the same from both ends (rivals, twins, fellow conspirators).
+    private string? EdgeTip(GraphEdge edge)
+    {
+        var roleOfTarget = VisibleRole(edge.SourceId, edge.TargetId);
+        var roleOfSource = VisibleRole(edge.TargetId, edge.SourceId);
+        if (roleOfSource is null || roleOfTarget is null)
+        {
+            return null;
+        }
+
+        var source = nodesById[edge.SourceId];
+        var target = nodesById[edge.TargetId];
+
+        return roleOfSource == roleOfTarget
+            ? $"{source.Name} & {target.Name}: {roleOfSource}"
+            : $"{source.Name}: {roleOfSource} / {target.Name}: {roleOfTarget}";
+    }
+
+    // Hover text for a node: its role relative to the graph's center, when one is recorded,
+    // folded into the existing name-and-description tooltip.
+    private string NodeTip(GraphNode node)
+    {
+        var role = node.IsCenter ? null : VisibleRole(CenterId, node.Id);
+        return role is null
+            ? $"{node.Name}: {node.ShortDescription}"
+            : $"{node.Name} ({role}): {node.ShortDescription}";
+    }
 }

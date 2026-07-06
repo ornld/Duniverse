@@ -6,7 +6,8 @@
             @foreach (var item in Items)
             {
                 <li>
-                    <a href="@($"/entity/{item.Id}")">@item.Name</a>: <span class="muted">@item.ShortDescription</span>
+                    <a href="@($"/entity/{item.Id}")">@item.Name</a>@if (RoleFor?.Invoke(item.Id) is string role)
+                    {<span class="related-role">@role</span>}: <span class="muted">@item.ShortDescription</span>
                 </li>
             }
         </ul>
@@ -19,4 +20,12 @@
 
     [Parameter, EditorRequired]
     public IEnumerable<DuneEntity>? Items { get; set; }
+
+    /// <summary>
+    /// Optional lookup mapping a related entity's id to the phrase describing what it is to the
+    /// entity being viewed ("Mother", "Betrayer of his House"). Null means no badge. The caller
+    /// owns spoiler filtering, so this component never needs to know about reading progress.
+    /// </summary>
+    [Parameter]
+    public Func<string, string?>? RoleFor { get; set; }
 }

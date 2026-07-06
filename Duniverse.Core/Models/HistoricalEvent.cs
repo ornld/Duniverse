@@ -22,5 +22,19 @@ namespace Duniverse.Models
         /// The primary outcomes or lingering impacts of the event on the universe.
         /// </summary>
         public string? LastingImpact { get; set; }
+
+        /// <summary>
+        /// The event's date in Guild reckoning ("10191 AG", "201 to 108 BG"), the Imperial
+        /// calendar counted from the Spacing Guild's monopoly. A display string rather than a
+        /// number: some events span ranges, and pre-Guild dates run backward. Null means the
+        /// chronology gives no usable date, and the timeline simply shows no year for it.
+        /// </summary>
+        public string? DateAG { get; set; }
+
+        /// <summary>
+        /// The historical era the event belongs to ("The Rise of Muad'Dib"). The timeline page
+        /// groups its entries under these as section headings, in SortOrder sequence.
+        /// </summary>
+        public string? Era { get; set; }
     }
 }

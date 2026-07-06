@@ -85,7 +85,7 @@ else if (entity is not null)
     <div class="entity-card back">
         @foreach (var group in Sections)
         {
-            <RelatedSection Title="@group.Title" Items="related.Where(group.Matches)" />
+            <RelatedSection Title="@group.Title" Items="related.Where(group.Matches)" RoleFor="RoleFor" />
         }
 
         @if (!hasAnyConnections)
@@ -184,6 +184,21 @@ else
     private void Reveal()
     {
         revealed = true;
+    }
+
+    // What the given related entity is to the one being viewed ("Mother", "Betrayer of his
+    // House"), or null when the pair has no label or the label belongs to a book the reader
+    // hasn't reached. The connection itself still shows; only its meaning is held back.
+    private string? RoleFor(string otherId)
+    {
+        if (entity is null)
+        {
+            return null;
+        }
+
+        return Registry.GetRelationshipLabel(entity.Id, otherId) is { } label && Spoiler.IsVisible(label.Tier)
+            ? label.Role
+            : null;
     }
 
     // Reader-facing description of the tier a gated entry belongs to, used in the spoiler notice.

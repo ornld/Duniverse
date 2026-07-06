@@ -29,6 +29,10 @@ namespace Duniverse.Data
             // spoiler gate has something to filter against. Everything unlisted stays safe-from-Dune.
             SpoilerTierMap.Apply(registry);
 
+            // Give connections their meaning: mother and son, betrayer and betrayed. Runs after
+            // the seeders because it can add links between pairs no seeder recorded.
+            RelationshipMap.Apply(registry);
+
             return registry;
         }
     }

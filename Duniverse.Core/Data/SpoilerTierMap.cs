@@ -62,6 +62,7 @@ namespace Duniverse.Data
                 ["char_Taraza"] = SpoilerTier.HereticsOfDune,
                 ["char_Waff"] = SpoilerTier.HereticsOfDune,
                 ["char_Murbella"] = SpoilerTier.HereticsOfDune,
+                ["char_Schwangyu"] = SpoilerTier.HereticsOfDune,     // Reverend Mother opposing the ghola project on Gammu
                 ["org_HonoredMatres"] = SpoilerTier.HereticsOfDune,
                 ["disc_HonoredMatreImprinting"] = SpoilerTier.HereticsOfDune,
                 ["bio_Futar"] = SpoilerTier.HereticsOfDune,          // creatures out of the Scattering
@@ -82,7 +83,6 @@ namespace Duniverse.Data
                 ["char_RaquellaBertoAnirul"] = SpoilerTier.ExpandedUniverse,
                 ["char_GilbertusAlbans"] = SpoilerTier.ExpandedUniverse,
                 ["char_JosefVenport"] = SpoilerTier.ExpandedUniverse,
-                ["char_Schwangyu"] = SpoilerTier.ExpandedUniverse,
                 ["char_BronsoOfIx"] = SpoilerTier.ExpandedUniverse,
                 ["char_DominicVernius"] = SpoilerTier.ExpandedUniverse,
                 ["char_RhomburVernius"] = SpoilerTier.ExpandedUniverse,

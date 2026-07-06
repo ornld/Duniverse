@@ -1,0 +1,84 @@
+@page "/terminology"
+@inject EntityRegistry Registry
+@inject SpoilerSettings Spoiler
+
+<PageTitle>Terminology of the Imperium - Duniverse</PageTitle>
+
+<div class="hero" style="background-image: linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/categories/disciplines.jpg');">
+    <h1>Terminology of the Imperium</h1>
+    <p class="tagline">
+        A field dictionary of the Duniverse, kept in the spirit of the appendix Frank Herbert
+        bound into the back of Dune. Words too small for a full record live here.
+    </p>
+
+    <div class="search-box">
+        <input @bind="filter" @bind:event="oninput" placeholder="Filter terms... e.g. kanly, sietch, water" />
+    </div>
+
+    <div class="letter-chips">
+        <button class="book-chip @(selectedLetter is null ? "selected" : "")" @onclick="() => selectedLetter = null">All</button>
+        @foreach (var letter in Letters)
+        {
+            <button class="book-chip @(selectedLetter == letter ? "selected" : "")" @onclick="() => selectedLetter = letter">@letter</button>
+        }
+    </div>
+
+    @if (FilteredTerms.Count == 0)
+    {
+        <p class="no-results">No terms match that filter.</p>
+    }
+    else
+    {
+        <dl class="glossary">
+            @foreach (var term in FilteredTerms)
+            {
+                <div class="glossary-entry">
+                    <dt>@term.Term</dt>
+                    <dd>
+                        @term.Definition
+                        @if (term.SeeEntityId is not null && LinkedName(term.SeeEntityId) is string linkedName)
+                        {
+                            <a class="glossary-see" href="@($"/entity/{term.SeeEntityId}")">See: @linkedName</a>
+                        }
+                    </dd>
+                </div>
+            }
+        </dl>
+    }
+</div>
+
+@code {
+    private string filter = "";
+    private char? selectedLetter;
+    private List<GlossaryTerm> visibleTerms = new();
+
+    protected override void OnInitialized()
+    {
+        // Spoiler-gated terms drop out here, the same contract entity pages follow.
+        visibleTerms = GlossarySeeder.GetTerms()
+            .Where(term => Spoiler.IsVisible(term.Tier))
+            .OrderBy(term => term.Term, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+    }
+
+    private IReadOnlyList<char> Letters => visibleTerms
+        .Select(term => char.ToUpperInvariant(term.Term[0]))
+        .Distinct()
+        .OrderBy(letter => letter)
+        .ToList();
+
+    private List<GlossaryTerm> FilteredTerms => visibleTerms
+        .Where(term => selectedLetter is null || char.ToUpperInvariant(term.Term[0]) == selectedLetter)
+        .Where(term => string.IsNullOrWhiteSpace(filter)
+            || term.Term.Contains(filter.Trim(), StringComparison.OrdinalIgnoreCase)
+            || term.Definition.Contains(filter.Trim(), StringComparison.OrdinalIgnoreCase))
+        .ToList();
+
+    // The full record a term points at, shown only when the reader is allowed to see that
+    // entity. A gated see-link would leak the name it points to, so it vanishes instead.
+    private string? LinkedName(string entityId)
+    {
+        var linked = Registry.GetEntity(entityId);
+        return linked is not null && Spoiler.IsVisible(linked) ? linked.Name : null;
+    }
+}

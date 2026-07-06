@@ -405,6 +405,92 @@ a {
     border-left: 4px solid var(--dune-accent-bright);
 }
 
+/* ---- Terminology of the Imperium ---- */
+
+.letter-chips {
+    margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.glossary {
+    margin: 1.5rem 0 0;
+    display: grid;
+    gap: 1rem;
+    text-align: left;
+}
+
+.glossary-entry {
+    padding: 0.9rem 1.1rem;
+    background: rgba(36, 28, 22, 0.5);
+    border: 1px solid var(--dune-border);
+    border-left: 3px solid var(--dune-accent);
+    border-radius: 6px;
+}
+
+    .glossary-entry dt {
+        margin: 0 0 0.35rem;
+        font-weight: 700;
+        color: var(--dune-accent-bright);
+        letter-spacing: 0.02em;
+    }
+
+    .glossary-entry dd {
+        margin: 0;
+        color: var(--dune-text);
+    }
+
+.glossary-see {
+    display: inline-block;
+    margin-left: 0.5rem;
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+/* ---- Collected Sayings ---- */
+
+.sayings-group {
+    margin-top: 2rem;
+    text-align: left;
+}
+
+.sayings-source {
+    font-size: 1.05rem;
+    color: var(--dune-accent-bright);
+    border-bottom: 1px solid var(--dune-border);
+    padding-bottom: 0.4rem;
+}
+
+.epigraph {
+    margin: 1rem 0 0;
+    padding: 1rem 1.25rem;
+    background: rgba(36, 28, 22, 0.5);
+    border: 1px solid var(--dune-border);
+    border-left: 3px solid var(--dune-accent);
+    border-radius: 6px;
+}
+
+.epigraph-text {
+    margin: 0;
+    font-style: italic;
+    color: var(--dune-text);
+    white-space: pre-line;
+}
+
+.epigraph-source {
+    margin-top: 0.6rem;
+    color: var(--dune-muted);
+    font-size: 0.85rem;
+    text-align: right;
+}
+
+.daily-saying {
+    max-width: 640px;
+    margin: 1.5rem auto 0;
+    text-align: left;
+}
+
 .gate-actions {
     margin-top: 1.25rem;
     display: flex;
@@ -471,6 +557,26 @@ a {
     stroke: var(--dune-border);
     stroke-width: 1;
     opacity: 0.8;
+}
+
+    /* Labeled edges carry a hover tooltip naming both sides of the relationship. */
+    .graph-edges line.has-label:hover {
+        stroke: var(--dune-accent);
+        stroke-width: 2.5;
+        opacity: 1;
+    }
+
+.related-role {
+    margin-left: 0.45rem;
+    padding: 0.1rem 0.55rem;
+    background: rgba(224, 164, 88, 0.12);
+    border: 1px solid var(--dune-accent);
+    border-radius: 999px;
+    color: var(--dune-accent-bright);
+    font-size: 0.72rem;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    vertical-align: middle;
 }
 
 .graph-node {
@@ -909,6 +1015,46 @@ a {
     font-size: 0.8rem;
     font-style: italic;
     margin-bottom: 0.3rem;
+}
+
+/* Era section headers spanning the timeline spine. The solid pill background hides the
+   spine line passing behind it. */
+.timeline-era-band {
+    position: relative;
+    width: 100%;
+    text-align: center;
+    padding: 0.5rem 0 2rem;
+}
+
+    .timeline-era-band span {
+        display: inline-block;
+        padding: 0.35rem 1.2rem;
+        background: var(--dune-bg);
+        border: 1px solid var(--dune-accent);
+        border-radius: 999px;
+        color: var(--dune-accent-bright);
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+    }
+
+.timeline-date {
+    display: inline-block;
+    padding: 0.15rem 0.6rem;
+    margin-bottom: 0.35rem;
+    background: rgba(224, 164, 88, 0.12);
+    border: 1px solid var(--dune-accent);
+    border-radius: 4px;
+    color: var(--dune-accent-bright);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+}
+
+.timeline-footnote {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    text-align: center;
 }
 
 @media (prefers-reduced-motion: reduce) {

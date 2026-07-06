@@ -16,6 +16,10 @@ namespace Duniverse.Services
         // neighbors instead of scanning the whole databank on every page view.
         private readonly Dictionary<string, HashSet<string>> _inboundLinks = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
 
+        // Labeled relationships, keyed "viewedId|otherId" -> what the other entity is to the
+        // viewed one. Each registered relationship writes two entries, one per direction.
+        private readonly Dictionary<string, RelationshipLabel> _relationshipLabels = new Dictionary<string, RelationshipLabel>(StringComparer.OrdinalIgnoreCase);
+
         /// <summary>The total number of registered entities.</summary>
         public int Count => _database.Count;
 
@@ -255,6 +259,55 @@ namespace Duniverse.Services
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Loads labeled relationships into the lookup, one entry per direction. A labeled pair
+        /// that isn't linked in either entity's RelatedEntityIds becomes a real connection here,
+        /// so the relationship map can introduce canon links (Paul and his grandfather the
+        /// Baron) without touching the seeders. The inbound-link index is kept in step, which is
+        /// why this must run after every seeder has registered.
+        /// </summary>
+        public void RegisterRelationships(IEnumerable<EntityRelationship> relationships)
+        {
+            foreach (var rel in relationships)
+            {
+                // Viewing To, the other entity is From, described by FromRole; and vice versa.
+                _relationshipLabels[$"{rel.ToId}|{rel.FromId}"] = new RelationshipLabel(rel.FromRole, rel.Tier);
+                _relationshipLabels[$"{rel.FromId}|{rel.ToId}"] = new RelationshipLabel(rel.ToRole, rel.Tier);
+
+                if (!_database.TryGetValue(rel.FromId, out var from) || !_database.TryGetValue(rel.ToId, out var to))
+                {
+                    continue;
+                }
+
+                bool alreadyLinked =
+                    from.RelatedEntityIds.Contains(to.Id, StringComparer.OrdinalIgnoreCase) ||
+                    to.RelatedEntityIds.Contains(from.Id, StringComparer.OrdinalIgnoreCase);
+
+                if (!alreadyLinked)
+                {
+                    from.RelatedEntityIds.Add(to.Id);
+
+                    if (!_inboundLinks.TryGetValue(to.Id, out var referrers))
+                    {
+                        referrers = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                        _inboundLinks[to.Id] = referrers;
+                    }
+                    referrers.Add(from.Id);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Looks up the label describing what <paramref name="otherId"/> is to
+        /// <paramref name="viewedId"/> ("Mother", "Twin sister", "Slain in the duel"), or null
+        /// when the pair has no recorded label. Callers decide whether the reader should see it
+        /// by checking the label's spoiler tier.
+        /// </summary>
+        public RelationshipLabel? GetRelationshipLabel(string viewedId, string otherId)
+        {
+            return _relationshipLabels.TryGetValue($"{viewedId}|{otherId}", out var label) ? label : null;
         }
 
         /// <summary>

@@ -12,13 +12,27 @@
     </p>
 
     <div class="timeline">
-        @for (int i = 0; i < events.Count; i++)
+        @{ string? currentEra = null; int cardIndex = 0; }
+        @foreach (var evt in events)
         {
-            var evt = events[i];
-            var side = i % 2 == 0 ? "left" : "right";
+            @* A new era opens a banded section header spanning the spine. Eras are computed
+               from the spoiler-filtered list, so an era whose events are all hidden never
+               shows an empty heading. *@
+            @if (evt.Era is not null && evt.Era != currentEra)
+            {
+                currentEra = evt.Era;
+                <div class="timeline-era-band"><span>@currentEra</span></div>
+            }
+
+            var side = cardIndex % 2 == 0 ? "left" : "right";
+            cardIndex++;
             <div class="timeline-item @side">
                 <div class="timeline-dot"></div>
                 <a class="timeline-card" href="@($"/entity/{evt.Id}")">
+                    @if (!string.IsNullOrEmpty(evt.DateAG))
+                    {
+                        <span class="timeline-date">@evt.DateAG</span>
+                    }
                     <span class="timeline-era">@evt.Timeframe</span>
                     <h3>@evt.Name</h3>
                     <p class="muted">@evt.ShortDescription</p>
@@ -26,6 +40,12 @@
             </div>
         }
     </div>
+
+    <p class="timeline-footnote muted">
+        Dates follow Guild reckoning: AG counts the years after the Spacing Guild's monopoly
+        began, BG the years before it. The chronicles disagree in places, so approximate dates
+        carry a "c." for circa.
+    </p>
 </div>
 
 @code {
