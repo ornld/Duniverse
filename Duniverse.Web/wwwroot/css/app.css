@@ -188,11 +188,12 @@ a {
 
 /* On desktop, sparsely filled categories (few records) would otherwise leave the card
    ending partway down the screen. Stretch the card to reach near the bottom of the
-   viewport; fuller categories already grow past this on their own. The 200px accounts
-   for the header, nav, back link, and page padding above the card. */
+   viewport; fuller categories already grow past this on their own. The 190px accounts
+   for the header, nav, back link, and page padding above the card, tuned to leave a
+   slim ~12px gap below the card. */
 @media (min-width: 900px) {
     .category-hero {
-        min-height: calc(100vh - 200px);
+        min-height: calc(100vh - 190px);
     }
 }
 
