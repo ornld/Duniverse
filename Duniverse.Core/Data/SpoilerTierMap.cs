@@ -85,6 +85,7 @@ namespace Duniverse.Data
                 ["char_JosefVenport"] = SpoilerTier.ExpandedUniverse,
                 ["char_BronsoOfIx"] = SpoilerTier.ExpandedUniverse,
                 ["char_DominicVernius"] = SpoilerTier.ExpandedUniverse,
+                ["char_DukePaulusAtreides"] = SpoilerTier.ExpandedUniverse, // the Old Duke is unnamed in Dune; the Paulus story is Prelude material
                 ["char_RhomburVernius"] = SpoilerTier.ExpandedUniverse,
                 ["char_ElroodIX"] = SpoilerTier.ExpandedUniverse,
                 ["char_AbulurdHarkonnen"] = SpoilerTier.ExpandedUniverse,

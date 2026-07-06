@@ -11,10 +11,11 @@ namespace Duniverse.Web.Services
     /// entity should currently be shown. The settings live in the browser's localStorage, so a
     /// choice sticks across reloads and return visits.
     ///
-    /// Protection is opt-in. Until the reader turns it on, <see cref="IsVisible(SpoilerTier)"/>
-    /// returns true for everything, so casual visitors and search-engine arrivals always see the
-    /// full site. Once it is on, an entity is shown only if the reader has read far enough along
-    /// the six-novel spine, or, for Expanded Universe entities, has opted into those as well.
+    /// Protection is on by default: a first-time visitor starts at Dune, the first book, and
+    /// owns their settings from there. Anyone who has made a choice keeps it, since saved
+    /// preferences always win over the default; turning protection off entirely opens the whole
+    /// site. When it is on, an entity is shown only if the reader has read far enough along the
+    /// six-novel spine, or, for Expanded Universe entities, has opted into those as well.
     /// </summary>
     public class SpoilerSettings
     {
@@ -23,8 +24,12 @@ namespace Duniverse.Web.Services
 
         public SpoilerSettings(IJSRuntime js) => _js = js;
 
-        /// <summary>Whether the reader has turned spoiler protection on at all.</summary>
-        public bool Enabled { get; private set; }
+        /// <summary>
+        /// Whether spoiler protection is active. True from the first visit, paired with the
+        /// Dune default on <see cref="NovelProgress"/>, so a newcomer starts safe at book one
+        /// and widens the gate themselves as they read.
+        /// </summary>
+        public bool Enabled { get; private set; } = true;
 
         /// <summary>
         /// How far the reader has read the six-novel spine, as the furthest safe tier
@@ -66,7 +71,7 @@ namespace Duniverse.Web.Services
             catch
             {
                 // localStorage can be blocked (private mode, strict privacy settings). Falling
-                // back to defaults just means protection stays off, which is the safe default.
+                // back to defaults means protection stays on at Dune, the safe starting point.
             }
 
             Loaded = true;

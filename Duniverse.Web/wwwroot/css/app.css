@@ -448,6 +448,132 @@ a {
     white-space: nowrap;
 }
 
+/* ---- Bloodlines ---- */
+
+.bloodline-legend {
+    margin-top: 1.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem 0.75rem;
+}
+
+.legend-chip {
+    padding: 0.2rem 0.7rem;
+    border-radius: 999px;
+    border: 1px solid currentColor;
+    font-size: 0.8rem;
+}
+
+.legend-note {
+    flex-basis: 100%;
+    font-size: 0.8rem;
+}
+
+.lineage-atreides { color: #e0a458; }
+.lineage-harkonnen { color: #c9413f; }
+.lineage-corrino { color: #cfc0a8; }
+.lineage-fremen { color: #8fae5c; }
+.lineage-other { color: #7fb3b0; }
+
+.bloodline-wrapper {
+    margin-top: 1.5rem;
+    background: rgba(23, 19, 16, 0.55);
+    border: 1px solid var(--dune-border);
+    border-radius: 8px;
+    padding: 0.75rem;
+}
+
+.bloodline-chart {
+    width: 100%;
+    height: auto;
+}
+
+.bloodline-bands line {
+    stroke: var(--dune-border);
+    stroke-dasharray: 6 6;
+}
+
+.bloodline-bands text {
+    fill: var(--dune-accent-bright);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    text-anchor: middle;
+    paint-order: stroke;
+    stroke: var(--dune-bg);
+    stroke-width: 10px;
+    stroke-linejoin: round;
+}
+
+.bloodline-edges path {
+    fill: none;
+    stroke: rgba(224, 164, 88, 0.45);
+    stroke-width: 1.6;
+}
+
+    .bloodline-edges path.dashed {
+        stroke-dasharray: 5 5;
+        stroke: rgba(224, 164, 88, 0.3);
+    }
+
+    .bloodline-edges path.union {
+        stroke: var(--dune-accent-bright);
+        stroke-width: 2.2;
+    }
+
+        .bloodline-edges path.union.dashed {
+            stroke-dasharray: 4 5;
+            stroke-width: 1.6;
+        }
+
+    .bloodline-edges path:hover {
+        stroke: var(--dune-accent-bright);
+        stroke-width: 2.6;
+    }
+
+.bloodline-node {
+    cursor: pointer;
+}
+
+    .bloodline-node circle {
+        fill: currentColor;
+        stroke: var(--dune-bg);
+        stroke-width: 2px;
+        transform-box: fill-box;
+        transform-origin: center;
+        transition: transform 0.2s ease, filter 0.2s ease;
+    }
+
+    .bloodline-node.ring-atreides circle { stroke: #e0a458; stroke-width: 3.5px; }
+    .bloodline-node.ring-harkonnen circle { stroke: #c9413f; stroke-width: 3.5px; }
+    .bloodline-node.ring-corrino circle { stroke: #cfc0a8; stroke-width: 3.5px; }
+    .bloodline-node.ring-fremen circle { stroke: #8fae5c; stroke-width: 3.5px; }
+    .bloodline-node.ring-other circle { stroke: #7fb3b0; stroke-width: 3.5px; }
+
+    .bloodline-node text {
+        fill: var(--dune-text);
+        font-size: 12.5px;
+        text-anchor: middle;
+        pointer-events: none;
+        paint-order: stroke;
+        stroke: var(--dune-bg);
+        stroke-width: 3px;
+        stroke-linejoin: round;
+    }
+
+    .bloodline-node:hover circle {
+        transform: scale(1.25);
+        filter: drop-shadow(0 0 6px currentColor);
+    }
+
+.bloodline-note {
+    margin-top: 0.75rem;
+    font-size: 0.85rem;
+    text-align: center;
+}
+
 /* ---- Collected Sayings ---- */
 
 .sayings-group {

@@ -1,0 +1,254 @@
+@page "/bloodlines"
+@inject EntityRegistry Registry
+@inject SpoilerSettings Spoiler
+@inject NavigationManager Nav
+
+<PageTitle>Bloodlines - Duniverse</PageTitle>
+
+<div class="hero" style="background-image: linear-gradient(rgba(23, 19, 16, 0.88), rgba(23, 19, 16, 0.93)), url('/images/entity-front-background.jpg');">
+    <h1>Bloodlines of the Imperium</h1>
+    <p class="tagline">
+        The saga is a genealogy chart with a plot. Follow the great lines of descent as they
+        converge on Paul Atreides, and watch what the Bene Gesserit spent ninety generations
+        breeding toward. Select anyone to open their full record.
+    </p>
+
+    <div class="bloodline-legend">
+        <span class="legend-chip lineage-atreides">Atreides</span>
+        <span class="legend-chip lineage-harkonnen">Harkonnen</span>
+        <span class="legend-chip lineage-corrino">Corrino</span>
+        <span class="legend-chip lineage-fremen">Fremen</span>
+        <span class="legend-chip lineage-other">Companions</span>
+        <span class="legend-note muted">A node's center shows the blood; a contrasting ring shows where they stand.</span>
+    </div>
+
+    @if (placed.Count > 0)
+    {
+        <div class="bloodline-wrapper">
+            <svg class="bloodline-chart" viewBox="0 0 @W @((int)chartHeight)" preserveAspectRatio="xMidYMid meet">
+                <g class="bloodline-bands">
+                    @foreach (var band in visibleBands)
+                    {
+                        <g transform="translate(0, @band.Y.ToString(Inv))">
+                            <line x1="40" y1="0" x2="@(W - 40)" y2="0" />
+                            <text x="@(W / 2)" y="4">@band.Label</text>
+                        </g>
+                    }
+                </g>
+                <g class="bloodline-edges">
+                    @foreach (var descent in visibleDescents)
+                    {
+                        <path d="@descent.Path" class="@(descent.Dashed ? "dashed" : null)">
+                            @if (descent.Label is not null)
+                            {
+                                <title>@descent.Label</title>
+                            }
+                        </path>
+                    }
+                    @foreach (var union in visibleUnions)
+                    {
+                        <path d="@union.Path" class="union @(union.Dashed ? "dashed" : null)">
+                            @if (union.Label is not null)
+                            {
+                                <title>@union.Label</title>
+                            }
+                        </path>
+                    }
+                </g>
+                <g class="bloodline-nodes">
+                    @foreach (var node in placed.Values)
+                    {
+                        <g class="bloodline-node lineage-@node.Fill @(node.Ring is not null ? $"ring-{node.Ring}" : "")"
+                           transform="translate(@node.X.ToString(Inv), @node.Y.ToString(Inv))"
+                           @onclick="() => GoTo(node.EntityId)">
+                            <circle r="13" />
+                            <text y="@node.LabelY.ToString(Inv)">@node.Name</text>
+                            <title>@node.Name: @node.ShortDescription</title>
+                        </g>
+                    }
+                </g>
+            </svg>
+        </div>
+
+        <p class="bloodline-note muted">
+            The chart honors your spoiler settings. Set your reading progress on the
+            <a href="/archives">Archives page</a> and the later generations reveal themselves
+            as you read.
+        </p>
+    }
+    else
+    {
+        <p class="no-results">No bloodline records are visible at your current spoiler settings.</p>
+    }
+</div>
+
+@code {
+    private static readonly System.Globalization.CultureInfo Inv = System.Globalization.CultureInfo.InvariantCulture;
+
+    private const int W = 1000;
+    private const double PadX = 55;
+    private const double TopMargin = 40;
+    private const double GenRowHeight = 118;
+    private const double BandRowHeight = 64;
+    private const double NodeRadius = 13;
+
+    private sealed record PlacedNode(string EntityId, string Name, string ShortDescription,
+        string Fill, string? Ring, double X, double Y)
+    {
+        // Vertical offset of the name below the node. Neighbors in a crowded generation
+        // alternate between two heights so long names never run into each other.
+        public double LabelY { get; set; } = 30;
+    }
+    private sealed record DrawnEdge(string Path, string? Label, bool Dashed);
+    private sealed record DrawnBand(string Label, double Y);
+
+    private Dictionary<string, PlacedNode> placed = new(StringComparer.OrdinalIgnoreCase);
+    private List<DrawnEdge> visibleDescents = new();
+    private List<DrawnEdge> visibleUnions = new();
+    private List<DrawnBand> visibleBands = new();
+    private double chartHeight;
+
+    protected override void OnInitialized()
+    {
+        BuildChart();
+    }
+
+    private void BuildChart()
+    {
+        placed = new Dictionary<string, PlacedNode>(StringComparer.OrdinalIgnoreCase);
+        visibleDescents = new List<DrawnEdge>();
+        visibleUnions = new List<DrawnEdge>();
+        visibleBands = new List<DrawnBand>();
+
+        // A person appears only when their entity is safe for the reader AND their presence
+        // in the chart is (Duncan belongs to a later book's marriage). Everyone hidden takes
+        // every touching line with them, so the chart never hints at what it holds back.
+        var visibleNodes = BloodlineMap.Nodes
+            .Select(node => (Node: node, Entity: Registry.GetEntity(node.EntityId)))
+            .Where(pair => pair.Entity is not null
+                && Spoiler.IsVisible(pair.Entity)
+                && Spoiler.IsVisible(pair.Node.Tier))
+            .ToList();
+
+        if (visibleNodes.Count == 0)
+        {
+            chartHeight = 0;
+            return;
+        }
+
+        // Rows: visible generations in order, with a band row inserted where a time-gap
+        // divider has visible people on both sides of it.
+        var generations = visibleNodes.Select(pair => pair.Node.Generation).Distinct().OrderBy(g => g).ToList();
+        var rowY = new Dictionary<int, double>();
+        double y = TopMargin;
+
+        foreach (var generation in generations)
+        {
+            bool hasEarlierRow = rowY.Count > 0;
+            foreach (var band in BloodlineMap.Bands)
+            {
+                if (band.BeforeGeneration == generation && hasEarlierRow)
+                {
+                    y += BandRowHeight / 2;
+                    visibleBands.Add(new DrawnBand(band.Label, y));
+                    y += BandRowHeight / 2;
+                }
+            }
+
+            rowY[generation] = y + GenRowHeight / 2;
+            y += GenRowHeight;
+        }
+
+        chartHeight = y + 10;
+
+        foreach (var (node, entity) in visibleNodes)
+        {
+            double x = PadX + node.Column * (W - 2 * PadX);
+            placed[node.EntityId] = new PlacedNode(entity!.Id, entity.Name, entity.ShortDescription ?? "",
+                node.Fill, node.Ring, x, rowY[node.Generation]);
+        }
+
+        // Stagger neighboring labels within each generation so long names stay legible.
+        foreach (var row in placed.Values.GroupBy(p => p.Y))
+        {
+            int i = 0;
+            foreach (var p in row.OrderBy(p => p.X))
+            {
+                p.LabelY = i % 2 == 0 ? 30 : 46;
+                i++;
+            }
+        }
+
+        // Unions: both partners visible and the bond itself safe to show. Partners standing
+        // apart get a dashed arc over the row instead of a bar through their neighbors.
+        foreach (var union in BloodlineMap.Unions)
+        {
+            if (!Spoiler.IsVisible(union.Tier)
+                || !placed.TryGetValue(union.PartnerAId, out var a)
+                || !placed.TryGetValue(union.PartnerBId, out var b))
+            {
+                continue;
+            }
+
+            var (left, right) = a.X <= b.X ? (a, b) : (b, a);
+            string path;
+            if (right.X - left.X > 0.2 * W)
+            {
+                double peak = left.Y - 34;
+                path = FormattableString.Invariant(
+                    $"M {left.X + NodeRadius} {left.Y - 4} C {left.X + 60} {peak}, {right.X - 60} {peak}, {right.X - NodeRadius} {right.Y - 4}");
+            }
+            else
+            {
+                path = FormattableString.Invariant(
+                    $"M {left.X + NodeRadius} {left.Y} L {right.X - NodeRadius} {right.Y}");
+            }
+
+            visibleUnions.Add(new DrawnEdge(path, union.Label, union.Dashed));
+        }
+
+        // Descents: drop from the midpoint of both parents when both are visible, from the
+        // one who is when only one survives the gate, and not at all otherwise.
+        foreach (var descent in BloodlineMap.Descents)
+        {
+            if (!placed.TryGetValue(descent.ChildId, out var child))
+            {
+                continue;
+            }
+
+            placed.TryGetValue(descent.ParentAId, out var parentA);
+            PlacedNode? parentB = null;
+            if (descent.ParentBId is not null)
+            {
+                placed.TryGetValue(descent.ParentBId, out parentB);
+            }
+
+            double sourceX, sourceY;
+            if (parentA is not null && parentB is not null)
+            {
+                sourceX = (parentA.X + parentB.X) / 2;
+                sourceY = parentA.Y;
+            }
+            else if ((parentA ?? parentB) is PlacedNode single)
+            {
+                sourceX = single.X;
+                sourceY = single.Y + NodeRadius;
+            }
+            else
+            {
+                continue;
+            }
+
+            double elbowY = child.Y - 46;
+            string path = FormattableString.Invariant(
+                $"M {sourceX} {sourceY} V {elbowY} H {child.X} V {child.Y - NodeRadius}");
+
+            visibleDescents.Add(new DrawnEdge(path, descent.Label, descent.Dashed));
+        }
+    }
+
+    private void GoTo(string id)
+    {
+        Nav.NavigateTo($"/entity/{id}");
+    }
+}

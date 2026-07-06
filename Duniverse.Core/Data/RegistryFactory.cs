@@ -33,6 +33,9 @@ namespace Duniverse.Data
             // the seeders because it can add links between pairs no seeder recorded.
             RelationshipMap.Apply(registry);
 
+            // Debug-only id check for the Bloodlines chart, so a typo there fails at startup.
+            BloodlineMap.Validate(registry);
+
             return registry;
         }
     }
