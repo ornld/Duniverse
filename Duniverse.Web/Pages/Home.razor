@@ -1,6 +1,7 @@
 @page "/"
 @inject EntityRegistry Registry
 @inject NavigationManager Nav
+@inject SpoilerSettings Spoiler
 
 <PageTitle>Duniverse</PageTitle>
 
@@ -96,7 +97,7 @@
 @code {
     private void RandomJump()
     {
-        var entity = Registry.GetRandomEntity();
+        var entity = Registry.GetRandomEntity(Spoiler.IsVisible);
         if (entity is not null)
         {
             Nav.NavigateTo($"/entity/{entity.Id}");

@@ -1,6 +1,7 @@
 @page "/archives"
 @inject EntityRegistry Registry
 @inject NavigationManager Nav
+@inject SpoilerSettings Spoiler
 
 <PageTitle>Duniverse Archives</PageTitle>
 
@@ -50,12 +51,15 @@
         Not sure where to start?
         <button class="surprise-btn" @onclick="RandomJump">Surprise me</button>
     </p>
+
+    <SpoilerControl OnChanged="RefilterCandidates" />
 </div>
 
 @code {
     private string query = "";
     private string lastQuery = "";
     private bool notFound;
+    private List<DuneEntity> rawCandidates = new();
     private List<DuneEntity> candidates = new();
 
     private static readonly (string Label, string Id)[] Examples =
@@ -78,7 +82,7 @@
 
     private void RandomJump()
     {
-        var entity = Registry.GetRandomEntity();
+        var entity = Registry.GetRandomEntity(Spoiler.IsVisible);
         if (entity is not null)
         {
             Nav.NavigateTo($"/entity/{entity.Id}");
@@ -88,6 +92,7 @@
     private void HandleSearch()
     {
         notFound = false;
+        rawCandidates = new List<DuneEntity>();
         candidates = new List<DuneEntity>();
         lastQuery = query.Trim();
 
@@ -106,10 +111,20 @@
 
         if (result.Candidates.Count > 0)
         {
-            candidates = result.Candidates.ToList();
+            rawCandidates = result.Candidates.ToList();
+            candidates = rawCandidates.Where(Spoiler.IsVisible).ToList();
+            notFound = candidates.Count == 0;
             return;
         }
 
         notFound = true;
+    }
+
+    // Re-apply spoiler filtering to the current suggestions when the reader changes their
+    // reading progress without running a new search.
+    private void RefilterCandidates()
+    {
+        candidates = rawCandidates.Where(Spoiler.IsVisible).ToList();
+        notFound = rawCandidates.Count > 0 && candidates.Count == 0;
     }
 }

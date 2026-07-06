@@ -1,4 +1,5 @@
 @inherits LayoutComponentBase
+@inject SpoilerSettings Spoiler
 
 <div class="page">
     <header class="site-header">
@@ -9,10 +10,22 @@
     <NavMenu />
 
     <main class="site-body">
-        @Body
+        @* Hold the body until spoiler preferences are read from storage, so a returning reader
+           with protection on never sees a flash of hidden content before it is filtered out. *@
+        @if (Spoiler.Loaded)
+        {
+            @Body
+        }
     </main>
 
     <footer class="site-footer">
         <span>An unofficial fan-made encyclopedia of the Dune universe.</span>
     </footer>
 </div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await Spoiler.LoadAsync();
+    }
+}

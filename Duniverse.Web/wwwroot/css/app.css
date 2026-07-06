@@ -286,6 +286,108 @@ a {
         color: #201408;
     }
 
+/* ---- Spoiler protection control ---- */
+
+.spoiler-control {
+    margin-top: 1.5rem;
+    padding: 1rem 1.1rem;
+    background: rgba(36, 28, 22, 0.5);
+    border: 1px solid var(--dune-border);
+    border-radius: 8px;
+    text-align: left;
+}
+
+.spoiler-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--dune-text);
+}
+
+    .spoiler-toggle input {
+        width: 1.05rem;
+        height: 1.05rem;
+        accent-color: var(--dune-accent);
+        cursor: pointer;
+    }
+
+.spoiler-options {
+    margin-top: 0.9rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--dune-border);
+    display: grid;
+    gap: 0.7rem;
+}
+
+.spoiler-label {
+    margin: 0;
+    color: var(--dune-muted);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.spoiler-books {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.book-chip {
+    padding: 0.35rem 0.8rem;
+    background: var(--dune-panel);
+    border: 1px solid var(--dune-border);
+    border-radius: 999px;
+    color: var(--dune-text);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+    .book-chip:hover {
+        border-color: var(--dune-accent);
+    }
+
+    .book-chip.selected {
+        background: var(--dune-accent);
+        border-color: var(--dune-accent);
+        color: #201408;
+        font-weight: 600;
+    }
+
+.spoiler-eu {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    color: var(--dune-text);
+    font-size: 0.9rem;
+}
+
+    .spoiler-eu input {
+        accent-color: var(--dune-accent);
+        cursor: pointer;
+    }
+
+.spoiler-note {
+    margin: 0;
+    font-size: 0.8rem;
+}
+
+.entity-card.spoiler-gate {
+    border-left: 4px solid var(--dune-accent-bright);
+}
+
+.gate-actions {
+    margin-top: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
 .no-results, .candidates {
     margin-top: 1.25rem;
     padding: 1rem;

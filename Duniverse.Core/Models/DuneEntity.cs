@@ -38,6 +38,15 @@ namespace Duniverse.Models
         public List<string> RelatedEntityIds { get; set; } = new List<string>();
 
         /// <summary>
+        /// The earliest work by which this entity is safe to encounter. Defaults to Dune, which
+        /// means no spoiler protection ever hides it. Entities first revealed in later novels or
+        /// in the Expanded Universe are raised above this default (see SpoilerTierMap in
+        /// Duniverse.Core/Data), so the site's optional spoiler gate can hold them back from a
+        /// reader who has not read that far yet.
+        /// </summary>
+        public SpoilerTier SpoilerTier { get; set; } = SpoilerTier.Dune;
+
+        /// <summary>
         /// Returns a string that represents the current entity.
         /// </summary>
         public override string ToString()

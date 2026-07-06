@@ -1,5 +1,6 @@
 @page "/timeline"
 @inject EntityRegistry Registry
+@inject SpoilerSettings Spoiler
 
 <PageTitle>Timeline - Duniverse Archives</PageTitle>
 
@@ -33,6 +34,7 @@
     protected override void OnInitialized()
     {
         events = Registry.GetAllEntities<HistoricalEvent>()
+            .Where(Spoiler.IsVisible)
             .OrderBy(e => e.SortOrder)
             .ToList();
     }

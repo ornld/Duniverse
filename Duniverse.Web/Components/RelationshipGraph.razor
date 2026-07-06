@@ -1,6 +1,7 @@
 @inject EntityRegistry Registry
 @inject GraphLayoutService LayoutService
 @inject NavigationManager Nav
+@inject SpoilerSettings Spoiler
 
 @if (graph is not null && graph.Nodes.Count > 1)
 {
@@ -46,7 +47,7 @@
 
     protected override void OnParametersSet()
     {
-        graph = LayoutService.BuildEgoGraph(Registry, CenterId, maxDepth: 2);
+        graph = LayoutService.BuildEgoGraph(Registry, CenterId, maxDepth: 2, include: Spoiler.IsVisible);
         LayoutService.ApplyForceDirectedLayout(graph, Width, Height);
         nodesById = graph.Nodes.ToDictionary(n => n.Id, StringComparer.OrdinalIgnoreCase);
     }

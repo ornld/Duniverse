@@ -1,12 +1,28 @@
 @page "/entity/{Id}"
 @inject EntityRegistry Registry
 @inject NavigationManager Nav
+@inject SpoilerSettings Spoiler
 
-<PageTitle>@(entity?.Name ?? "Not Found") - Duniverse Archives</PageTitle>
+<PageTitle>@((entity is not null && isGated && !revealed) ? "Spoiler-protected entry" : (entity?.Name ?? "Not Found")) - Duniverse Archives</PageTitle>
 
 <a class="back-link" href="/archives">&larr; Back to Duniverse Archive</a>
 
-@if (entity is not null)
+@if (entity is not null && isGated && !revealed)
+{
+    <div class="entity-card front spoiler-gate">
+        <h1>A spoiler lies ahead</h1>
+        <p class="short-desc">This entry draws on @BookName(entity.SpoilerTier).</p>
+        <p>
+            You've set your reading progress to stop short of that. You can reveal this entry
+            anyway, or head back and keep exploring what's safe for you.
+        </p>
+        <div class="gate-actions">
+            <button class="surprise-btn" @onclick="Reveal">Reveal this entry</button>
+            <a class="chip" href="/archives">Back to search</a>
+        </div>
+    </div>
+}
+else if (entity is not null)
 {
     <div class="entity-card front">
         <h1>@entity.Name</h1>
@@ -113,6 +129,8 @@ else
     public string Id { get; set; } = "";
 
     private DuneEntity? entity;
+    private bool isGated;
+    private bool revealed;
     private List<House> rivals = new();
     private List<DuneEntity> candidates = new();
     private bool hasAnyConnections;
@@ -130,14 +148,20 @@ else
 
     protected override void OnParametersSet()
     {
+        // A fresh entity address means the reveal choice starts over.
+        revealed = false;
+
         var result = Registry.Resolve(Id);
         entity = result.Entity;
-        candidates = result.Candidates.ToList();
+        candidates = result.Candidates.Where(Spoiler.IsVisible).ToList();
 
         if (entity is null)
         {
+            isGated = false;
             return;
         }
+
+        isGated = !Spoiler.IsVisible(entity);
 
         // If the URL used a name or a typo rather than the canonical ID, normalize the
         // address bar so links and bookmarks always point at the real ID.
@@ -147,18 +171,22 @@ else
             return;
         }
 
-        rivals = entity is House house ? Registry.GetRivalHouses(house.Id).ToList() : new List<House>();
+        // Every connection is filtered through the spoiler gate, so a related entity from a book
+        // the reader hasn't reached never surfaces as a link, a rivalry, or a graph node.
+        rivals = entity is House house
+            ? Registry.GetRivalHouses(house.Id).Where(Spoiler.IsVisible).ToList()
+            : new List<House>();
 
-        relatedPersonas = Registry.GetRelatedEntities<Persona>(entity.Id).ToList();
-        relatedHouses = Registry.GetRelatedEntities<House>(entity.Id).ToList();
-        relatedOrganizations = Registry.GetRelatedEntities<Organization>(entity.Id).ToList();
-        relatedWorlds = Registry.GetRelatedEntities<World>(entity.Id).ToList();
-        relatedArtifacts = Registry.GetRelatedEntities<Artifact>(entity.Id).ToList();
-        relatedVehicles = Registry.GetRelatedEntities<Vehicle>(entity.Id).ToList();
-        relatedDisciplines = Registry.GetRelatedEntities<Discipline>(entity.Id).ToList();
-        relatedTheologicalSystems = Registry.GetRelatedEntities<TheologicalSystem>(entity.Id).ToList();
-        relatedHistoricalEvents = Registry.GetRelatedEntities<HistoricalEvent>(entity.Id).ToList();
-        relatedFloraFauna = Registry.GetRelatedEntities<FloraFauna>(entity.Id).ToList();
+        relatedPersonas = Registry.GetRelatedEntities<Persona>(entity.Id).Where(Spoiler.IsVisible).ToList();
+        relatedHouses = Registry.GetRelatedEntities<House>(entity.Id).Where(Spoiler.IsVisible).ToList();
+        relatedOrganizations = Registry.GetRelatedEntities<Organization>(entity.Id).Where(Spoiler.IsVisible).ToList();
+        relatedWorlds = Registry.GetRelatedEntities<World>(entity.Id).Where(Spoiler.IsVisible).ToList();
+        relatedArtifacts = Registry.GetRelatedEntities<Artifact>(entity.Id).Where(Spoiler.IsVisible).ToList();
+        relatedVehicles = Registry.GetRelatedEntities<Vehicle>(entity.Id).Where(Spoiler.IsVisible).ToList();
+        relatedDisciplines = Registry.GetRelatedEntities<Discipline>(entity.Id).Where(Spoiler.IsVisible).ToList();
+        relatedTheologicalSystems = Registry.GetRelatedEntities<TheologicalSystem>(entity.Id).Where(Spoiler.IsVisible).ToList();
+        relatedHistoricalEvents = Registry.GetRelatedEntities<HistoricalEvent>(entity.Id).Where(Spoiler.IsVisible).ToList();
+        relatedFloraFauna = Registry.GetRelatedEntities<FloraFauna>(entity.Id).Where(Spoiler.IsVisible).ToList();
 
         hasAnyConnections =
             relatedPersonas.Count > 0 ||
@@ -172,4 +200,21 @@ else
             relatedHistoricalEvents.Count > 0 ||
             relatedFloraFauna.Count > 0;
     }
+
+    private void Reveal()
+    {
+        revealed = true;
+    }
+
+    // Reader-facing description of the tier a gated entry belongs to, used in the spoiler notice.
+    private static string BookName(SpoilerTier tier) => tier switch
+    {
+        SpoilerTier.DuneMessiah => "Dune Messiah",
+        SpoilerTier.ChildrenOfDune => "Children of Dune",
+        SpoilerTier.GodEmperorOfDune => "God Emperor of Dune",
+        SpoilerTier.HereticsOfDune => "Heretics of Dune",
+        SpoilerTier.Chapterhouse => "Chapterhouse: Dune",
+        SpoilerTier.ExpandedUniverse => "the Expanded Universe (prequels and sequels)",
+        _ => "Dune",
+    };
 }

@@ -23,7 +23,8 @@ namespace Duniverse.Services
         /// if the deeper hops would push the graph past MaxNodes, they're trimmed rather than
         /// overwhelming the view with a dense, unreadable tangle.
         /// </summary>
-        public EntityGraph BuildEgoGraph(EntityRegistry registry, string centerId, int maxDepth = 2)
+        public EntityGraph BuildEgoGraph(EntityRegistry registry, string centerId, int maxDepth = 2,
+            Func<DuneEntity, bool>? include = null)
         {
             var graph = new EntityGraph();
 
@@ -47,6 +48,13 @@ namespace Duniverse.Services
                 {
                     foreach (var neighbor in registry.GetDirectlyRelated(entity.Id))
                     {
+                        // Skip neighbors the caller wants hidden (the spoiler gate passes a
+                        // predicate here), so they never become a node or leak through an edge.
+                        if (include is not null && !include(neighbor))
+                        {
+                            continue;
+                        }
+
                         var edgeKey = string.CompareOrdinal(entity.Id, neighbor.Id) < 0
                             ? $"{entity.Id}|{neighbor.Id}"
                             : $"{neighbor.Id}|{entity.Id}";

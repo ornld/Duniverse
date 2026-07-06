@@ -1,0 +1,71 @@
+@inject SpoilerSettings Spoiler
+
+<div class="spoiler-control @(Spoiler.Enabled ? "is-on" : "")">
+    <label class="spoiler-toggle">
+        <input type="checkbox" checked="@Spoiler.Enabled" @onchange="OnToggleEnabled" />
+        <span>Hide spoilers past where I've read</span>
+    </label>
+
+    @if (Spoiler.Enabled)
+    {
+        <div class="spoiler-options">
+            <p class="spoiler-label">I've read up to:</p>
+            <div class="spoiler-books">
+                @foreach (var book in Novels)
+                {
+                    <button type="button"
+                            class="book-chip @(Spoiler.NovelProgress == book.Tier ? "selected" : "")"
+                            @onclick="() => SetProgress(book.Tier)">
+                        @book.Title
+                    </button>
+                }
+            </div>
+
+            <label class="spoiler-eu">
+                <input type="checkbox" checked="@Spoiler.IncludeExpandedUniverse" @onchange="OnToggleExpandedUniverse" />
+                <span>Include the Expanded Universe (prequels &amp; sequels)</span>
+            </label>
+
+            <p class="spoiler-note muted">
+                Hidden entries aren't gone. Open one directly and you'll get the choice to reveal it.
+            </p>
+        </div>
+    }
+</div>
+
+@code {
+    // Raised after any change so a hosting page can re-filter content it's already showing.
+    [Parameter] public EventCallback OnChanged { get; set; }
+
+    private record Novel(string Title, SpoilerTier Tier);
+
+    private static readonly Novel[] Novels =
+    {
+        new("Dune", SpoilerTier.Dune),
+        new("Dune Messiah", SpoilerTier.DuneMessiah),
+        new("Children of Dune", SpoilerTier.ChildrenOfDune),
+        new("God Emperor", SpoilerTier.GodEmperorOfDune),
+        new("Heretics", SpoilerTier.HereticsOfDune),
+        new("Chapterhouse", SpoilerTier.Chapterhouse),
+    };
+
+    private async Task OnToggleEnabled(ChangeEventArgs e)
+    {
+        var enabled = e.Value is true;
+        await Spoiler.UpdateAsync(enabled, Spoiler.NovelProgress, Spoiler.IncludeExpandedUniverse);
+        await OnChanged.InvokeAsync();
+    }
+
+    private async Task SetProgress(SpoilerTier tier)
+    {
+        await Spoiler.UpdateAsync(Spoiler.Enabled, tier, Spoiler.IncludeExpandedUniverse);
+        await OnChanged.InvokeAsync();
+    }
+
+    private async Task OnToggleExpandedUniverse(ChangeEventArgs e)
+    {
+        var include = e.Value is true;
+        await Spoiler.UpdateAsync(Spoiler.Enabled, Spoiler.NovelProgress, include);
+        await OnChanged.InvokeAsync();
+    }
+}

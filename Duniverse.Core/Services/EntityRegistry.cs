@@ -44,17 +44,19 @@ namespace Duniverse.Services
         /// <summary>
         /// Returns a single entity chosen at random from the whole databank, or null if the
         /// databank is empty. Backs the "Surprise me" control, which drops a reader on an
-        /// arbitrary entity page as a starting point for exploring the archive.
+        /// arbitrary entity page as a starting point for exploring the archive. An optional
+        /// filter narrows the pool - the spoiler gate passes one so a reader with protection on
+        /// never lands on an entity from a book they have not reached yet.
         /// </summary>
-        public DuneEntity? GetRandomEntity()
+        public DuneEntity? GetRandomEntity(Func<DuneEntity, bool>? filter = null)
         {
-            if (_database.Count == 0)
+            var pool = (filter is null ? _database.Values.AsEnumerable() : _database.Values.Where(filter)).ToList();
+            if (pool.Count == 0)
             {
                 return null;
             }
 
-            int index = Random.Shared.Next(_database.Count);
-            return _database.Values.ElementAt(index);
+            return pool[Random.Shared.Next(pool.Count)];
         }
 
         /// <summary>
