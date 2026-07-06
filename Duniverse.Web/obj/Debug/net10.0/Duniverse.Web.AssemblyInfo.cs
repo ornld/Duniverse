@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Duniverse.Web")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a0f10f2eda69d82714a78480b8dab47c0eb1070b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1b93c350f036d0dcf429238da8bfe59cb66ce8e1")]
 [assembly: System.Reflection.AssemblyProductAttribute("Duniverse.Web")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Duniverse.Web")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
