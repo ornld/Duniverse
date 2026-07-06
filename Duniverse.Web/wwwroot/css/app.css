@@ -275,7 +275,9 @@ a {
 }
 
 .entity-card {
-    background: var(--dune-panel);
+    background-color: var(--dune-panel);
+    background-size: cover;
+    background-position: center;
     border: 1px solid var(--dune-border);
     border-radius: 8px;
     padding: 1.5rem;
@@ -284,10 +286,12 @@ a {
 
 .entity-card.front {
     border-left: 4px solid var(--dune-accent);
+    background-image: linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/entity-front-background.jpg');
 }
 
 .entity-card.back {
     border-left: 4px dashed var(--dune-accent);
+    background-image: linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/entity-back-background.png');
 }
 
 .entity-card h1 {
