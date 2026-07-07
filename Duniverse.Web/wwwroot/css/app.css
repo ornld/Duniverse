@@ -108,7 +108,10 @@ html, body {
     background: var(--dune-bg);
     color: var(--dune-text);
     font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
-    overflow-x: hidden;
+    /* clip, not hidden: hidden turns the root into a scroll container, which quietly
+       disables position: sticky for every descendant (the pinned nav). clip prevents
+       sideways overflow the same way without creating a scroller. */
+    overflow-x: clip;
     max-width: 100%;
 }
 
@@ -1354,15 +1357,39 @@ button.chip {
 
 /* ---- Navigation ---- */
 
+/* The nav is pinned and built from translucent, top-lit material: once content
+   scrolls underneath, the page ghosts through the blur like smoked glass. The strip
+   carries a hairline of light along its top face, and its bottom edge is the same
+   spice seam the Index dropdown uses (brightest center, dissolving ends) instead of
+   a flat border. Sticky also keeps every page one click from anywhere on long
+   timelines and category lists. */
 .top-nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 0.4rem 0.9rem;
     padding: 0.6rem 2rem;
-    background: var(--dune-panel);
-    border-bottom: 1px solid var(--dune-border);
+    background: linear-gradient(180deg, rgba(44, 35, 27, 0.82), rgba(30, 23, 18, 0.82));
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow:
+        inset 0 1px 0 rgba(241, 230, 214, 0.05),
+        0 10px 30px rgba(0, 0, 0, 0.28);
 }
+
+    .top-nav::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent 2%, rgba(224, 164, 88, 0.4) 50%, transparent 98%);
+        pointer-events: none;
+    }
 
     .top-nav a {
         position: relative;
@@ -1385,11 +1412,22 @@ button.chip {
            gradient clipped to the text, and the glow blooms from drop-shadows so the
            gradient stays crisp inside the glyphs. Each shadow layer halves the opacity
            of the one before while doubling its reach, so the bloom dissolves into the
-           background instead of ending at a visible line around the tab. */
+           background instead of ending at a visible line around the tab.
+
+           Two motions keep the eyes alive. On arrival the glow ignites: it starts dim,
+           flares past its resting brightness, and settles (ibad-ignite, runs once per
+           activation). At rest a faint gleam drifts through the letterforms every few
+           seconds (ibad-gleam): a third gradient layer, clipped to the same text, sweeps
+           a soft highlight across and then waits off-glyph for most of the cycle. Both
+           are stripped under prefers-reduced-motion, leaving the tuned static glow. */
 
         .top-nav.tab-glow a.active,
         .top-nav.tab-glow .index-trigger.active .index-label {
-            background-image: linear-gradient(180deg, #1e4a9e 0%, #4a8fe8 52%, #1e4a9e 100%);
+            background-image:
+                linear-gradient(100deg, rgba(126, 180, 255, 0) 40%, rgba(126, 180, 255, 0.5) 50%, rgba(126, 180, 255, 0) 60%),
+                linear-gradient(180deg, #1e4a9e 0%, #4a8fe8 52%, #1e4a9e 100%);
+            background-size: 250% 100%, 100% 100%;
+            background-position: 140% 0, 0 0;
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
@@ -1399,6 +1437,54 @@ button.chip {
                 drop-shadow(0 0 16px rgba(34, 82, 190, 0.3))
                 drop-shadow(0 0 34px rgba(30, 74, 158, 0.16))
                 drop-shadow(0 0 60px rgba(30, 74, 158, 0.08));
+            animation:
+                ibad-ignite 0.6s ease-out,
+                ibad-gleam 7s ease-in-out 1.2s infinite;
+        }
+
+        @keyframes ibad-ignite {
+            0% {
+                filter:
+                    drop-shadow(0 0 1px rgba(56, 116, 228, 0.4))
+                    drop-shadow(0 0 3px rgba(44, 98, 212, 0.2))
+                    drop-shadow(0 0 8px rgba(34, 82, 190, 0.1))
+                    drop-shadow(0 0 20px rgba(30, 74, 158, 0.05))
+                    drop-shadow(0 0 40px rgba(30, 74, 158, 0.02));
+            }
+
+            30% {
+                filter:
+                    drop-shadow(0 0 3px rgba(120, 172, 255, 1))
+                    drop-shadow(0 0 12px rgba(80, 140, 240, 0.85))
+                    drop-shadow(0 0 28px rgba(56, 112, 220, 0.55))
+                    drop-shadow(0 0 52px rgba(40, 90, 180, 0.3))
+                    drop-shadow(0 0 80px rgba(30, 74, 158, 0.16));
+            }
+
+            100% {
+                filter:
+                    drop-shadow(0 0 2px rgba(56, 116, 228, 0.9))
+                    drop-shadow(0 0 7px rgba(44, 98, 212, 0.5))
+                    drop-shadow(0 0 16px rgba(34, 82, 190, 0.3))
+                    drop-shadow(0 0 34px rgba(30, 74, 158, 0.16))
+                    drop-shadow(0 0 60px rgba(30, 74, 158, 0.08));
+            }
+        }
+
+        /* The sweep itself takes ~2.8s; the remaining ~4.2s of each cycle the highlight
+           rests beyond the glyphs, so the gleam reads as an occasional catch of light,
+           not a marquee. Only the first (highlight) layer moves. */
+        @keyframes ibad-gleam {
+            0% { background-position: 140% 0, 0 0; }
+            40% { background-position: -40% 0, 0 0; }
+            100% { background-position: -40% 0, 0 0; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .top-nav.tab-glow a.active,
+            .top-nav.tab-glow .index-trigger.active .index-label {
+                animation: none;
+            }
         }
 
 .nav-divider {
@@ -1411,19 +1497,22 @@ button.chip {
    The ten categories live behind one "Index" tab. The panel is centered under the
    whole nav bar (not the trigger) so it never clips a viewport edge, and it opens
    like blown sand: a spice-colored seam, a translucent haze over the page, grains
-   falling on a canvas, and the entries settling in one after another. */
+   falling on a canvas, and the entries settling in one after another.
 
-.top-nav {
-    position: relative;
-}
+   (No positioning rule needed here: the nav is position: sticky, which is a
+   positioned ancestor, so the panel's absolute centering anchors to it.) */
 
 .nav-index {
     display: inline-block;
 }
 
+/* The Index is the one nav item that opens instead of navigating, so unlike the
+   plain text links it gets a body: a quiet pill in the site's chip language, which
+   reads as "control" at a glance. */
 .index-trigger {
-    background: none;
-    border: none;
+    background: rgba(23, 19, 16, 0.45);
+    border: 1px solid var(--dune-border);
+    border-radius: 999px;
     cursor: pointer;
     font: inherit;
     font-size: 0.9rem;
@@ -1431,12 +1520,13 @@ button.chip {
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
-    padding: 0.2rem 0;
-    transition: color 0.2s ease;
+    padding: 0.2rem 0.8rem;
+    transition: color 0.2s ease, border-color 0.2s ease;
 }
 
     .index-trigger:hover {
         color: var(--dune-accent-bright);
+        border-color: var(--dune-accent);
     }
 
     .index-trigger.active .index-chevron {
