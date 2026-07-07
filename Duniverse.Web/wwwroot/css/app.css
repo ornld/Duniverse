@@ -788,6 +788,470 @@ a {
     text-align: center;
 }
 
+/* ---- Connection finder ---- */
+
+/* The same category palette the relationship graph uses, opted into by the connection
+   finder's chips, suggestion dots, and chain nodes via the connection-cat class. */
+.connection-cat.category-artifacts { color: #e0a458; }
+.connection-cat.category-disciplines { color: #7fb3b0; }
+.connection-cat.category-flora-fauna { color: #8fae5c; }
+.connection-cat.category-historical-events { color: #c76b3f; }
+.connection-cat.category-houses { color: #d4494f; }
+.connection-cat.category-organizations { color: #9b6dc4; }
+.connection-cat.category-personas { color: #f4c07c; }
+.connection-cat.category-theological-systems { color: #b98fd1; }
+.connection-cat.category-vehicles { color: #6f97b5; }
+.connection-cat.category-worlds { color: #d9a441; }
+.connection-cat.category-unknown { color: var(--dune-muted); }
+
+.connection-pickers {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.9rem;
+    max-width: 52rem;
+}
+
+.connection-joiner {
+    color: var(--dune-muted);
+    font-size: 1.3rem;
+    /* Optically centers the glyph on the input row, below the pickers' uppercase labels. */
+    padding-top: 1.85rem;
+}
+
+.endpoint-picker {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+}
+
+.endpoint-label {
+    display: block;
+    margin-bottom: 0.35rem;
+    color: var(--dune-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.endpoint-picker input {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    background: var(--dune-panel);
+    border: 1px solid var(--dune-border);
+    border-radius: 4px;
+    color: var(--dune-text);
+    font-size: 1rem;
+}
+
+    .endpoint-picker input:focus {
+        outline: none;
+        border-color: var(--dune-accent);
+    }
+
+.endpoint-suggestions {
+    list-style: none;
+    margin: 0.4rem 0 0;
+    padding: 0.25rem;
+    background: var(--dune-panel);
+    border: 1px solid var(--dune-border);
+    border-radius: 6px;
+}
+
+    .endpoint-suggestions button {
+        display: flex;
+        align-items: baseline;
+        gap: 0.5rem;
+        width: 100%;
+        padding: 0.45rem 0.6rem;
+        background: transparent;
+        border: none;
+        border-radius: 4px;
+        color: var(--dune-text);
+        font-size: 0.9rem;
+        text-align: left;
+        cursor: pointer;
+    }
+
+        .endpoint-suggestions button:hover {
+            background: rgba(224, 164, 88, 0.12);
+        }
+
+        .endpoint-suggestions button .muted {
+            font-size: 0.78rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+.endpoint-dot {
+    flex: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 6px currentColor;
+}
+
+.endpoint-chosen {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.5rem 0.8rem;
+    background: var(--dune-panel);
+    border: 1px solid var(--dune-border);
+    border-left: 3px solid currentColor;
+    border-radius: 4px;
+}
+
+.endpoint-name {
+    color: var(--dune-text);
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.endpoint-clear {
+    margin-left: auto;
+    padding: 0 0.3rem;
+    background: transparent;
+    border: none;
+    color: var(--dune-muted);
+    font-size: 1.15rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+    .endpoint-clear:hover {
+        color: var(--dune-accent-bright);
+    }
+
+.connection-card {
+    margin-top: 1.4rem;
+    margin-bottom: 0;
+    text-align: center;
+}
+
+.connection-chain {
+    width: 100%;
+    height: auto;
+    /* A long relationship label on the first or last edge can reach past the viewBox;
+       letting it spill into the card's padding beats clipping it mid-word. */
+    overflow: visible;
+}
+
+/* Each link's reveal is staggered by its position (--i) along the chain: the node pops
+   in, the edge draws toward the next node, its label fades up, and the next node lands.
+   pathLength="1" on the lines normalizes every edge, so one dash animation draws them
+   all regardless of pixel length. */
+.chain-edge {
+    stroke: var(--dune-accent);
+    stroke-width: 1.8;
+    opacity: 0.85;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: chain-draw 0.4s ease-out forwards;
+    animation-delay: calc(var(--i) * 0.55s + 0.3s);
+}
+
+@keyframes chain-draw {
+    to { stroke-dashoffset: 0; }
+}
+
+.chain-edge-label {
+    fill: var(--dune-accent-bright);
+    font-size: 11.5px;
+    text-anchor: middle;
+    letter-spacing: 0.04em;
+    paint-order: stroke;
+    stroke: var(--dune-bg);
+    stroke-width: 3px;
+    stroke-linejoin: round;
+    opacity: 0;
+    animation: chain-appear 0.4s ease forwards;
+    animation-delay: calc(var(--i) * 0.55s + 0.55s);
+}
+
+.chain-node {
+    cursor: pointer;
+    opacity: 0;
+    animation: chain-appear 0.3s ease-out forwards;
+    animation-delay: calc(var(--i) * 0.55s);
+}
+
+@keyframes chain-appear {
+    to { opacity: 1; }
+}
+
+    .chain-node circle {
+        fill: currentColor;
+        stroke: var(--dune-bg);
+        stroke-width: 2px;
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: chain-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        animation-delay: calc(var(--i) * 0.55s);
+        transition: filter 0.2s ease;
+    }
+
+@keyframes chain-pop {
+    from { transform: scale(0.3); }
+    to { transform: scale(1); }
+}
+
+    .chain-node:hover circle {
+        filter: drop-shadow(0 0 7px currentColor);
+    }
+
+    .chain-node text {
+        fill: var(--dune-text);
+        font-size: 12px;
+        text-anchor: middle;
+        pointer-events: none;
+        paint-order: stroke;
+        stroke: var(--dune-bg);
+        stroke-width: 3px;
+        stroke-linejoin: round;
+    }
+
+    .chain-node.is-end circle {
+        stroke: var(--dune-accent-bright);
+        stroke-width: 2.5px;
+    }
+
+    .chain-node.is-end text {
+        fill: var(--dune-accent-bright);
+        font-weight: 700;
+        font-size: 13px;
+    }
+
+.trace-note {
+    margin-top: 1.4rem;
+    padding: 1rem 1.1rem;
+    background: var(--dune-panel);
+    border: 1px solid var(--dune-border);
+    border-left: 3px solid var(--dune-accent);
+    border-radius: 6px;
+    max-width: 42rem;
+}
+
+    .trace-note p {
+        margin: 0;
+    }
+
+button.chip {
+    color: var(--dune-text);
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .chain-edge,
+    .chain-edge-label,
+    .chain-node,
+    .chain-node circle {
+        animation: none;
+    }
+
+    .chain-edge {
+        stroke-dashoffset: 0;
+    }
+
+    .chain-edge-label,
+    .chain-node {
+        opacity: 1;
+    }
+}
+
+/* ---- First-visit clearance ritual ---- */
+
+.ritual-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+    overflow-y: auto;
+    background: rgba(23, 19, 16, 0.88);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    animation: ritual-fade 0.4s ease;
+}
+
+    .ritual-backdrop.closing {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+@keyframes ritual-fade {
+    from { opacity: 0; }
+}
+
+.ritual-panel {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    max-width: 640px;
+    margin: auto;
+    padding: 2.25rem 2rem 1.75rem;
+    background-color: var(--dune-panel);
+    background-image: linear-gradient(rgba(23, 19, 16, 0.88), rgba(23, 19, 16, 0.93)), url('/images/main-menu-background.jpg');
+    background-size: cover;
+    background-position: center;
+    border: 1px solid var(--dune-border);
+    border-radius: 10px;
+    text-align: center;
+    outline: none;
+    animation: ritual-rise 0.45s ease-out;
+}
+
+@keyframes ritual-rise {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+}
+
+.ritual-sand {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.ritual-eyebrow {
+    margin: 0 0 0.4rem;
+    color: var(--dune-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+.ritual-panel h2 {
+    margin: 0 0 0.75rem;
+    font-size: 1.55rem;
+    color: var(--dune-accent-bright);
+}
+
+.ritual-copy {
+    margin: 0 auto;
+    max-width: 30rem;
+    color: var(--dune-text);
+}
+
+.ritual-shelf {
+    /* Lifted above the sand canvas (which paints over the rest of the panel) so grains
+       fall behind the book spines, not across their faces. */
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 0.55rem;
+    margin: 1.6rem 0 0.4rem;
+}
+
+/* Each novel is a book spine on a shelf. The entrance animation uses a backwards fill
+   (not forwards) so once a spine has shelved itself, the base styles own transform again
+   and the hover lift can transition normally. */
+.ritual-spine {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.55rem;
+    width: 56px;
+    height: 208px;
+    padding: 0.7rem 0 0.9rem;
+    background: linear-gradient(180deg, #32261b, #241c16 55%, #2b2016);
+    /* A raised hinge down the left edge, so the bar reads as a spine, not a button. */
+    box-shadow: inset 3px 0 0 rgba(224, 164, 88, 0.28), inset -2px 0 4px rgba(0, 0, 0, 0.45);
+    border: 1px solid var(--dune-border);
+    border-radius: 4px 6px 6px 4px;
+    color: var(--dune-text);
+    cursor: pointer;
+    animation: spine-shelve 0.4s ease-out backwards;
+    animation-delay: calc(var(--i) * 90ms + 0.25s);
+    transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+@keyframes spine-shelve {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+}
+
+    .ritual-spine:hover,
+    .ritual-spine:focus-visible {
+        transform: translateY(-7px);
+        border-color: var(--dune-accent);
+        box-shadow: inset 3px 0 0 rgba(224, 164, 88, 0.5), inset -2px 0 4px rgba(0, 0, 0, 0.45), 0 6px 16px rgba(224, 164, 88, 0.18);
+    }
+
+        .ritual-spine:hover .spine-title,
+        .ritual-spine:focus-visible .spine-title {
+            color: var(--dune-accent-bright);
+        }
+
+.spine-num {
+    color: var(--dune-muted);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+}
+
+.spine-title {
+    writing-mode: vertical-rl;
+    color: var(--dune-text);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    transition: color 0.18s ease;
+}
+
+.ritual-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.65rem;
+    margin-top: 1.4rem;
+}
+
+.ritual-skip {
+    padding: 0;
+    background: none;
+    border: none;
+    color: var(--dune-muted);
+    font-size: 0.85rem;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+}
+
+    .ritual-skip:hover {
+        color: var(--dune-accent-bright);
+    }
+
+.ritual-note {
+    margin: 1.1rem auto 0;
+    max-width: 30rem;
+    font-size: 0.78rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ritual-backdrop,
+    .ritual-panel,
+    .ritual-spine {
+        animation: none;
+    }
+}
+
 .entity-card h1 {
     margin-top: 0;
 }
@@ -1398,5 +1862,34 @@ a {
 
     .graph-card {
         padding: 1rem 0.5rem;
+    }
+
+    .connection-pickers {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+
+    .connection-joiner {
+        align-self: center;
+        padding-top: 0;
+        transform: rotate(90deg);
+    }
+
+    .ritual-panel {
+        padding: 1.6rem 1rem 1.4rem;
+    }
+
+        .ritual-panel h2 {
+            font-size: 1.25rem;
+        }
+
+    .ritual-shelf {
+        gap: 0.35rem;
+    }
+
+    .ritual-spine {
+        width: 44px;
+        height: 188px;
     }
 }

@@ -10,12 +10,18 @@
 
     <main class="site-body">
         @* Hold the body until spoiler preferences are read from storage, so a returning reader
-           with protection on never sees a flash of hidden content before it is filtered out. *@
+           with protection on never sees a flash of hidden content before it is filtered out.
+           The @key wrapper re-mounts the current page when the first-visit ritual applies a
+           choice, so whatever page the reader landed on re-filters against it. *@
         @if (Spoiler.Loaded)
         {
-            @Body
+            <div @key="spoilerEpoch">
+                @Body
+            </div>
         }
     </main>
+
+    <SpoilerRitual OnApplied="OnRitualApplied" />
 
     <footer class="site-footer">
         <span>An unofficial encyclopedia of the Dune universe.</span>
@@ -35,8 +41,15 @@
 </div>
 
 @code {
+    private int spoilerEpoch;
+
     protected override async Task OnInitializedAsync()
     {
         await Spoiler.LoadAsync();
+    }
+
+    private void OnRitualApplied()
+    {
+        spoilerEpoch++;
     }
 }

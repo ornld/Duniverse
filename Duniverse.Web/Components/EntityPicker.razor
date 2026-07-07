@@ -1,0 +1,113 @@
+@inject EntityRegistry Registry
+@inject SpoilerSettings Spoiler
+
+@* One endpoint of a connection trace: a search input that narrows to a picked record.
+   Once picked, the record shows as a colored chip with a clear button; clearing returns
+   to the input. Suggestions run through the spoiler gate, so a reader can only anchor a
+   trace on records they are cleared to see. *@
+
+<div class="endpoint-picker">
+    <span class="endpoint-label">@Label</span>
+
+    @if (Selected is not null)
+    {
+        <div class="endpoint-chosen connection-cat category-@GraphLayoutService.CategorySlug(Selected)">
+            <span class="endpoint-dot"></span>
+            <span class="endpoint-name" title="@Selected.ShortDescription">@Selected.Name</span>
+            <button type="button" class="endpoint-clear" title="Clear this record" @onclick="ClearAsync">&times;</button>
+        </div>
+    }
+    else
+    {
+        <input @bind="query" @bind:event="oninput" @bind:after="UpdateSuggestions"
+               @onkeyup="HandleKeyUp" placeholder="@Placeholder" />
+
+        @if (suggestions.Count > 0)
+        {
+            <ul class="endpoint-suggestions">
+                @foreach (var suggestion in suggestions)
+                {
+                    <li>
+                        <button type="button" @onclick="() => PickAsync(suggestion)">
+                            <span class="endpoint-dot connection-cat category-@GraphLayoutService.CategorySlug(suggestion)"></span>
+                            <span>@suggestion.Name</span>
+                            <span class="muted">@suggestion.ShortDescription</span>
+                        </button>
+                    </li>
+                }
+            </ul>
+        }
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Label { get; set; } = "";
+
+    [Parameter]
+    public string Placeholder { get; set; } = "";
+
+    [Parameter]
+    public DuneEntity? Selected { get; set; }
+
+    [Parameter]
+    public EventCallback<DuneEntity?> SelectedChanged { get; set; }
+
+    private string query = "";
+    private List<DuneEntity> suggestions = new();
+
+    private void UpdateSuggestions()
+    {
+        var trimmed = query.Trim();
+
+        // A single letter matches half the archive; wait for two before suggesting.
+        if (trimmed.Length < 2)
+        {
+            suggestions.Clear();
+            return;
+        }
+
+        // Shortest names first: for a query like "atreides" that puts "House Atreides"
+        // ahead of longer compound names, which tends to match what the reader meant.
+        suggestions = Registry.SearchByName(trimmed)
+            .Where(Spoiler.IsVisible)
+            .OrderBy(entity => entity.Name.Length)
+            .ThenBy(entity => entity.Name)
+            .Take(8)
+            .ToList();
+    }
+
+    private async Task HandleKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key != "Enter")
+        {
+            return;
+        }
+
+        // Enter takes the archive's best resolution of the text (exact ID, unique name,
+        // or typo correction), and otherwise falls back to the top suggestion.
+        var resolved = Registry.Resolve(query.Trim()).Entity;
+        if (resolved is not null && Spoiler.IsVisible(resolved))
+        {
+            await PickAsync(resolved);
+        }
+        else if (suggestions.Count > 0)
+        {
+            await PickAsync(suggestions[0]);
+        }
+    }
+
+    private async Task PickAsync(DuneEntity entity)
+    {
+        query = "";
+        suggestions.Clear();
+        Selected = entity;
+        await SelectedChanged.InvokeAsync(entity);
+    }
+
+    private async Task ClearAsync()
+    {
+        Selected = null;
+        await SelectedChanged.InvokeAsync(null);
+    }
+}

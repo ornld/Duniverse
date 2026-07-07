@@ -1,0 +1,175 @@
+@inject SpoilerSettings Spoiler
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+@implements IDisposable
+
+@* The first-visit clearance ritual. A brand-new reader gets one full-screen moment: mark
+   the last Dune novel you finished, and the archive seals everything past it before you
+   see a single record. The main menu is deliberately exempt, so the site's first
+   impression stays clean; the ritual waits at the threshold and appears on the reader's
+   first step deeper in (any other route, clicked or landed on directly). Any action here
+   (a spine, the full archive, or skip) saves a preference, so the ritual never returns.
+   Returning readers, who already own a saved choice, never see it at all. *@
+
+@if (ShouldShow)
+{
+    <div class="ritual-backdrop @(closing ? "closing" : "")" @onkeydown="HandleKeyDown">
+        <div class="ritual-panel" role="dialog" aria-modal="true" aria-labelledby="ritual-title"
+             tabindex="-1" @ref="panel">
+            <canvas class="ritual-sand" @ref="sandCanvas"></canvas>
+
+            <h2 id="ritual-title">How deep into the saga have you read?</h2>
+
+            <div class="ritual-shelf">
+                @for (int i = 0; i < Novels.Length; i++)
+                {
+                    var novel = Novels[i];
+                    <button type="button" class="ritual-spine" style="--i: @i"
+                            @onclick="() => ChooseAsync(novel.Tier)">
+                        <span class="spine-num">@novel.Numeral</span>
+                        <span class="spine-title">@novel.Title</span>
+                    </button>
+                }
+            </div>
+
+            <div class="ritual-actions">
+                <button type="button" class="surprise-btn" @onclick="OpenEverythingAsync">
+                    Open the full archive
+                </button>
+            </div>
+
+            <p class="ritual-note muted">Change this any time on the Archives page.</p>
+        </div>
+    </div>
+}
+
+@code {
+    // Raised after the reader commits a choice, so the layout can re-mount the page
+    // underneath and let it re-filter against the new reading progress.
+    [Parameter] public EventCallback OnApplied { get; set; }
+
+    private bool dismissed;
+    private bool closing;
+    private bool activated;
+    private ElementReference panel;
+    private ElementReference sandCanvas;
+
+    private bool ShouldShow => Spoiler.Loaded && !Spoiler.HasStoredChoice && !dismissed && !OnMainMenu;
+
+    // The main menu is the one place the ritual never covers. Query strings and fragments
+    // are stripped before the check, so "/?utm=..." still counts as home.
+    private bool OnMainMenu
+    {
+        get
+        {
+            var relative = Nav.ToBaseRelativePath(Nav.Uri);
+            var cut = relative.IndexOfAny(new[] { '?', '#' });
+            if (cut >= 0)
+            {
+                relative = relative[..cut];
+            }
+            return relative.Length == 0;
+        }
+    }
+
+    private record Novel(string Numeral, string Title, SpoilerTier Tier);
+
+    private static readonly Novel[] Novels =
+    {
+        new("I", "Dune", SpoilerTier.Dune),
+        new("II", "Dune Messiah", SpoilerTier.DuneMessiah),
+        new("III", "Children of Dune", SpoilerTier.ChildrenOfDune),
+        new("IV", "God Emperor", SpoilerTier.GodEmperorOfDune),
+        new("V", "Heretics", SpoilerTier.HereticsOfDune),
+        new("VI", "Chapterhouse", SpoilerTier.Chapterhouse),
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Re-evaluate on every route change: that is the moment a fresh reader steps off
+        // the main menu and the ritual is due.
+        Nav.LocationChanged += OnLocationChanged;
+
+        // Await the (idempotent) storage read directly instead of leaning on the layout's
+        // copy of it. A parent re-render does not reach this component when its parameters
+        // compare equal, so without this await the ritual would stay stuck on the render
+        // from before the settings finished loading, and never appear.
+        await Spoiler.LoadAsync();
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        Nav.LocationChanged -= OnLocationChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // The overlay enters the DOM the first time a fresh reader leaves the main menu,
+        // so the sand and the focus grab can only start here, after the render that
+        // created it. Focus lands on the panel so Escape works immediately and screen
+        // readers enter the dialog. Browser-back to the main menu unmounts the panel
+        // (which also stops the sand loop); "activated" resets so a return trip gets the
+        // full entrance again.
+        if (ShouldShow)
+        {
+            if (!activated)
+            {
+                activated = true;
+                await panel.FocusAsync();
+                await JS.InvokeVoidAsync("duneNav.sandSettle", sandCanvas);
+            }
+        }
+        else
+        {
+            activated = false;
+        }
+    }
+
+    private async Task ChooseAsync(SpoilerTier tier)
+    {
+        await Spoiler.UpdateAsync(enabled: true, tier, includeExpandedUniverse: false);
+        await CloseAsync(applied: true);
+    }
+
+    private async Task OpenEverythingAsync()
+    {
+        await Spoiler.UpdateAsync(enabled: false, Spoiler.NovelProgress, Spoiler.IncludeExpandedUniverse);
+        await CloseAsync(applied: true);
+    }
+
+    // Skipping keeps the safe default (guarded at Dune) and records it as a real choice,
+    // so the ritual asks exactly once. The page underneath already rendered with these
+    // defaults, so nothing needs to re-filter.
+    private async Task SkipAsync()
+    {
+        await Spoiler.UpdateAsync(Spoiler.Enabled, Spoiler.NovelProgress, Spoiler.IncludeExpandedUniverse);
+        await CloseAsync(applied: false);
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape" && !closing)
+        {
+            await SkipAsync();
+        }
+    }
+
+    private async Task CloseAsync(bool applied)
+    {
+        // A short outward fade instead of a hard vanish; the delay matches the CSS.
+        closing = true;
+        StateHasChanged();
+        await Task.Delay(300);
+        dismissed = true;
+
+        if (applied)
+        {
+            await OnApplied.InvokeAsync();
+        }
+    }
+}

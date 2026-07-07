@@ -44,6 +44,13 @@ namespace Duniverse.Web.Services
         public bool Loaded { get; private set; }
 
         /// <summary>
+        /// True once the reader owns their settings: a saved preference was found in
+        /// localStorage, or they made a choice this session. False on a genuine first visit,
+        /// which is what cues the one-time clearance ritual in the layout.
+        /// </summary>
+        public bool HasStoredChoice { get; private set; }
+
+        /// <summary>
         /// Reads any saved preferences out of localStorage. Idempotent: the first call does the
         /// work, later calls return immediately, so every page can safely await it on init.
         /// </summary>
@@ -65,6 +72,7 @@ namespace Duniverse.Web.Services
                         Enabled = stored.Enabled;
                         NovelProgress = stored.NovelProgress;
                         IncludeExpandedUniverse = stored.IncludeExpandedUniverse;
+                        HasStoredChoice = true;
                     }
                 }
             }
@@ -86,6 +94,10 @@ namespace Duniverse.Web.Services
             Enabled = enabled;
             NovelProgress = novelProgress;
             IncludeExpandedUniverse = includeExpandedUniverse;
+
+            // Even if persistence fails below, the reader has decided; the ritual must not
+            // come back mid-session to ask again.
+            HasStoredChoice = true;
 
             try
             {

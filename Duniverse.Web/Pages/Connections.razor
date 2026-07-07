@@ -1,0 +1,256 @@
+@page "/connections"
+@inject EntityRegistry Registry
+@inject PathFinderService PathFinder
+@inject SpoilerSettings Spoiler
+@inject NavigationManager Nav
+
+<PageTitle>Connections - Duniverse</PageTitle>
+
+<div class="hero" style="background-image: linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/entity-graph-background.jpg');">
+    <h1>Trace a Connection</h1>
+    <p class="tagline">
+        Everything in the Duniverse touches everything else. Pick two records and the
+        archive traces the shortest chain of relationships joining them, link by link.
+    </p>
+
+    <div class="connection-pickers">
+        <EntityPicker Label="First record" Placeholder="e.g. Duncan Idaho"
+                      Selected="@from" SelectedChanged="OnFromChanged" />
+        <span class="connection-joiner" aria-hidden="true">&#8596;</span>
+        <EntityPicker Label="Second record" Placeholder="e.g. Shai-Hulud"
+                      Selected="@to" SelectedChanged="OnToChanged" />
+    </div>
+
+    @if (outcome == TraceOutcome.Found && path is not null)
+    {
+        <div class="entity-card graph-card connection-card" @key="traceId">
+            <svg class="connection-chain" viewBox="0 0 @ChainWidth.ToString(Inv) @ChainHeight.ToString(Inv)"
+                 style="max-width: @(ChainWidth.ToString(Inv))px"
+                 preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+                <g class="chain-edges">
+                    @for (int i = 1; i < path.Count; i++)
+                    {
+                        var prev = path[i - 1];
+                        var next = path[i];
+                        var tip = StepTip(prev, next);
+                        <line class="chain-edge" style="--i: @(i - 1)" pathLength="1"
+                              x1="@NodeX(i - 1).ToString(Inv)" y1="@NodeY(i - 1).ToString(Inv)"
+                              x2="@NodeX(i).ToString(Inv)" y2="@NodeY(i).ToString(Inv)">
+                            @if (tip is not null)
+                            {
+                                <title>@tip</title>
+                            }
+                        </line>
+                        @if (StepRole(prev, next) is { } role)
+                        {
+                            @* The g wrapper keeps Razor from reading <text> as its own
+                               literal-text tag inside this code block. *@
+                            <g class="chain-edge-label" style="--i: @(i - 1)">
+                                <text x="@MidX(i).ToString(Inv)" y="@LabelY(i).ToString(Inv)">@role</text>
+                            </g>
+                        }
+                    }
+                </g>
+                <g class="chain-nodes">
+                    @for (int i = 0; i < path.Count; i++)
+                    {
+                        var entity = path[i];
+                        var isEnd = i == 0 || i == path.Count - 1;
+                        <g class="chain-node connection-cat category-@GraphLayoutService.CategorySlug(entity) @(isEnd ? "is-end" : null)"
+                           style="--i: @i" transform="translate(@NodeX(i).ToString(Inv), @NodeY(i).ToString(Inv))"
+                           @onclick="() => GoTo(entity.Id)">
+                            <circle r="@(isEnd ? 15 : 11)" />
+                            <text y="@(isEnd ? 36 : 32)">@Truncate(entity.Name)</text>
+                            <title>@entity.Name: @entity.ShortDescription</title>
+                        </g>
+                    }
+                </g>
+            </svg>
+            <p class="graph-hint muted">@Summary(path.Count - 1) Click any name to open its record.</p>
+        </div>
+    }
+    else if (outcome == TraceOutcome.SamePick)
+    {
+        <div class="trace-note">
+            <p>That traces a record straight to itself. Pick two different records.</p>
+        </div>
+    }
+    else if (outcome == TraceOutcome.BeyondProgress)
+    {
+        <div class="trace-note">
+            <p>
+                A chain between these two exists, and it runs through the deeper chronicles.
+                Your reading progress keeps those records sealed for now. Read further, then
+                trace again.
+            </p>
+        </div>
+    }
+    else if (outcome == TraceOutcome.NoRecord)
+    {
+        <div class="trace-note">
+            <p>The archives hold no recorded chain between these two.</p>
+        </div>
+    }
+
+    <div class="examples">
+        <span class="examples-label">Try:</span>
+        @foreach (var pair in ExamplePairs)
+        {
+            <button type="button" class="chip" @onclick="() => ApplyExample(pair.FromId, pair.ToId)">
+                @pair.Label
+            </button>
+        }
+    </div>
+
+    <SpoilerControl OnChanged="OnSpoilerChanged" />
+</div>
+
+@code {
+    private static readonly System.Globalization.CultureInfo Inv = System.Globalization.CultureInfo.InvariantCulture;
+
+    private DuneEntity? from;
+    private DuneEntity? to;
+    private IReadOnlyList<DuneEntity>? path;
+    private TraceOutcome outcome = TraceOutcome.None;
+
+    // Bumped on every successful trace and used as the result card's @key, so Blazor builds
+    // fresh SVG elements each time and the draw-in animation restarts from the first link.
+    private int traceId;
+
+    private enum TraceOutcome { None, Found, SamePick, BeyondProgress, NoRecord }
+
+    private static readonly (string Label, string FromId, string ToId)[] ExamplePairs =
+    {
+        ("Duncan Idaho & Shai-Hulud", "char_DuncanIdaho", "bio_ShaiHulud"),
+        ("Gom Jabbar & Giedi Prime", "art_GomJabbar", "loc_GiediPrime"),
+        ("Princess Irulan & the Fremen", "char_PrincessIrulan", "org_Fremen"),
+        ("Ornithopter & Bene Gesserit", "vehicle_Ornithopter", "org_BeneGesserit"),
+    };
+
+    // ---- Chain geometry ----
+    // Nodes sit on a gentle zigzag so edge labels above the lines and names below the
+    // circles never fight for the same pixels. The viewBox grows with the path length and
+    // the SVG carries a matching max-width, so short chains stay small instead of scaling
+    // up to fill the card.
+
+    private const double Spacing = 150;
+    private const double Margin = 78;
+    private const double BaselineY = 84;
+    private const double Zigzag = 26;
+
+    private double ChainWidth => Margin * 2 + Spacing * ((path?.Count ?? 1) - 1);
+    private double ChainHeight => 178;
+
+    private static double NodeX(int i) => Margin + Spacing * i;
+    private static double NodeY(int i) => BaselineY + (i % 2 == 0 ? 0 : Zigzag);
+    private static double MidX(int i) => (NodeX(i - 1) + NodeX(i)) / 2;
+
+    // Labels ride above the higher of an edge's two endpoints. Anchoring on the edge's own
+    // midpoint puts long labels level with a node circle, which then paints over the text.
+    private static double LabelY(int i) => Math.Min(NodeY(i - 1), NodeY(i)) - 20;
+
+    private void OnFromChanged(DuneEntity? entity)
+    {
+        from = entity;
+        Trace();
+    }
+
+    private void OnToChanged(DuneEntity? entity)
+    {
+        to = entity;
+        Trace();
+    }
+
+    private void ApplyExample(string fromId, string toId)
+    {
+        from = Registry.GetEntity(fromId);
+        to = Registry.GetEntity(toId);
+        Trace();
+    }
+
+    // A change in reading progress can hide a chosen endpoint, reroute a chain around newly
+    // sealed records, or open a shorter chain through newly revealed ones. Re-resolve from
+    // scratch either way.
+    private void OnSpoilerChanged()
+    {
+        if (from is not null && !Spoiler.IsVisible(from))
+        {
+            from = null;
+        }
+        if (to is not null && !Spoiler.IsVisible(to))
+        {
+            to = null;
+        }
+        Trace();
+    }
+
+    private void Trace()
+    {
+        path = null;
+        outcome = TraceOutcome.None;
+
+        if (from is null || to is null)
+        {
+            return;
+        }
+
+        if (string.Equals(from.Id, to.Id, StringComparison.OrdinalIgnoreCase))
+        {
+            outcome = TraceOutcome.SamePick;
+            return;
+        }
+
+        path = PathFinder.FindShortestPath(Registry, from.Id, to.Id, Spoiler.IsVisible);
+        if (path is not null)
+        {
+            outcome = TraceOutcome.Found;
+            traceId++;
+            return;
+        }
+
+        // Distinguish "no chain at your reading progress" from "no chain at all", without
+        // revealing anything about what the sealed records are.
+        outcome = PathFinder.FindShortestPath(Registry, from.Id, to.Id) is not null
+            ? TraceOutcome.BeyondProgress
+            : TraceOutcome.NoRecord;
+    }
+
+    private void GoTo(string id)
+    {
+        Nav.NavigateTo($"/entity/{id}");
+    }
+
+    private static string Truncate(string name) => name.Length > 18 ? name[..17] + "…" : name;
+
+    private static string Summary(int steps) => steps switch
+    {
+        1 => "One recorded link joins them directly.",
+        2 => "Two links bridge the gap.",
+        3 => "The chain runs three links long.",
+        _ => $"The chain runs {steps} links long.",
+    };
+
+    // Spoiler-checked phrase describing what "next" is to "prev", shown along the edge.
+    private string? StepRole(DuneEntity prev, DuneEntity next)
+    {
+        return Registry.GetRelationshipLabel(prev.Id, next.Id) is { } label && Spoiler.IsVisible(label.Tier)
+            ? label.Role
+            : null;
+    }
+
+    // Hover text for an edge, naming both sides of the relationship when both are recorded,
+    // in the same shape the relationship graph uses.
+    private string? StepTip(DuneEntity prev, DuneEntity next)
+    {
+        var roleOfNext = StepRole(prev, next);
+        var roleOfPrev = StepRole(next, prev);
+        if (roleOfNext is null || roleOfPrev is null)
+        {
+            return null;
+        }
+
+        return roleOfPrev == roleOfNext
+            ? $"{prev.Name} & {next.Name}: {roleOfNext}"
+            : $"{prev.Name}: {roleOfPrev} / {next.Name}: {roleOfNext}";
+    }
+}
