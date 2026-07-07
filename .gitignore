@@ -5,6 +5,7 @@ release/
 
 # IDE and tooling
 .idea/
+.claude/
 *.DotSettings.user
 *.lscache
 
