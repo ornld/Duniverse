@@ -158,6 +158,27 @@ a {
     border-top: 1px solid var(--dune-border);
 }
 
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 0.6rem;
+}
+
+    .social-links a {
+        color: var(--dune-muted);
+        display: inline-flex;
+    }
+
+        .social-links a:hover {
+            color: var(--dune-accent-bright);
+        }
+
+    .social-links svg {
+        width: 18px;
+        height: 18px;
+    }
+
 .hero {
     position: relative;
     overflow: hidden;
