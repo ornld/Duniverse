@@ -1,3 +1,7 @@
+@inject IJSRuntime JS
+@inject NavigationManager Nav
+@implements IDisposable
+
 <nav class="top-nav tab-glow">
     <NavLink href="/" Match="NavLinkMatch.All">Main Menu</NavLink>
     <NavLink href="/archives">Archives</NavLink>
@@ -6,14 +10,94 @@
     <NavLink href="/terminology">Terminology</NavLink>
     <NavLink href="/sayings">Sayings</NavLink>
     <span class="nav-divider"></span>
-    <NavLink href="/category/artifacts">Artifact</NavLink>
-    <NavLink href="/category/disciplines">Discipline</NavLink>
-    <NavLink href="/category/flora-fauna">Flora & Fauna</NavLink>
-    <NavLink href="/category/historical-events">Historical Event</NavLink>
-    <NavLink href="/category/houses">House</NavLink>
-    <NavLink href="/category/organizations">Organization</NavLink>
-    <NavLink href="/category/personas">Persona</NavLink>
-    <NavLink href="/category/theological-systems">Theological System</NavLink>
-    <NavLink href="/category/vehicles">Vehicle</NavLink>
-    <NavLink href="/category/worlds">World</NavLink>
+    <div class="nav-index @(open ? "open" : "")" @onkeydown="OnKeyDown">
+        <button type="button" class="index-trigger @(IsCategoryPage ? "active" : "")"
+                aria-haspopup="true" aria-expanded="@open" @onclick="Toggle">
+            <span class="index-label">Index</span>
+            <svg class="index-chevron" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.5"
+                      stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+        </button>
+        @if (open)
+        {
+            <div class="index-backdrop" @onclick="Close"></div>
+            <div class="index-panel">
+                <canvas class="index-sand" @ref="sandCanvas"></canvas>
+                <div class="index-seam"></div>
+                <ul>
+                    <li style="--i: 0"><NavLink href="/category/artifacts">Artifact</NavLink></li>
+                    <li style="--i: 1"><NavLink href="/category/disciplines">Discipline</NavLink></li>
+                    <li style="--i: 2"><NavLink href="/category/flora-fauna">Flora & Fauna</NavLink></li>
+                    <li style="--i: 3"><NavLink href="/category/historical-events">Historical Event</NavLink></li>
+                    <li style="--i: 4"><NavLink href="/category/houses">House</NavLink></li>
+                    <li style="--i: 5"><NavLink href="/category/organizations">Organization</NavLink></li>
+                    <li style="--i: 6"><NavLink href="/category/personas">Persona</NavLink></li>
+                    <li style="--i: 7"><NavLink href="/category/theological-systems">Theological System</NavLink></li>
+                    <li style="--i: 8"><NavLink href="/category/vehicles">Vehicle</NavLink></li>
+                    <li style="--i: 9"><NavLink href="/category/worlds">World</NavLink></li>
+                </ul>
+            </div>
+        }
+    </div>
 </nav>
+
+@code {
+    private bool open;
+    private bool runSand;
+    private ElementReference sandCanvas;
+
+    // The trigger carries the Eyes of Ibad glow whenever the reader is inside any
+    // category, so the "blue marks where you are" rule survives the links moving
+    // into a dropdown.
+    private bool IsCategoryPage => Nav.Uri.Contains("/category/");
+
+    protected override void OnInitialized()
+    {
+        Nav.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        if (open)
+        {
+            open = false;
+        }
+        StateHasChanged();
+    }
+
+    private void Toggle()
+    {
+        open = !open;
+        runSand = open;
+    }
+
+    private void Close()
+    {
+        open = false;
+    }
+
+    private void OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape")
+        {
+            open = false;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // The canvas only exists while the panel is open, so the sand can only be
+        // started here, after the render that created it.
+        if (open && runSand)
+        {
+            runSand = false;
+            await JS.InvokeVoidAsync("duneNav.sandSettle", sandCanvas);
+        }
+    }
+
+    public void Dispose()
+    {
+        Nav.LocationChanged -= OnLocationChanged;
+    }
+}
