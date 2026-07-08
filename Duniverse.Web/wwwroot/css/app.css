@@ -90,6 +90,18 @@ code {
 
 /* ---- Duniverse Archives theme ---- */
 
+/* Marcellus, by Brian J. Bonislawsky / Astigmatic (SIL Open Font License; the license
+   text sits beside the font file in /fonts). Self-hosted so the site makes no
+   third-party requests. One weight exists (400), which is why the heading rule below
+   pins font-weight: a browser asked for bold would fake it and smear the letterforms. */
+@font-face {
+    font-family: "Marcellus";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('../fonts/marcellus-400.woff2') format('woff2');
+}
+
 :root {
     --dune-bg: #171310;
     --dune-panel: #241c16;
@@ -102,6 +114,14 @@ code {
 
 *, *::before, *::after {
     box-sizing: border-box;
+}
+
+/* Display type: headings and the wordmark carry Marcellus, a Roman-inscription serif
+   that reads as archive rather than operating system. Body text stays on the system
+   stack for reading comfort. */
+h1, h2, h3, .site-title {
+    font-family: "Marcellus", Georgia, serif;
+    font-weight: 400;
 }
 
 html, body {
@@ -123,6 +143,44 @@ a {
         color: var(--dune-accent-bright);
     }
 
+/* Keyboard focus gets a spice-gold ring. Without this the browser draws its default
+   blue outline, and blue is reserved for the Eyes of Ibad on the active tab. Inputs
+   with their own focus treatment (search boxes, pickers) override this locally. */
+:focus-visible {
+    outline: 2px solid var(--dune-accent);
+    outline-offset: 2px;
+}
+
+/* Text selection in the same spice light, for the same reason. */
+::selection {
+    background: rgba(224, 164, 88, 0.35);
+    color: var(--dune-text);
+}
+
+/* Scrollbars in the site's own materials: modern Chrome and Firefox take the two-color
+   form; Safari takes the -webkit- parts, ignored by browsers using the form above. */
+html {
+    scrollbar-color: var(--dune-border) var(--dune-bg);
+}
+
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--dune-bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--dune-border);
+    border: 3px solid var(--dune-bg);
+    border-radius: 6px;
+}
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--dune-muted);
+    }
+
 .page {
     display: flex;
     flex-direction: column;
@@ -139,7 +197,6 @@ a {
 
 .site-title {
     font-size: 1.4rem;
-    font-weight: 700;
     letter-spacing: 0.04em;
     text-decoration: none;
     color: var(--dune-accent-bright);
