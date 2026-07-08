@@ -93,12 +93,75 @@ namespace Duniverse.Services
         }
 
         /// <summary>
+        /// Collects the whole visible archive into one graph: every entity the
+        /// <paramref name="include"/> predicate admits becomes a node, and every recorded
+        /// connection between two admitted entities becomes an edge. The spoiler gate passes
+        /// its predicate here, so a reader's graph is built purely from records they are
+        /// cleared to see; hidden entities never enter the simulation, which means the shape
+        /// of the visible web leaks nothing about what is missing from it. Entities are
+        /// walked in a deterministic order so the layout lands the same way on every visit.
+        /// </summary>
+        public EntityGraph BuildFullGraph(EntityRegistry registry, Func<DuneEntity, bool>? include = null)
+        {
+            var graph = new EntityGraph();
+
+            var entities = registry.GetAllEntities<DuneEntity>()
+                .Where(entity => include is null || include(entity))
+                .OrderBy(entity => entity.Id, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            var admitted = new HashSet<string>(entities.Select(e => e.Id), StringComparer.OrdinalIgnoreCase);
+
+            graph.Nodes.AddRange(entities.Select(entity => new GraphNode
+            {
+                Id = entity.Id,
+                Name = entity.Name,
+                ShortDescription = entity.ShortDescription ?? "",
+                Category = CategorySlug(entity),
+            }));
+
+            var edgeKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var entity in entities)
+            {
+                foreach (var neighbor in registry.GetDirectlyRelated(entity.Id))
+                {
+                    if (!admitted.Contains(neighbor.Id))
+                    {
+                        continue;
+                    }
+
+                    var edgeKey = string.CompareOrdinal(entity.Id, neighbor.Id) < 0
+                        ? $"{entity.Id}|{neighbor.Id}"
+                        : $"{neighbor.Id}|{entity.Id}";
+
+                    if (edgeKeys.Add(edgeKey))
+                    {
+                        graph.Edges.Add(new GraphEdge(entity.Id, neighbor.Id));
+                    }
+                }
+            }
+
+            return graph;
+        }
+
+        /// <summary>
         /// Runs the spring-embedder simulation in place, settling each node's X/Y into the
         /// [0, width] x [0, height] viewport. Nodes start on a seeded circle (deterministic and
         /// already roughly spaced out) rather than at random, so the simulation converges to a
         /// similar layout each time instead of jittering between runs.
         /// </summary>
-        public void ApplyForceDirectedLayout(EntityGraph graph, double width, double height, int iterations = 300)
+        /// <param name="gravity">Optional pull toward the canvas center, as a fraction of a
+        /// node's distance from it. Zero (the default) suits small ego graphs, whose pinned
+        /// center already anchors them. Large free-floating graphs need a little gravity to
+        /// keep loosely connected clusters from drifting apart.</param>
+        /// <param name="repulsionRange">How far a node's repulsion reaches. Infinite (the
+        /// default) matches classic Fruchterman-Reingold and suits small graphs. On large
+        /// graphs, unlimited range makes every node press on every other, and the summed
+        /// pressure pins the outer ring flat against the clamped borders; a range of two or
+        /// three ideal-distances keeps spacing local, the way d3-force's theta cutoff does,
+        /// and lets the cloud settle as a constellation instead of a box.</param>
+        public void ApplyForceDirectedLayout(EntityGraph graph, double width, double height, int iterations = 300,
+            double gravity = 0, double repulsionRange = double.PositiveInfinity)
         {
             var nodes = graph.Nodes;
             int count = nodes.Count;
@@ -146,6 +209,10 @@ namespace Duniverse.Services
                         double dx = a.X - b.X;
                         double dy = a.Y - b.Y;
                         double distance = Math.Max(Math.Sqrt(dx * dx + dy * dy), 0.01);
+                        if (distance > repulsionRange)
+                        {
+                            continue;
+                        }
                         double repulsion = (idealDistance * idealDistance) / distance;
 
                         double fx = (dx / distance) * repulsion;
@@ -175,6 +242,16 @@ namespace Duniverse.Services
 
                         node.ForceX -= (dx / distance) * attraction * 0.5;
                         node.ForceY -= (dy / distance) * attraction * 0.5;
+                    }
+                }
+
+                // Gravity: a gentle spring from every node toward the canvas center.
+                if (gravity > 0)
+                {
+                    foreach (var node in nodes)
+                    {
+                        node.ForceX += (centerX - node.X) * gravity;
+                        node.ForceY += (centerY - node.Y) * gravity;
                     }
                 }
 

@@ -1,0 +1,165 @@
+@page "/universe"
+@inject EntityRegistry Registry
+@inject GraphLayoutService LayoutService
+@inject SpoilerSettings Spoiler
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+
+<PageTitle>Universe - Duniverse</PageTitle>
+
+<div class="hero" style="background-image: linear-gradient(rgba(23, 19, 16, 0.9), rgba(23, 19, 16, 0.94)), url('/images/entity-graph-background.jpg');">
+    <h1>The Whole Duniverse</h1>
+    <p class="tagline">
+        Every record in the archive and every connection between them, drawn as one web.
+        Your reading progress decides how much of it exists.
+    </p>
+
+    <div class="universe-find">
+        <EntityPicker Label="Find a record" Placeholder="e.g. Lady Jessica"
+                      Selected="@found" SelectedChanged="OnFoundChanged" />
+    </div>
+
+    <div class="universe-card" @ref="container">
+        <div class="universe-controls">
+            <button type="button" data-uni-zoom="in" title="Zoom in" aria-label="Zoom in">+</button>
+            <button type="button" data-uni-zoom="out" title="Zoom out" aria-label="Zoom out">&minus;</button>
+            <button type="button" data-uni-zoom="reset" title="Reset the view" aria-label="Reset the view">&#8634;</button>
+        </div>
+
+        <svg class="universe-graph" viewBox="0 0 1600 1200" xmlns="http://www.w3.org/2000/svg"
+             role="img" aria-label="Every visible record in the archive, connected as one graph">
+            <g class="universe-world">
+                <g class="graph-edges">
+                    @foreach (var edge in graph.Edges)
+                    {
+                        var source = nodesById[edge.SourceId];
+                        var target = nodesById[edge.TargetId];
+                        <line x1="@source.X.ToString(Inv)" y1="@source.Y.ToString(Inv)"
+                              x2="@target.X.ToString(Inv)" y2="@target.Y.ToString(Inv)" />
+                    }
+                </g>
+                <g class="graph-nodes">
+                    @foreach (var node in graph.Nodes)
+                    {
+                        <g class="graph-node category-@node.Category @(node.Id == found?.Id ? "is-found" : null)"
+                           transform="translate(@node.X.ToString(Inv), @node.Y.ToString(Inv))"
+                           @onclick="() => GoTo(node.Id)">
+                            @* The invisible circle is the hit target: without it, the gap
+                               between the dot and its label is dead space that eats clicks. *@
+                            <circle class="hit" r="17" />
+                            <circle r="9" />
+                            <text y="24">@Truncate(node.Name)</text>
+                            <title>@node.Name: @node.ShortDescription</title>
+                        </g>
+                    }
+                </g>
+            </g>
+        </svg>
+    </div>
+
+    <p class="graph-hint muted">
+        @graph.Nodes.Count records and @graph.Edges.Count connections at your reading
+        progress. Drag to travel, zoom to read, click any point to open its record.
+    </p>
+
+    <div class="universe-legend">
+        @foreach (var entry in Legend)
+        {
+            <span><span class="endpoint-dot connection-cat category-@entry.Slug"></span>@entry.Label</span>
+        }
+    </div>
+
+    <SpoilerControl OnChanged="OnSpoilerChanged" />
+</div>
+
+@code {
+    private static readonly System.Globalization.CultureInfo Inv = System.Globalization.CultureInfo.InvariantCulture;
+
+    private const double Width = 1600;
+    private const double Height = 1200;
+
+    private ElementReference container;
+    private EntityGraph graph = new();
+    private Dictionary<string, GraphNode> nodesById = new();
+    private DuneEntity? found;
+    private bool pendingReset;
+
+    private record LegendEntry(string Slug, string Label);
+
+    private static readonly LegendEntry[] Legend =
+    {
+        new("personas", "Personas"),
+        new("houses", "Houses"),
+        new("organizations", "Organizations"),
+        new("worlds", "Worlds"),
+        new("artifacts", "Artifacts"),
+        new("vehicles", "Vehicles"),
+        new("disciplines", "Disciplines"),
+        new("theological-systems", "Theological Systems"),
+        new("historical-events", "Historical Events"),
+        new("flora-fauna", "Flora & Fauna"),
+    };
+
+    protected override void OnInitialized()
+    {
+        Rebuild();
+    }
+
+    // The whole visible archive, laid out fresh. Hidden entities are excluded before the
+    // simulation runs, so they neither appear nor bend the shape of what does.
+    private void Rebuild()
+    {
+        graph = LayoutService.BuildFullGraph(Registry, Spoiler.IsVisible);
+        LayoutService.ApplyForceDirectedLayout(graph, Width, Height, iterations: 220, gravity: 0.08, repulsionRange: 240);
+        nodesById = graph.Nodes.ToDictionary(n => n.Id, StringComparer.OrdinalIgnoreCase);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("duneUniverse.attach", container);
+        }
+
+        if (pendingReset)
+        {
+            pendingReset = false;
+            await JS.InvokeVoidAsync("duneUniverse.reset");
+        }
+    }
+
+    private async Task OnFoundChanged(DuneEntity? entity)
+    {
+        found = entity;
+
+        if (entity is not null && nodesById.TryGetValue(entity.Id, out var node))
+        {
+            // Glide the camera to the chosen record and zoom close enough to read it.
+            await JS.InvokeVoidAsync("duneUniverse.focusOn", node.X, node.Y, 2.6);
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("duneUniverse.reset");
+        }
+    }
+
+    // A change in reading progress can add stars to the universe or take them away;
+    // rebuild from scratch and bring the camera home so the new whole is in frame.
+    private void OnSpoilerChanged()
+    {
+        if (found is not null && !Spoiler.IsVisible(found))
+        {
+            found = null;
+        }
+
+        Rebuild();
+        pendingReset = true;
+    }
+
+    private void GoTo(string id)
+    {
+        Nav.NavigateTo($"/entity/{id}");
+    }
+
+    private static string Truncate(string name) => name.Length > 18 ? name[..17] + "…" : name;
+}

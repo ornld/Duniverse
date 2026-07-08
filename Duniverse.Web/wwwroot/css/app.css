@@ -848,6 +848,115 @@ html {
     text-align: center;
 }
 
+/* ---- The whole Duniverse ---- */
+
+.universe-card {
+    position: relative;
+    padding: 0.75rem;
+    background-color: var(--dune-panel);
+    background-image: linear-gradient(rgba(23, 19, 16, 0.92), rgba(23, 19, 16, 0.95)), url('/images/entity-graph-background.jpg');
+    background-size: cover;
+    background-position: center;
+    border: 1px solid var(--dune-border);
+    border-radius: 8px;
+}
+
+.universe-graph {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 78vh;
+    /* The constellation owns its own gestures (drag pans, pinch zooms); the page
+       scrolls normally everywhere outside it. */
+    touch-action: none;
+    cursor: grab;
+    border-radius: 6px;
+}
+
+    .universe-graph:active {
+        cursor: grabbing;
+    }
+
+.universe-world {
+    will-change: transform;
+}
+
+/* Hundreds of edges need a lighter hand than the ego graph's dozen, but enough spice
+   in the stroke to read as threads of a web against the dark. */
+.universe-graph .graph-edges line {
+    stroke: rgba(224, 164, 88, 0.26);
+    stroke-width: 1;
+    opacity: 1;
+}
+
+.universe-graph .graph-node text {
+    font-size: 13px;
+}
+
+.universe-graph .graph-node .hit {
+    fill: transparent;
+    stroke: none;
+    pointer-events: all;
+}
+
+.graph-node.is-found circle {
+    stroke: var(--dune-accent-bright);
+    stroke-width: 3px;
+}
+
+.graph-node.is-found text {
+    opacity: 1;
+    fill: var(--dune-accent-bright);
+}
+
+.universe-find {
+    max-width: 26rem;
+    margin-bottom: 1rem;
+}
+
+.universe-controls {
+    position: absolute;
+    top: 1.1rem;
+    right: 1.1rem;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+    .universe-controls button {
+        width: 36px;
+        height: 36px;
+        background: rgba(23, 19, 16, 0.82);
+        border: 1px solid var(--dune-border);
+        border-radius: 6px;
+        color: var(--dune-text);
+        font-size: 1.05rem;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+        .universe-controls button:hover {
+            border-color: var(--dune-accent);
+            color: var(--dune-accent-bright);
+        }
+
+.universe-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.4rem 1rem;
+    margin-top: 0.9rem;
+    color: var(--dune-muted);
+    font-size: 0.8rem;
+}
+
+    .universe-legend > span {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
 /* ---- Connection finder ---- */
 
 /* The same category palette the relationship graph uses, opted into by the connection
