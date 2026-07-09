@@ -9,7 +9,7 @@
 
 @if (entity is not null && isGated && !revealed)
 {
-    <div class="entity-card front spoiler-gate dossier-item" style="--i: 0" @key="entity.Id">
+    <div class="entity-card front spoiler-gate dossier-item category-@GraphLayoutService.CategorySlug(entity)" style="--i: 0" @key="entity.Id">
         <h1>A spoiler lies ahead</h1>
         <p class="short-desc">This entry draws on @BookName(entity.SpoilerTier).</p>
         <p>
@@ -28,7 +28,7 @@ else if (entity is not null)
     @* One keyed wrapper per record: navigating from one entity to another rebuilds this
        subtree, so the dossier entrance below replays for every newly opened record. *@
     <div @key="entity.Id">
-    <div class="entity-card front dossier-item" style="--i: 0">
+    <div class="entity-card front dossier-item category-@GraphLayoutService.CategorySlug(entity)" style="--i: 0">
         <h1>@entity.Name</h1>
         <p class="short-desc">@entity.ShortDescription</p>
 

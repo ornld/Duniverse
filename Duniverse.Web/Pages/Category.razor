@@ -8,7 +8,7 @@
 
 @if (items.Count > 0)
 {
-    <div class="hero category-hero" style="@heroStyle">
+    <div class="hero category-hero category-@Slug.ToLowerInvariant()" style="@heroStyle">
         <h1>@categoryTitle</h1>
         <p class="tagline">@items.Count records. Select one to see its full entry and connections.</p>
 

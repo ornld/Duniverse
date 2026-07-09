@@ -270,7 +270,10 @@ html {
 
 .hero {
     position: relative;
-    overflow: hidden;
+    /* clip, not hidden: hidden makes the hero a scroll container, which would capture
+       the timeline's view() timeline; clip crops the background art the same way
+       while leaving the document as the nearest scroller. */
+    overflow: clip;
     background-size: cover;
     background-position: center;
     border: 1px solid var(--dune-border);
@@ -891,6 +894,7 @@ html {
 
 .graph-node {
     cursor: pointer;
+    color: var(--cat-color, var(--dune-muted));
     transition: opacity 0.15s ease;
 }
 
@@ -937,17 +941,32 @@ html {
         opacity: 1;
     }
 
-.graph-node.category-artifacts { color: #e0a458; }
-.graph-node.category-disciplines { color: #7fb3b0; }
-.graph-node.category-flora-fauna { color: #8fae5c; }
-.graph-node.category-historical-events { color: #c76b3f; }
-.graph-node.category-houses { color: #d4494f; }
-.graph-node.category-organizations { color: #9b6dc4; }
-.graph-node.category-personas { color: #f4c07c; }
-.graph-node.category-theological-systems { color: #b98fd1; }
-.graph-node.category-vehicles { color: #6f97b5; }
-.graph-node.category-worlds { color: #d9a441; }
-.graph-node.category-unknown { color: var(--dune-muted); }
+/* The site-wide category palette. Graph stars, the connection finder's chips and
+   dots, and the tinted card edges below all read from --cat-color, so each
+   category's color is decided exactly once, here. */
+.category-artifacts { --cat-color: #e0a458; }
+.category-disciplines { --cat-color: #7fb3b0; }
+.category-flora-fauna { --cat-color: #8fae5c; }
+.category-historical-events { --cat-color: #c76b3f; }
+.category-houses { --cat-color: #d4494f; }
+.category-organizations { --cat-color: #9b6dc4; }
+.category-personas { --cat-color: #f4c07c; }
+.category-theological-systems { --cat-color: #b98fd1; }
+.category-vehicles { --cat-color: #6f97b5; }
+.category-worlds { --cat-color: #d9a441; }
+.category-unknown { --cat-color: var(--dune-muted); }
+
+/* A record's kind tints the top edge of its card and of its browse page's hero, and
+   the left edge of every tile within, threading the graphs' color language through
+   the rest of the site. Elements without a category keep the plain border color. */
+.entity-card.front,
+.category-hero {
+    border-top: 2px solid var(--cat-color, var(--dune-border));
+}
+
+.category-hero .category-tile {
+    border-left: 2px solid var(--cat-color, var(--dune-border));
+}
 
 .graph-hint {
     margin-top: 0.5rem;
@@ -1120,19 +1139,11 @@ html {
 
 /* ---- Connection finder ---- */
 
-/* The same category palette the relationship graph uses, opted into by the connection
-   finder's chips, suggestion dots, and chain nodes via the connection-cat class. */
-.connection-cat.category-artifacts { color: #e0a458; }
-.connection-cat.category-disciplines { color: #7fb3b0; }
-.connection-cat.category-flora-fauna { color: #8fae5c; }
-.connection-cat.category-historical-events { color: #c76b3f; }
-.connection-cat.category-houses { color: #d4494f; }
-.connection-cat.category-organizations { color: #9b6dc4; }
-.connection-cat.category-personas { color: #f4c07c; }
-.connection-cat.category-theological-systems { color: #b98fd1; }
-.connection-cat.category-vehicles { color: #6f97b5; }
-.connection-cat.category-worlds { color: #d9a441; }
-.connection-cat.category-unknown { color: var(--dune-muted); }
+/* The connection finder's chips, suggestion dots, and chain nodes read the same
+   category palette as everything else (--cat-color, defined with the graphs). */
+.connection-cat {
+    color: var(--cat-color, var(--dune-muted));
+}
 
 .connection-pickers {
     display: flex;
@@ -1578,6 +1589,33 @@ button.chip {
     .ritual-backdrop,
     .ritual-panel,
     .ritual-spine {
+        animation: none;
+    }
+}
+
+/* ---- Page entrance ----
+   Every route change re-mounts the page wrapper (keyed by path in MainLayout), and
+   the fresh element settles in with one short fade. Kept under a fifth of a second:
+   any longer and the whole site starts to feel slower, not smoother. Record pages
+   opt out through :has, since their dossier entrance below already stages the arrival. */
+
+@keyframes page-enter {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+}
+
+.page-enter {
+    animation: page-enter 0.18s ease-out;
+}
+
+    .page-enter:has(.dossier-item) {
+        animation: none;
+    }
+
+@media (prefers-reduced-motion: reduce) {
+    .page-enter {
         animation: none;
     }
 }
@@ -2155,6 +2193,7 @@ button.chip {
     border-radius: 50%;
     background: var(--dune-accent);
     box-shadow: 0 0 0 4px var(--dune-bg), 0 0 10px rgba(224, 164, 88, 0.6);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
 }
 
     .timeline-item.left .timeline-dot {
@@ -2163,6 +2202,13 @@ button.chip {
 
     .timeline-item.right .timeline-dot {
         left: -7px;
+    }
+
+    /* The era dot on the spine answers its card's hover with a brighter glow. */
+    .timeline-item:has(.timeline-card:hover) .timeline-dot {
+        background: var(--dune-accent-bright);
+        box-shadow: 0 0 0 4px var(--dune-bg), 0 0 14px rgba(244, 192, 124, 0.85);
+        transform: scale(1.25);
     }
 
 .timeline-card {
@@ -2241,8 +2287,61 @@ button.chip {
     text-align: center;
 }
 
+/* ---- Timeline reveal ----
+   Events are dealt off the spine as they scroll into view: each card starts against
+   the center line and settles out to its side while it fades in. The animation scrubs
+   with the scroll position (view timeline, no script), so rolling back up rewinds it.
+   Browsers without scroll-driven animations skip the @supports block and show the
+   settled state, exactly as before. */
+
+@keyframes timeline-reveal-left {
+    from {
+        opacity: 0;
+        transform: translateX(2.5rem);
+    }
+}
+
+@keyframes timeline-reveal-right {
+    from {
+        opacity: 0;
+        transform: translateX(-2.5rem);
+    }
+}
+
+@keyframes timeline-reveal-up {
+    from {
+        opacity: 0;
+        transform: translateY(1.25rem);
+    }
+}
+
+@supports (animation-timeline: view()) {
+    .timeline-item.left {
+        animation: timeline-reveal-left linear both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 70%;
+    }
+
+    .timeline-item.right {
+        animation: timeline-reveal-right linear both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 70%;
+    }
+
+    .timeline-era-band {
+        animation: timeline-reveal-up linear both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 70%;
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
     .timeline-card:hover {
+        animation: none;
+    }
+
+    .timeline-item,
+    .timeline-era-band {
         animation: none;
     }
 }
@@ -2298,6 +2397,14 @@ button.chip {
     .timeline-item.right .timeline-dot {
         left: 13px;
         right: auto;
+    }
+
+    /* Stacked in one column, the side-drift loses its meaning; everything rises. */
+    @supports (animation-timeline: view()) {
+        .timeline-item.left,
+        .timeline-item.right {
+            animation-name: timeline-reveal-up;
+        }
     }
 
     .graph-card {

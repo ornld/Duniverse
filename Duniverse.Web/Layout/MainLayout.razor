@@ -1,5 +1,6 @@
 @inherits LayoutComponentBase
 @inject SpoilerSettings Spoiler
+@inject NavigationManager Nav
 
 <div class="page">
     <header class="site-header">
@@ -12,10 +13,11 @@
         @* Hold the body until spoiler preferences are read from storage, so a returning reader
            with protection on never sees a flash of hidden content before it is filtered out.
            The @key wrapper re-mounts the current page when the first-visit ritual applies a
-           choice, so whatever page the reader landed on re-filters against it. *@
+           choice (re-filtering whatever page the reader landed on) and on every route change,
+           which replays the page-enter settle for each navigation. *@
         @if (Spoiler.Loaded)
         {
-            <div @key="spoilerEpoch">
+            <div class="page-enter" @key="PageKey">
                 @Body
             </div>
         }
@@ -42,6 +44,10 @@
 
 @code {
     private int spoilerEpoch;
+
+    // Path only, stripped of query and hash: those refine a page in place (search text,
+    // anchors) and re-mounting on them would replay the entrance mid-interaction.
+    private string PageKey => $"{spoilerEpoch}:{Nav.ToBaseRelativePath(Nav.Uri).Split('?', '#')[0]}";
 
     protected override async Task OnInitializedAsync()
     {
