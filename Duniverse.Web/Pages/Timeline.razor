@@ -26,7 +26,10 @@
             var side = cardIndex % 2 == 0 ? "left" : "right";
             cardIndex++;
             <div class="timeline-item @side">
-                <div class="timeline-dot"></div>
+                @* The dot is a second door to the same record as its card, for the mouse
+                   only: hidden from assistive tech and skipped in the tab order, so the
+                   event is not announced or focused twice. *@
+                <a class="timeline-dot" href="@($"/entity/{evt.Id}")" aria-hidden="true" tabindex="-1"></a>
                 <a class="timeline-card" href="@($"/entity/{evt.Id}")">
                     @if (!string.IsNullOrEmpty(evt.DateAG))
                     {

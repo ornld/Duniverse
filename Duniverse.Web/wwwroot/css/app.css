@@ -2207,8 +2207,17 @@ button.chip {
         left: -7px;
     }
 
-    /* The era dot on the spine answers its card's hover with a brighter glow. */
-    .timeline-item:has(.timeline-card:hover) .timeline-dot {
+    /* The dot on the spine and its card answer each other's hover: either one lights
+       both. The dot's padded pseudo-element widens its hover target, since a bare
+       14px circle is a fiddly thing to rest a cursor on. */
+    .timeline-dot::after {
+        content: "";
+        position: absolute;
+        inset: -8px;
+    }
+
+    .timeline-item:has(.timeline-card:hover) .timeline-dot,
+    .timeline-dot:hover {
         background: var(--dune-accent-bright);
         box-shadow: 0 0 0 4px var(--dune-bg), 0 0 14px rgba(244, 192, 124, 0.85);
         transform: scale(1.25);
@@ -2227,7 +2236,8 @@ button.chip {
     transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
 }
 
-    .timeline-card:hover {
+    .timeline-card:hover,
+    .timeline-item:has(.timeline-dot:hover) .timeline-card {
         transform: translateY(-2px);
         border-color: transparent;
         background:
@@ -2339,7 +2349,8 @@ button.chip {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .timeline-card:hover {
+    .timeline-card:hover,
+    .timeline-item:has(.timeline-dot:hover) .timeline-card {
         animation: none;
     }
 
