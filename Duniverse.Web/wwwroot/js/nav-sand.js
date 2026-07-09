@@ -54,14 +54,15 @@ window.duneNav = {
             // Every grain settles a plausible sink below wherever it entered.
             grain.settleY = Math.min(h * 0.95, Math.max(grain.y, 0) + h * (0.15 + Math.random() * 0.55));
             grain.restFrames = 0;
-            // The first wave blows in at once; respawns wait a while so the steady
-            // state stays a sparse sift instead of a sandstorm over the links.
-            grain.startAt = now + (initial ? 0 : 600 + Math.random() * 2600);
+            // The first wave blows in at once; respawns pause only briefly, so the
+            // steady state holds a full airborne haze: a window onto Arrakis, kept
+            // legible by the calm wind rather than by thinning the sand.
+            grain.startAt = now + (initial ? 0 : 400 + Math.random() * 1400);
             return grain;
         }
 
         const grains = [];
-        const count = Math.round(rect.width / 1.2);
+        const count = Math.round(rect.width / 0.75);
         const t0 = performance.now();
         for (let i = 0; i < count; i++) {
             grains.push(spawn({}, t0, true));
