@@ -257,10 +257,13 @@ html {
     .social-links a {
         color: var(--dune-muted);
         display: inline-flex;
+        transition: color 0.3s ease, transform 0.2s ease, filter 0.2s ease;
     }
 
         .social-links a:hover {
             color: var(--dune-accent-bright);
+            transform: translateY(-2px);
+            filter: drop-shadow(0 0 5px currentColor);
         }
 
     .social-links svg {
