@@ -17,11 +17,17 @@
 
 <body>
     <div id="app">
-        <svg class="loading-progress">
-            <circle r="40%" cx="50%" cy="50%" />
-            <circle r="40%" cx="50%" cy="50%" />
-        </svg>
-        <div class="loading-progress-text"></div>
+        <!-- Shown while the runtime downloads and boots; Blazor replaces all of #app the
+             moment the app renders. The seam's width tracks --blazor-load-percentage, the
+             real download progress the loader publishes, so this is a true progress bar
+             wearing the site's material rather than a themed fake. -->
+        <div class="boot-screen">
+            <div class="boot-wordmark">Duniverse</div>
+            <div class="boot-seam">
+                <div class="boot-seam-fill"></div>
+            </div>
+            <p class="boot-line">Opening the archives</p>
+        </div>
     </div>
 
     <div id="blazor-error-ui">
@@ -31,7 +37,38 @@
     </div>
     <script src="js/nav-sand.js"></script>
     <script src="js/universe-pan.js"></script>
-    <script src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>
+    <script src="_framework/blazor.webassembly#[.{fingerprint}].js" autostart="false"></script>
+    <!-- GitHub Pages cannot negotiate compression for the framework files, so a cold
+         visitor would download ~7 MB uncompressed. The publish output already contains a
+         Brotli twin of every boot resource at roughly a third the size; this hook fetches
+         those twins and decodes them in the browser (decode.min.js is Google's reference
+         decoder, MIT licensed). On localhost the dev server negotiates compression
+         itself, so the hook steps aside and dev behaves stock. -->
+    <script type="module">
+        import { BrotliDecode } from './js/decode.min.js';
+
+        Blazor.start({
+            loadBootResource: (type, name, defaultUri, integrity) => {
+                if (type === 'dotnetjs' || type === 'manifest' || type === 'configuration') {
+                    // The runtime's own script must load as a URL, not a Response.
+                    return defaultUri;
+                }
+                if (location.hostname === 'localhost') {
+                    return undefined;
+                }
+                return (async function () {
+                    const response = await fetch(defaultUri + '.br', { cache: 'no-cache' });
+                    if (!response.ok) {
+                        throw new Error(response.statusText);
+                    }
+                    const buffer = await response.arrayBuffer();
+                    const decompressed = BrotliDecode(new Int8Array(buffer));
+                    const contentType = type === 'dotnetwasm' ? 'application/wasm' : 'application/octet-stream';
+                    return new Response(decompressed, { headers: { 'content-type': contentType } });
+                })();
+            }
+        });
+    </script>
 </body>
 
 </html>

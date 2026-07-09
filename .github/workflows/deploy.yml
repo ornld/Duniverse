@@ -25,6 +25,11 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
+      # The wasm relinker strips unused runtime code from dotnet.native.wasm; without
+      # this workload the publish logs a warning and ships the fatter runtime.
+      - name: Install wasm-tools workload
+        run: dotnet workload install wasm-tools
+
       - name: Publish
         run: dotnet publish Duniverse.Web/Duniverse.Web.csproj -c Release -o release --nologo
 

@@ -29,13 +29,20 @@
         <svg class="universe-graph" viewBox="0 0 1600 1200" xmlns="http://www.w3.org/2000/svg"
              role="img" aria-label="Every visible record in the archive, connected as one graph">
             <g class="universe-world">
+                @* The birth of the universe: every node carries a delay proportional to its
+                   distance from the canvas center, so creation blooms outward as a wave; a
+                   thread appears only after the later of its two stars exists. The @key wraps
+                   an inner group (never .universe-world itself, whose element the pan module
+                   holds), so a reading-progress change births the new universe from scratch. *@
+                <g @key="birthEpoch">
                 <g class="graph-edges">
                     @foreach (var edge in graph.Edges)
                     {
                         var source = nodesById[edge.SourceId];
                         var target = nodesById[edge.TargetId];
                         <line x1="@source.X.ToString(Inv)" y1="@source.Y.ToString(Inv)"
-                              x2="@target.X.ToString(Inv)" y2="@target.Y.ToString(Inv)" />
+                              x2="@target.X.ToString(Inv)" y2="@target.Y.ToString(Inv)"
+                              style="--birth: @EdgeBirthDelay(edge)" />
                     }
                 </g>
                 <g class="graph-nodes">
@@ -43,6 +50,7 @@
                     {
                         <g class="graph-node category-@node.Category @(node.Id == found?.Id ? "is-found" : null)"
                            transform="translate(@node.X.ToString(Inv), @node.Y.ToString(Inv))"
+                           style="--birth: @NodeBirthDelay(node)"
                            @onclick="() => GoTo(node.Id)">
                             @* The invisible circle is the hit target: without it, the gap
                                between the dot and its label is dead space that eats clicks. *@
@@ -52,6 +60,7 @@
                             <title>@node.Name: @node.ShortDescription</title>
                         </g>
                     }
+                </g>
                 </g>
             </g>
         </svg>
@@ -84,6 +93,12 @@
     private DuneEntity? found;
     private bool pendingReset;
 
+    // Bumped on every rebuild so the keyed subtree recreates and the birth replays.
+    private int birthEpoch;
+
+    // How long the creation wave takes to reach the canvas corners, in seconds.
+    private const double BirthWave = 1.6;
+
     private record LegendEntry(string Slug, string Label);
 
     private static readonly LegendEntry[] Legend =
@@ -112,6 +127,27 @@
         graph = LayoutService.BuildFullGraph(Registry, Spoiler.IsVisible);
         LayoutService.ApplyForceDirectedLayout(graph, Width, Height, iterations: 220, gravity: 0.08, repulsionRange: 240);
         nodesById = graph.Nodes.ToDictionary(n => n.Id, StringComparer.OrdinalIgnoreCase);
+        birthEpoch++;
+    }
+
+    // The creation wave: a node's delay grows with its distance from the canvas center,
+    // normalized against the far corners so the outermost stars land at BirthWave.
+    private double BirthSeconds(GraphNode node)
+    {
+        double dx = node.X - Width / 2;
+        double dy = node.Y - Height / 2;
+        double corner = Math.Sqrt(Width * Width + Height * Height) / 2;
+        return Math.Sqrt(dx * dx + dy * dy) / corner * BirthWave;
+    }
+
+    private string NodeBirthDelay(GraphNode node) =>
+        BirthSeconds(node).ToString("0.00", Inv) + "s";
+
+    // A connection can only exist once both of its stars do.
+    private string EdgeBirthDelay(GraphEdge edge)
+    {
+        double later = Math.Max(BirthSeconds(nodesById[edge.SourceId]), BirthSeconds(nodesById[edge.TargetId]));
+        return (later + 0.25).ToString("0.00", Inv) + "s";
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

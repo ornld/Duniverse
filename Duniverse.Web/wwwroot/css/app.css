@@ -41,39 +41,68 @@
         content: "An error has occurred."
     }
 
-.loading-progress {
-    position: absolute;
-    display: block;
-    width: 8rem;
-    height: 8rem;
-    inset: 20vh 0 auto 0;
-    margin: 0 auto 0 auto;
+/* ---- Boot screen ----
+   What a first-time visitor sees while the runtime downloads: the wordmark over a
+   spice seam that fills with the real load percentage. Replaces the template's blue
+   spinner and "(100%)" text; blue belongs to the Eyes of Ibad alone. Colors are
+   hard-coded rather than var() so the screen renders right even if the theme block
+   ever moves below it. */
+
+.boot-screen {
+    position: fixed;
+    inset: 0;
+    /* Above everything: nothing app-rendered exists while this shows, but the ceiling
+       costs nothing and keeps the screen whole if anything ever paints early. */
+    z-index: 900;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.15rem;
+    background: #171310;
 }
 
-    .loading-progress circle {
-        fill: none;
-        stroke: #e0e0e0;
-        stroke-width: 0.6rem;
-        transform-origin: 50% 50%;
-        transform: rotate(-90deg);
-    }
-
-        .loading-progress circle:last-child {
-            stroke: #1b6ec2;
-            stroke-dasharray: calc(3.141 * var(--blazor-load-percentage, 0%) * 0.8), 500%;
-            transition: stroke-dasharray 0.05s ease-in-out;
-        }
-
-.loading-progress-text {
-    position: absolute;
-    text-align: center;
-    font-weight: bold;
-    inset: calc(20vh + 3.25rem) 0 auto 0.2rem;
+.boot-wordmark {
+    font-family: "Marcellus", Georgia, serif;
+    font-size: 2.3rem;
+    letter-spacing: 0.12em;
+    color: #f4c07c;
+    animation: boot-breathe 2.4s ease-in-out infinite;
 }
 
-    .loading-progress-text:after {
-        content: var(--blazor-load-percentage-text, "Loading");
+.boot-seam {
+    width: min(320px, 70vw);
+    height: 2px;
+    border-radius: 999px;
+    background: rgba(224, 164, 88, 0.16);
+    overflow: hidden;
+}
+
+.boot-seam-fill {
+    height: 100%;
+    width: var(--blazor-load-percentage, 0%);
+    background: linear-gradient(90deg, #a05c22, #e0a458, #f4c07c);
+    box-shadow: 0 0 8px rgba(224, 164, 88, 0.6);
+    transition: width 0.2s ease;
+}
+
+.boot-line {
+    margin: 0;
+    color: #a89478;
+    font-size: 0.8rem;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+}
+
+@keyframes boot-breathe {
+    50% { opacity: 0.7; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .boot-wordmark {
+        animation: none;
     }
+}
 
 code {
     color: #c02d76;
@@ -966,6 +995,44 @@ html {
 .graph-node.is-found text {
     opacity: 1;
     fill: var(--dune-accent-bright);
+}
+
+/* ---- The birth of the universe ----
+   On arrival (and again whenever reading progress rebuilds the graph) creation blooms
+   outward from the center: each star ignites at its --birth delay, set inline from its
+   distance to the middle of the canvas, and each thread laces in only after the later
+   of its two stars exists. Backwards fill keeps elements dark until their moment and
+   hands transform control back to the hover styles once they land. */
+
+@keyframes uni-appear {
+    from { opacity: 0; }
+}
+
+@keyframes uni-ignite {
+    from { transform: scale(0.2); }
+}
+
+.universe-graph .graph-node {
+    animation: uni-appear 0.5s ease-out backwards;
+    animation-delay: var(--birth, 0s);
+}
+
+    .universe-graph .graph-node circle {
+        animation: uni-ignite 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+        animation-delay: var(--birth, 0s);
+    }
+
+.universe-graph .graph-edges line {
+    animation: uni-appear 0.6s ease-out backwards;
+    animation-delay: var(--birth, 0s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .universe-graph .graph-node,
+    .universe-graph .graph-node circle,
+    .universe-graph .graph-edges line {
+        animation: none;
+    }
 }
 
 .universe-find {
