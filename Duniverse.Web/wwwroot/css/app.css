@@ -649,6 +649,65 @@ html {
         filter: drop-shadow(0 0 6px currentColor);
     }
 
+/* ---- Chart entrance ----
+   The chart settles one generation at a time, oldest first: a row's people land
+   (fade on the group, an overshoot pop on the circle), their lines flow toward the
+   next row a beat later, and that row follows. Every element reads its own row from
+   --row, set inline by the page. Entrances use a backwards fill rather than forwards,
+   so once an element has landed the base styles own its transform again and the
+   existing hover states keep working. */
+
+@keyframes blood-appear {
+    from { opacity: 0; }
+}
+
+@keyframes blood-pop {
+    from { transform: scale(0.35); }
+}
+
+@keyframes blood-draw {
+    from { stroke-dashoffset: 1; }
+}
+
+.bloodline-bands g {
+    animation: blood-appear 0.4s ease-out backwards;
+    animation-delay: calc(var(--row) * 0.38s);
+}
+
+.bloodline-node {
+    animation: blood-appear 0.35s ease-out backwards;
+    animation-delay: calc(var(--row) * 0.38s);
+}
+
+    .bloodline-node circle {
+        animation: blood-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+        animation-delay: calc(var(--row) * 0.38s);
+    }
+
+/* Solid lines truly draw themselves (their pathLength is normalized to 1 in the
+   markup); dashed lines fade on the same clock, since the draw trick would replace
+   their dash pattern. */
+.bloodline-edges path.draw {
+    stroke-dasharray: 1;
+    animation: blood-draw 0.45s ease-out backwards;
+    animation-delay: calc(var(--row) * 0.38s + 0.18s);
+}
+
+.bloodline-edges path.dashed {
+    animation: blood-appear 0.45s ease-out backwards;
+    animation-delay: calc(var(--row) * 0.38s + 0.18s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .bloodline-bands g,
+    .bloodline-node,
+    .bloodline-node circle,
+    .bloodline-edges path.draw,
+    .bloodline-edges path.dashed {
+        animation: none;
+    }
+}
+
 .bloodline-note {
     margin-top: 0.75rem;
     font-size: 0.85rem;
@@ -1417,6 +1476,29 @@ button.chip {
     .ritual-backdrop,
     .ritual-panel,
     .ritual-spine {
+        animation: none;
+    }
+}
+
+/* ---- Dossier entrance ----
+   Opening a record lays its file on the desk: the record card settles first, the
+   divider and relationship web follow, the related sections last. The page keys the
+   whole subtree by entity id, so walking from record to record replays it. */
+
+@keyframes dossier-settle {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+}
+
+.dossier-item {
+    animation: dossier-settle 0.4s ease-out backwards;
+    animation-delay: calc(var(--i, 0) * 0.12s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dossier-item {
         animation: none;
     }
 }

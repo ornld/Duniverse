@@ -25,10 +25,15 @@
     {
         <div class="bloodline-wrapper">
             <svg class="bloodline-chart" viewBox="0 0 @W @((int)chartHeight)" preserveAspectRatio="xMidYMid meet">
+                @* Every element carries its generation's row index (--row), and the CSS
+                   staggers the entrance by it: a generation's people settle, their lines
+                   flow down, and the next generation follows. Solid lines truly draw
+                   (pathLength normalizes them for the dash trick); dashed lines fade in
+                   instead, since the trick would destroy their dash pattern. *@
                 <g class="bloodline-bands">
                     @foreach (var band in visibleBands)
                     {
-                        <g transform="translate(0, @band.Y.ToString(Inv))">
+                        <g transform="translate(0, @band.Y.ToString(Inv))" style="--row: @band.Row">
                             <line x1="40" y1="0" x2="@(W - 40)" y2="0" />
                             <text x="@(W / 2)" y="4">@band.Label</text>
                         </g>
@@ -37,7 +42,8 @@
                 <g class="bloodline-edges">
                     @foreach (var descent in visibleDescents)
                     {
-                        <path d="@descent.Path" class="@(descent.Dashed ? "dashed" : null)">
+                        <path d="@descent.Path" class="@(descent.Dashed ? "dashed" : "draw")"
+                              pathLength="@(descent.Dashed ? null : "1")" style="--row: @descent.Row">
                             @if (descent.Label is not null)
                             {
                                 <title>@descent.Label</title>
@@ -46,7 +52,8 @@
                     }
                     @foreach (var union in visibleUnions)
                     {
-                        <path d="@union.Path" class="union @(union.Dashed ? "dashed" : null)">
+                        <path d="@union.Path" class="union @(union.Dashed ? "dashed" : "draw")"
+                              pathLength="@(union.Dashed ? null : "1")" style="--row: @union.Row">
                             @if (union.Label is not null)
                             {
                                 <title>@union.Label</title>
@@ -59,6 +66,7 @@
                     {
                         <g class="bloodline-node lineage-@node.Fill @(node.Ring is not null ? $"ring-{node.Ring}" : "")"
                            transform="translate(@node.X.ToString(Inv), @node.Y.ToString(Inv))"
+                           style="--row: @node.Row"
                            @onclick="() => GoTo(node.EntityId)">
                             <circle r="13" />
                             <text y="@node.LabelY.ToString(Inv)">@node.Name</text>
@@ -91,15 +99,17 @@
     private const double BandRowHeight = 64;
     private const double NodeRadius = 13;
 
+    // Row carries the visible generation's order (0 = oldest on screen) so the entrance
+    // animation can settle the chart one generation at a time.
     private sealed record PlacedNode(string EntityId, string Name, string ShortDescription,
-        string Fill, string? Ring, double X, double Y)
+        string Fill, string? Ring, double X, double Y, int Row)
     {
         // Vertical offset of the name below the node. Neighbors in a crowded generation
         // alternate between two heights so long names never run into each other.
         public double LabelY { get; set; } = 30;
     }
-    private sealed record DrawnEdge(string Path, string? Label, bool Dashed);
-    private sealed record DrawnBand(string Label, double Y);
+    private sealed record DrawnEdge(string Path, string? Label, bool Dashed, int Row);
+    private sealed record DrawnBand(string Label, double Y, int Row);
 
     private Dictionary<string, PlacedNode> placed = new(StringComparer.OrdinalIgnoreCase);
     private List<DrawnEdge> visibleDescents = new();
@@ -138,6 +148,8 @@
         // Rows: visible generations in order, with a band row inserted where a time-gap
         // divider has visible people on both sides of it.
         var generations = visibleNodes.Select(pair => pair.Node.Generation).Distinct().OrderBy(g => g).ToList();
+        var genRow = generations.Select((generation, index) => (generation, index))
+            .ToDictionary(pair => pair.generation, pair => pair.index);
         var rowY = new Dictionary<int, double>();
         double y = TopMargin;
 
@@ -149,7 +161,8 @@
                 if (band.BeforeGeneration == generation && hasEarlierRow)
                 {
                     y += BandRowHeight / 2;
-                    visibleBands.Add(new DrawnBand(band.Label, y));
+                    // The band belongs to the row about to be placed, so it enters with it.
+                    visibleBands.Add(new DrawnBand(band.Label, y, rowY.Count));
                     y += BandRowHeight / 2;
                 }
             }
@@ -164,7 +177,7 @@
         {
             double x = PadX + node.Column * (W - 2 * PadX);
             placed[node.EntityId] = new PlacedNode(entity!.Id, entity.Name, entity.ShortDescription ?? "",
-                node.Fill, node.Ring, x, rowY[node.Generation]);
+                node.Fill, node.Ring, x, rowY[node.Generation], genRow[node.Generation]);
         }
 
         // Stagger neighboring labels within each generation so long names stay legible.
@@ -203,7 +216,7 @@
                     $"M {left.X + NodeRadius} {left.Y} L {right.X - NodeRadius} {right.Y}");
             }
 
-            visibleUnions.Add(new DrawnEdge(path, union.Label, union.Dashed));
+            visibleUnions.Add(new DrawnEdge(path, union.Label, union.Dashed, left.Row));
         }
 
         // Descents: drop from the midpoint of both parents when both are visible, from the
@@ -242,7 +255,9 @@
             string path = FormattableString.Invariant(
                 $"M {sourceX} {sourceY} V {elbowY} H {child.X} V {child.Y - NodeRadius}");
 
-            visibleDescents.Add(new DrawnEdge(path, descent.Label, descent.Dashed));
+            // Descents flow once the parents' generation has settled, so they enter on
+            // the row above the child.
+            visibleDescents.Add(new DrawnEdge(path, descent.Label, descent.Dashed, Math.Max(0, child.Row - 1)));
         }
     }
 

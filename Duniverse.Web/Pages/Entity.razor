@@ -9,7 +9,7 @@
 
 @if (entity is not null && isGated && !revealed)
 {
-    <div class="entity-card front spoiler-gate">
+    <div class="entity-card front spoiler-gate dossier-item" style="--i: 0" @key="entity.Id">
         <h1>A spoiler lies ahead</h1>
         <p class="short-desc">This entry draws on @BookName(entity.SpoilerTier).</p>
         <p>
@@ -25,7 +25,10 @@
 }
 else if (entity is not null)
 {
-    <div class="entity-card front">
+    @* One keyed wrapper per record: navigating from one entity to another rebuilds this
+       subtree, so the dossier entrance below replays for every newly opened record. *@
+    <div @key="entity.Id">
+    <div class="entity-card front dossier-item" style="--i: 0">
         <h1>@entity.Name</h1>
         <p class="short-desc">@entity.ShortDescription</p>
 
@@ -72,18 +75,18 @@ else if (entity is not null)
         }
     </div>
 
-    <div class="connections-divider">
+    <div class="connections-divider dossier-item" style="--i: 1">
         <span>Connected relationships throughout the Duniverse</span>
     </div>
 
     @if (hasAnyConnections)
     {
-        <div class="entity-card graph-card">
+        <div class="entity-card graph-card dossier-item" style="--i: 2">
             <RelationshipGraph CenterId="@entity.Id" />
         </div>
     }
 
-    <div class="entity-card back">
+    <div class="entity-card back dossier-item" style="--i: 3">
         @foreach (var group in Sections)
         {
             <RelatedSection Title="@group.Title" Items="related.Where(group.Matches)" RoleFor="RoleFor" />
@@ -93,6 +96,7 @@ else if (entity is not null)
         {
             <p class="muted">No connected records found.</p>
         }
+    </div>
     </div>
 }
 else if (candidates.Count > 0)
