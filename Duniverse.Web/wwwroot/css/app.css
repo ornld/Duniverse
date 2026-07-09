@@ -849,10 +849,18 @@ html {
     stroke: var(--dune-border);
     stroke-width: 1;
     opacity: 0.8;
+    transition: stroke 0.15s ease, stroke-width 0.15s ease, opacity 0.15s ease;
 }
 
     /* Labeled edges carry a hover tooltip naming both sides of the relationship. */
     .graph-edges line.has-label:hover {
+        stroke: var(--dune-accent);
+        stroke-width: 2.5;
+        opacity: 1;
+    }
+
+    /* Hovering a node lights every line it touches, tracing its place in the web. */
+    .graph-edges line.touches-hovered {
         stroke: var(--dune-accent);
         stroke-width: 2.5;
         opacity: 1;

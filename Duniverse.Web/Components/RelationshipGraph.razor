@@ -15,7 +15,7 @@
                     var tip = EdgeTip(edge);
                     <line x1="@source.X.ToString(Inv)" y1="@source.Y.ToString(Inv)"
                           x2="@target.X.ToString(Inv)" y2="@target.Y.ToString(Inv)"
-                          class="@(tip is null ? null : "has-label")">
+                          class="@EdgeClasses(edge, tip)">
                         @if (tip is not null)
                         {
                             <title>@tip</title>
@@ -28,7 +28,9 @@
                 {
                     <g class="graph-node category-@node.Category @(node.IsCenter ? "is-center" : "")"
                        transform="translate(@node.X.ToString(Inv), @node.Y.ToString(Inv))"
-                       @onclick="() => GoTo(node.Id)">
+                       @onclick="() => GoTo(node.Id)"
+                       @onmouseover="() => hoveredNodeId = node.Id"
+                       @onmouseout="() => hoveredNodeId = null">
                         <circle r="@(node.IsCenter ? 20 : 11)" />
                         <text y="@(node.IsCenter ? 34 : 24)">@Truncate(node.Name)</text>
                         <title>@NodeTip(node)</title>
@@ -51,6 +53,7 @@
 
     private EntityGraph? graph;
     private Dictionary<string, GraphNode> nodesById = new();
+    private string? hoveredNodeId;
 
     protected override void OnParametersSet()
     {
@@ -65,6 +68,24 @@
     }
 
     private static string Truncate(string name) => name.Length > 18 ? name[..17] + "…" : name;
+
+    // Edges hover-highlight two ways: has-label marks pairs whose relationship carries a
+    // tooltip, touches-hovered lights every line into the node under the cursor, labeled
+    // or not, so a node's whole web reads at a glance.
+    private string? EdgeClasses(GraphEdge edge, string? tip)
+    {
+        var touchesHovered = hoveredNodeId is not null
+            && (string.Equals(edge.SourceId, hoveredNodeId, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(edge.TargetId, hoveredNodeId, StringComparison.OrdinalIgnoreCase));
+
+        return (tip, touchesHovered) switch
+        {
+            (null, false) => null,
+            (null, true) => "touches-hovered",
+            (_, false) => "has-label",
+            (_, true) => "has-label touches-hovered"
+        };
+    }
 
     // Spoiler-checked role phrase describing what otherId is to viewedId, or null.
     private string? VisibleRole(string viewedId, string otherId)
