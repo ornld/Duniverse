@@ -866,6 +866,16 @@ html {
         opacity: 1;
     }
 
+    /* While a node is hovered, everything outside its neighborhood recedes,
+       so the lit connections stand alone against a dimmed web. */
+    .relationship-graph.has-hover .graph-edges line:not(.touches-hovered) {
+        opacity: 0.25;
+    }
+
+    .relationship-graph.has-hover .graph-node:not(.near-hovered) {
+        opacity: 0.3;
+    }
+
 .related-role {
     margin-left: 0.45rem;
     padding: 0.1rem 0.55rem;
@@ -881,6 +891,7 @@ html {
 
 .graph-node {
     cursor: pointer;
+    transition: opacity 0.15s ease;
 }
 
     .graph-node circle {
@@ -1003,6 +1014,22 @@ html {
 .graph-node.is-found text {
     opacity: 1;
     fill: var(--dune-accent-bright);
+}
+
+/* Hovering a star lights every thread it holds and lets the rest of the web recede.
+   Lit threads stay slimmer than the ego graph's: hundreds of 1px lines need less. */
+.universe-graph .graph-edges line.touches-hovered {
+    stroke: var(--dune-accent);
+    stroke-width: 1.6;
+    opacity: 1;
+}
+
+.universe-graph.has-hover .graph-edges line:not(.touches-hovered) {
+    opacity: 0.12;
+}
+
+.universe-graph.has-hover .graph-node:not(.near-hovered) {
+    opacity: 0.22;
 }
 
 /* ---- The birth of the universe ----

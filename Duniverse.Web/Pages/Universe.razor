@@ -26,7 +26,7 @@
             <button type="button" data-uni-zoom="reset" title="Reset the view" aria-label="Reset the view">&#8634;</button>
         </div>
 
-        <svg class="universe-graph" viewBox="0 0 1600 1200" xmlns="http://www.w3.org/2000/svg"
+        <svg class="universe-graph @(hoveredNodeId is null ? null : "has-hover")" viewBox="0 0 1600 1200" xmlns="http://www.w3.org/2000/svg"
              role="img" aria-label="Every visible record in the archive, connected as one graph">
             <g class="universe-world">
                 @* The birth of the universe: every node carries a delay proportional to its
@@ -42,16 +42,19 @@
                         var target = nodesById[edge.TargetId];
                         <line x1="@source.X.ToString(Inv)" y1="@source.Y.ToString(Inv)"
                               x2="@target.X.ToString(Inv)" y2="@target.Y.ToString(Inv)"
+                              class="@(TouchesHovered(edge) ? "touches-hovered" : null)"
                               style="--birth: @EdgeBirthDelay(edge)" />
                     }
                 </g>
                 <g class="graph-nodes">
                     @foreach (var node in graph.Nodes)
                     {
-                        <g class="graph-node category-@node.Category @(node.Id == found?.Id ? "is-found" : null)"
+                        <g class="graph-node category-@node.Category @(node.Id == found?.Id ? "is-found" : null) @(IsNearHovered(node) ? "near-hovered" : null)"
                            transform="translate(@node.X.ToString(Inv), @node.Y.ToString(Inv))"
                            style="--birth: @NodeBirthDelay(node)"
-                           @onclick="() => GoTo(node.Id)">
+                           @onclick="() => GoTo(node.Id)"
+                           @onmouseover="() => hoveredNodeId = node.Id"
+                           @onmouseout="() => hoveredNodeId = null">
                             @* The invisible circle is the hit target: without it, the gap
                                between the dot and its label is dead space that eats clicks. *@
                             <circle class="hit" r="17" />
@@ -68,7 +71,8 @@
 
     <p class="graph-hint muted">
         @graph.Nodes.Count records and @graph.Edges.Count connections at your reading
-        progress. Drag to travel, zoom to read, click any point to open its record.
+        progress. Drag to travel, zoom to read, hover any point to light its web,
+        click it to open its record.
     </p>
 
     <div class="universe-legend">
@@ -90,6 +94,8 @@
     private ElementReference container;
     private EntityGraph graph = new();
     private Dictionary<string, GraphNode> nodesById = new();
+    private Dictionary<string, HashSet<string>> neighborsById = new(StringComparer.OrdinalIgnoreCase);
+    private string? hoveredNodeId;
     private DuneEntity? found;
     private bool pendingReset;
 
@@ -127,7 +133,39 @@
         graph = LayoutService.BuildFullGraph(Registry, Spoiler.IsVisible);
         LayoutService.ApplyForceDirectedLayout(graph, Width, Height, iterations: 220, gravity: 0.08, repulsionRange: 240);
         nodesById = graph.Nodes.ToDictionary(n => n.Id, StringComparer.OrdinalIgnoreCase);
+        neighborsById = BuildNeighbors(graph);
+        hoveredNodeId = null;
         birthEpoch++;
+    }
+
+    private static Dictionary<string, HashSet<string>> BuildNeighbors(EntityGraph graph)
+    {
+        var map = graph.Nodes.ToDictionary(
+            n => n.Id,
+            _ => new HashSet<string>(StringComparer.OrdinalIgnoreCase),
+            StringComparer.OrdinalIgnoreCase);
+        foreach (var edge in graph.Edges)
+        {
+            map[edge.SourceId].Add(edge.TargetId);
+            map[edge.TargetId].Add(edge.SourceId);
+        }
+        return map;
+    }
+
+    private bool TouchesHovered(GraphEdge edge)
+    {
+        return hoveredNodeId is not null
+            && (string.Equals(edge.SourceId, hoveredNodeId, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(edge.TargetId, hoveredNodeId, StringComparison.OrdinalIgnoreCase));
+    }
+
+    // The hovered star and its direct neighbors keep full presence while the rest of
+    // the universe recedes; a star counts as near itself so it never fades under the cursor.
+    private bool IsNearHovered(GraphNode node)
+    {
+        return hoveredNodeId is not null
+            && (string.Equals(node.Id, hoveredNodeId, StringComparison.OrdinalIgnoreCase)
+                || (neighborsById.TryGetValue(hoveredNodeId, out var near) && near.Contains(node.Id)));
     }
 
     // The creation wave: a node's delay grows with its distance from the canvas center,

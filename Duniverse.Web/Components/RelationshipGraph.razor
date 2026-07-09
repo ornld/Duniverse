@@ -6,7 +6,7 @@
 @if (graph is not null && graph.Nodes.Count > 1)
 {
     <div class="graph-wrapper">
-        <svg class="relationship-graph" viewBox="0 0 @Width @Height" preserveAspectRatio="xMidYMid meet">
+        <svg class="relationship-graph @(hoveredNodeId is null ? null : "has-hover")" viewBox="0 0 @Width @Height" preserveAspectRatio="xMidYMid meet">
             <g class="graph-edges">
                 @foreach (var edge in graph.Edges)
                 {
@@ -26,7 +26,7 @@
             <g class="graph-nodes">
                 @foreach (var node in graph.Nodes)
                 {
-                    <g class="graph-node category-@node.Category @(node.IsCenter ? "is-center" : "")"
+                    <g class="graph-node category-@node.Category @(node.IsCenter ? "is-center" : "") @(IsNearHovered(node) ? "near-hovered" : "")"
                        transform="translate(@node.X.ToString(Inv), @node.Y.ToString(Inv))"
                        @onclick="() => GoTo(node.Id)"
                        @onmouseover="() => hoveredNodeId = node.Id"
@@ -38,7 +38,7 @@
                 }
             </g>
         </svg>
-        <p class="graph-hint muted">Click any node to re-center the web of connections on it.</p>
+        <p class="graph-hint muted">Hover any node to light its connections. Click it to re-center the web on it.</p>
     </div>
 }
 
@@ -53,6 +53,7 @@
 
     private EntityGraph? graph;
     private Dictionary<string, GraphNode> nodesById = new();
+    private Dictionary<string, HashSet<string>> neighborsById = new(StringComparer.OrdinalIgnoreCase);
     private string? hoveredNodeId;
 
     protected override void OnParametersSet()
@@ -60,6 +61,31 @@
         graph = LayoutService.BuildEgoGraph(Registry, CenterId, maxDepth: 2, include: Spoiler.IsVisible);
         LayoutService.ApplyForceDirectedLayout(graph, Width, Height);
         nodesById = graph.Nodes.ToDictionary(n => n.Id, StringComparer.OrdinalIgnoreCase);
+        neighborsById = BuildNeighbors(graph);
+        hoveredNodeId = null;
+    }
+
+    private static Dictionary<string, HashSet<string>> BuildNeighbors(EntityGraph graph)
+    {
+        var map = graph.Nodes.ToDictionary(
+            n => n.Id,
+            _ => new HashSet<string>(StringComparer.OrdinalIgnoreCase),
+            StringComparer.OrdinalIgnoreCase);
+        foreach (var edge in graph.Edges)
+        {
+            map[edge.SourceId].Add(edge.TargetId);
+            map[edge.TargetId].Add(edge.SourceId);
+        }
+        return map;
+    }
+
+    // The hovered node and its direct neighbors keep full presence while the rest of
+    // the graph recedes; a node counts as near itself so it never fades under the cursor.
+    private bool IsNearHovered(GraphNode node)
+    {
+        return hoveredNodeId is not null
+            && (string.Equals(node.Id, hoveredNodeId, StringComparison.OrdinalIgnoreCase)
+                || (neighborsById.TryGetValue(hoveredNodeId, out var near) && near.Contains(node.Id)));
     }
 
     private void GoTo(string id)
