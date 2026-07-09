@@ -43,7 +43,7 @@ window.duneNav = {
             }
             grain.px = grain.x;
             grain.py = grain.y;
-            grain.vy = (0.35 + Math.random() * 0.9) * dpr;
+            grain.vy = (0.3 + Math.random() * 0.65) * dpr;
             grain.size = (0.6 + Math.random() * 1.2) * dpr;
             // Lighter grains ride the wind harder than heavy ones, which spreads one
             // shared gust into layers of different speeds.
@@ -73,12 +73,13 @@ window.duneNav = {
             }
 
             // The shared wind, always blowing one way: a steady push plus gusts that
-            // swell and die on their own rhythm.
+            // swell and die on their own rhythm. Tuned to a sift, not a storm; the
+            // directional pull, not raw speed, is what keeps it reading as sand.
             const gust =
                 0.5 * Math.sin(now * 0.00055) +
                 0.3 * Math.sin(now * 0.0016 + 2.1) +
                 0.2 * Math.sin(now * 0.00037 + 4.4);
-            const wind = (0.8 + 2.0 * (gust * 0.5 + 0.5)) * dpr;
+            const wind = (0.35 + 1.15 * (gust * 0.5 + 0.5)) * dpr;
 
             ctx.clearRect(0, 0, w, h);
             ctx.lineCap = "round";
@@ -93,8 +94,8 @@ window.duneNav = {
                     g.py = g.y;
                     // Directional turbulence, not sway: the jitter roughens the path
                     // but never pushes a grain back against the wind.
-                    g.x += wind * g.carry + (Math.random() - 0.5) * 0.5 * dpr;
-                    g.y += g.vy + (Math.random() - 0.5) * 0.3 * dpr;
+                    g.x += wind * g.carry + (Math.random() - 0.5) * 0.3 * dpr;
+                    g.y += g.vy + (Math.random() - 0.5) * 0.2 * dpr;
                     if (g.x > w + 4 * dpr) {
                         spawn(g, now, false);
                         continue;
@@ -127,7 +128,7 @@ window.duneNav = {
                     ctx.strokeStyle = g.color;
                     ctx.lineWidth = g.size;
                     ctx.beginPath();
-                    ctx.moveTo(g.px + (g.px - g.x) * 1.5, g.py + (g.py - g.y) * 1.5);
+                    ctx.moveTo(g.px + (g.px - g.x) * 0.9, g.py + (g.py - g.y) * 0.9);
                     ctx.lineTo(g.x, g.y);
                     ctx.stroke();
                 }
