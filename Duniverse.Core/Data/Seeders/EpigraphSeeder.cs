@@ -73,6 +73,28 @@ namespace Duniverse.Data.Seeders
                     Text = "Once men turned their thinking over to machines in the hope that this would set them free. But that only permitted other men with machines to enslave them.",
                     Work = "Reverend Mother Gaius Helen Mohiam, to Paul Atreides",
                 },
+                new()
+                {
+                    Text = "Hope clouds observation.",
+                    Work = "Reverend Mother Gaius Helen Mohiam, to Paul Atreides",
+                },
+                new()
+                {
+                    Text = "The willow submits to the wind and prospers until one day it is many willows—a wall against the wind. This is the willow's purpose.",
+                    Work = "Reverend Mother Gaius Helen Mohiam, to Paul Atreides",
+                },
+                new()
+                {
+                    Text = "The mystery of life isn't a problem to solve, but a reality to experience.",
+                    Work = "Reverend Mother Gaius Helen Mohiam, to Paul Atreides",
+                },
+
+                // ---- Muad'Dib: Family Commentaries, by the Princess Irulan ----
+                new()
+                {
+                    Text = "Any road followed precisely to its end leads precisely nowhere. Climb the mountain just a little bit to test that it's a mountain. From the top of the mountain, you cannot see the mountain.",
+                    Work = "Muad'Dib: Family Commentaries, by the Princess Irulan",
+                },
 
                 // ---- The Orange Catholic Bible ----
                 new()
@@ -89,6 +111,16 @@ namespace Duniverse.Data.Seeders
                 },
                 new()
                 {
+                    Text = "Parting with friends is a sadness. A place is only a place.",
+                    Work = "Thufir Hawat, to Paul Atreides",
+                },
+                new()
+                {
+                    Text = "It is said in the desert that possession of water in great amount can inflict a man with fatal carelessness.",
+                    Work = "Liet-Kynes",
+                },
+                new()
+                {
                     Text = "The sleeper must awaken.",
                     Work = "Duke Leto Atreides",
                 },
@@ -96,6 +128,11 @@ namespace Duniverse.Data.Seeders
                 {
                     Text = "God created Arrakis to train the faithful.",
                     Work = "A saying of the Fremen",
+                },
+                new()
+                {
+                    Text = "Polish comes from the cities; wisdom from the desert.",
+                    Work = "A saying of the Arrakeen villagers",
                 },
 
                 // ---- Later books ----
@@ -109,6 +146,12 @@ namespace Duniverse.Data.Seeders
                 {
                     Text = "Empires do not suffer emptiness of purpose at the time of their creation. It is when they have become established that aims are lost and replaced by vague ritual.",
                     Work = "Words of Muad'Dib, by the Princess Irulan",
+                    Tier = SpoilerTier.DuneMessiah,
+                },
+                new()
+                {
+                    Text = "Truth suffers from too much analysis.",
+                    Work = "An ancient Fremen saying",
                     Tier = SpoilerTier.DuneMessiah,
                 },
                 new()
@@ -131,7 +174,19 @@ namespace Duniverse.Data.Seeders
                 },
                 new()
                 {
+                    Text = "Governments, if they endure, always tend increasingly toward aristocratic forms. No government in history has been known to evade this pattern.",
+                    Work = "The Stolen Journals of Leto II",
+                    Tier = SpoilerTier.GodEmperorOfDune,
+                },
+                new()
+                {
                     Text = "The purpose of argument is to change the nature of truth.",
+                    Work = "The Bene Gesserit Coda",
+                    Tier = SpoilerTier.Chapterhouse,
+                },
+                new()
+                {
+                    Text = "Seek freedom and become captive of your desires. Seek discipline and find your liberty.",
                     Work = "The Bene Gesserit Coda",
                     Tier = SpoilerTier.Chapterhouse,
                 },
