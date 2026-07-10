@@ -157,6 +157,10 @@ html, body {
     background: var(--dune-bg);
     color: var(--dune-text);
     font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    /* Without this reset the browser's default 8px body margin insets the nav bar
+       from the window edges and pads the sides of every page by 8px more than the
+       top and bottom. */
+    margin: 0;
     /* clip, not hidden: hidden turns the root into a scroll container, which quietly
        disables position: sticky for every descendant (the pinned nav). clip prevents
        sideways overflow the same way without creating a scroller. */
@@ -233,10 +237,12 @@ html {
 
 .site-body {
     flex: 1;
-    max-width: 1230px;
     width: 100%;
     margin: 0 auto;
-    padding: 2rem 2.5rem 3rem;
+    /* All four gaps around the boxed page content read as the same 2rem. The bottom
+       is 0.5rem of padding because every page's last block (the hero, or the final
+       entity card) brings its own 1.5rem margin to the total. */
+    padding: 2rem 2rem 0.5rem;
 }
 
 .site-footer {
@@ -2078,6 +2084,15 @@ button.chip {
 
 .home-section {
     margin: 2rem 0;
+}
+
+/* About Dune is the site's one long-read page. On ordinary desktops its prose fills
+   the box like every other page (the user's preference); only on extra-wide monitors
+   do the columns stop growing, so the lines stay readable on a 27-inch display. */
+@media (min-width: 1720px) {
+    .about-hero .home-section {
+        max-width: 60rem;
+    }
 }
 
 /* The home search reuses the connection finder's picker; capped so the input reads
