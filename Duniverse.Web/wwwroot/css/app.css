@@ -2038,6 +2038,12 @@ button.chip {
     margin: 2rem 0;
 }
 
+/* The home search reuses the connection finder's picker; capped so the input reads
+   as a search box rather than a full-width bar across the hero. */
+.home-search {
+    max-width: 34rem;
+    margin-top: 1.5rem;
+}
     .home-section h2 {
         color: var(--dune-accent-bright);
         border-bottom: 1px solid var(--dune-border);

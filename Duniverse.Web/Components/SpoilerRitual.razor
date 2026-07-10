@@ -5,11 +5,12 @@
 
 @* The first-visit clearance ritual. A brand-new reader gets one full-screen moment: mark
    the last Dune novel you finished, and the archive seals everything past it before you
-   see a single record. The main menu is deliberately exempt, so the site's first
-   impression stays clean; the ritual waits at the threshold and appears on the reader's
-   first step deeper in (any other route, clicked or landed on directly). Any action here
-   (a spine, the full archive, or skip) saves a preference, so the ritual never returns.
-   Returning readers, who already own a saved choice, never see it at all. *@
+   see a single record. The main menu and the About page are deliberately exempt, so the
+   site's first impression stays clean and a curious newcomer can read about the book
+   unbothered; the ritual waits at the threshold and appears on the reader's first step
+   deeper in (any other route, clicked or landed on directly). Any action here (a spine,
+   the full archive, or skip) saves a preference, so the ritual never returns. Returning
+   readers, who already own a saved choice, never see it at all. *@
 
 @if (ShouldShow)
 {
@@ -54,11 +55,12 @@
     private ElementReference panel;
     private ElementReference sandCanvas;
 
-    private bool ShouldShow => Spoiler.Loaded && !Spoiler.HasStoredChoice && !dismissed && !OnMainMenu;
+    private bool ShouldShow => Spoiler.Loaded && !Spoiler.HasStoredChoice && !dismissed && !OnExemptPage;
 
-    // The main menu is the one place the ritual never covers. Query strings and fragments
+    // The main menu and the About page hold no records, so the ritual never covers them;
+    // it waits for the first step into the archive proper. Query strings and fragments
     // are stripped before the check, so "/?utm=..." still counts as home.
-    private bool OnMainMenu
+    private bool OnExemptPage
     {
         get
         {
@@ -68,7 +70,9 @@
             {
                 relative = relative[..cut];
             }
-            return relative.Length == 0;
+            relative = relative.TrimEnd('/');
+            return relative.Length == 0
+                || relative.Equals("about", StringComparison.OrdinalIgnoreCase);
         }
     }
 

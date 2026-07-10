@@ -1,0 +1,98 @@
+@page "/about"
+
+<PageTitle>About Dune - Duniverse</PageTitle>
+
+<div class="hero" style="background-image: linear-gradient(rgba(23, 19, 16, 0.82), rgba(23, 19, 16, 0.88)), url('/images/main-menu-background.jpg');">
+    <h1>About Dune</h1>
+    <p class="tagline">
+        Where the saga began.
+    </p>
+
+<section class="home-section">
+    <h2>Why Dune Matters</h2>
+    <p>
+        Published in 1965, <em>Dune</em> ranks among the most influential science fiction
+        novels ever written. Frank Herbert built a story around ecology, religion, resource scarcity, and the perils of
+        charismatic leadership. A desert planet holds the empire's only source of the spice
+        melange, the universes most valuable resource. This drags every noble house, religious order, and imperial power
+        into its path. Herbert's premise was that one resource could dictate the fate
+        of civilizations. It handed science fiction a new kind of epic, one built on
+        environments and power rather than heroes squaring off against villains.
+    </p>
+    <p>
+        Its influence runs through the science fiction that came after it. Critics have long
+        drawn lines between Arrakis and Tatooine, and between Paul Atreides' ascent and the
+        "chosen one" arc George Lucas later gave Luke Skywalker in <em>Star Wars</em>. Dune
+        shows up again and again on lists of the works that shaped the modern space epic.
+        Herbert cared less about creating a messiah than about warning readers away from
+        worshipping one. Paul's arc follows the shape of a hero's journey on purpose. It is
+        engineered to leave readers uneasy about the charismatic figures they are tempted to
+        idolize.
+    </p>
+</section>
+
+<section class="home-section">
+    <h2>About Frank Herbert</h2>
+    <p>
+        Frank Herbert (1920-1986) worked as an American journalist before he became one of
+        science fiction's defining authors. Years spent as a newspaper reporter and editor
+        left their mark on <em>Dune</em>. The novel's dense, research-driven world-building
+        reads like the work of someone who spent a career chasing down facts before writing
+        a sentence. Herbert went on to write five sequels himself: <em>Dune Messiah</em>,
+        <em>Children of Dune</em>, <em>God Emperor of Dune</em>, <em>Heretics of Dune</em>,
+        and <em>Chapterhouse: Dune</em>. The saga stretches across ten thousand years of
+        future history. He died in 1986.
+    </p>
+</section>
+
+<section class="home-section">
+    <h2>About the creation of Dune</h2>
+    <p>
+        The seed of <em>Dune</em> was, quite literally, sand. In the late 1950s, Herbert set
+        out to write a magazine article about a U.S. Department of Agriculture project. The
+        project used grasses to hold back the shifting sand dunes along the Oregon coast. He
+        never finished the article. The research stayed with him anyway. The notion of sand as
+        a force capable of swallowing roads, towns, and rivers took root. Over the next six
+        years it grew into a whole desert planet, complete with its own ecology, its own
+        religion, and a people who had learned to survive on it.
+    </p>
+    <p>
+        The finished novel ran first as a serial in <em>Analog Science Fiction</em> magazine.
+        Roughly twenty publishers rejected it afterward. They were put off by its length and
+        its strangeness for the market at the time. It finally found a home in 1965 with
+        Chilton Books, a publisher better known for auto repair manuals. <em>Dune</em> went on
+        to win the Hugo and the inaugural Nebula Award. It remains one of the best-selling
+        science fiction novels of all time.
+    </p>
+</section>
+
+<section class="home-section">
+    <h2>In Frank Herbert's Own Words</h2>
+    <p>
+        Herbert spoke and wrote at length beyond the novel itself. He warned about the dangers
+        he saw in charismatic leaders, in unchecked power, and in technology deployed without a
+        second thought. These are the same warnings <em>Dune</em> was built to dramatize.
+    </p>
+    <div class="quote-grid">
+        @foreach (var quote in AuthorQuotes)
+        {
+            <div class="quote-card">
+                <p class="quote-text">"@quote.Text"</p>
+                <span class="quote-author">- @quote.Source</span>
+            </div>
+        }
+    </div>
+</section>
+
+</div>
+
+@code {
+    private record AuthorQuote(string Text, string Source);
+
+    private static readonly List<AuthorQuote> AuthorQuotes = new()
+    {
+        new("Technology is both a tool for helping humans and for destroying them. This is the paradox of our times which we're compelled to face.", "Frank Herbert in Conversations in Port Townsend, interview with Tim O'Reilly, 1983"),
+        new("Dune was aimed at this whole idea of the infallible leader because my view of history says mistakes made by a leader (or made in a leader's name) are amplified by the numbers who follow without question.", "Frank Herbert in Dune Genesis, Omni magazine, 1980"),
+        new("By the time we awaken faintly to the awareness that we have been socially conditioned, we find ourselves so indoctrinated that it's difficult, if not impossible, to break the old patterns.", "Frank Herbert in Science Fiction: Today and Tomorrow Magazine, 1974"),
+    };
+}
