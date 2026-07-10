@@ -1902,6 +1902,30 @@ button.chip {
     }
 }
 
+/* Above the wrap threshold the tabs stop clustering in the middle: each one takes an
+   equal share of the bar, so the row spreads evenly across it. The share is capped so
+   the tabs stay within comfortable reach of each other on wide screens instead of
+   stretching to the far edges. Long labels keep their natural width (flex
+   min-content), so nothing ever truncates. */
+@media (min-width: 921px) {
+    .top-nav {
+        column-gap: 0.7rem;
+    }
+
+    .top-nav > a,
+    .top-nav .nav-index {
+        flex: 1 1 0;
+        max-width: 5.5rem;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    .index-trigger {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
 /* ---- Index dropdown ----
    The ten categories live behind one "Index" tab. The panel is centered under the
    whole nav bar (not the trigger) so it never clips a viewport edge, and it opens
