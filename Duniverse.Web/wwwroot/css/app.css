@@ -247,10 +247,49 @@ html {
 
 .site-footer {
     text-align: center;
-    padding: 1rem;
     color: var(--dune-muted);
     font-size: 0.8rem;
-    border-top: 1px solid var(--dune-border);
+}
+
+/* ---- Footer horizon ----
+   A band of open sky between the page and the footer text. The band's background
+   stays transparent so the page's own night shows through; a whisper of spice glow
+   gathers at the dune line. The moons sit behind the dune svg in DOM order, so the
+   crests overlap the first moon's lower edge. */
+
+.footer-horizon {
+    position: relative;
+    height: 120px;
+    overflow: clip;
+    background: linear-gradient(to bottom, transparent 30%, rgba(224, 164, 88, 0.05));
+}
+
+.horizon-dunes {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 72px;
+    display: block;
+}
+
+.footer-horizon .twin-moons {
+    position: absolute;
+    right: 9%;
+    /* High enough that the first moon rides clear of the far crest at any viewport
+       width; the crest line under the moons shifts as the stretched dune paths
+       compress, so this carries clearance for the narrow case too. */
+    bottom: 28px;
+}
+
+/* The nearest crest and this fill are the same color on purpose: the text sits on
+   the shadowed face of the closest dune, not in a separate box below the art. The
+   near-crest path in MainLayout hardcodes this same value (svg attributes cannot
+   read custom properties); if the panel tone ever changes, change both. */
+.footer-content {
+    background: var(--dune-panel);
+    padding: 1rem;
 }
 
 .social-links {
@@ -2471,6 +2510,23 @@ button.chip {
 
     .site-header {
         padding: 1rem;
+    }
+
+    /* A shallower sky and smaller moons: at phone widths the stretched dune paths
+       compress, so the whole scene scales down together to keep the crests gentle. */
+    .footer-horizon {
+        height: 88px;
+    }
+
+    .horizon-dunes {
+        height: 52px;
+    }
+
+    .footer-horizon .twin-moons {
+        right: 5%;
+        bottom: 16px;
+        transform: scale(0.75);
+        transform-origin: 100% 100%;
     }
 
     .top-nav {

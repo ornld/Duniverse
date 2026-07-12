@@ -26,18 +26,40 @@
     <SpoilerRitual OnApplied="OnRitualApplied" />
 
     <footer class="site-footer">
-        <span>An unofficial encyclopedia of the Dune universe.</span>
-        <div class="social-links">
-            <a href="https://x.com/notlukearnold" target="_blank" rel="noopener" aria-label="X profile" title="X">
-                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                </svg>
-            </a>
-            <a href="https://instagram.com/notlukearnold" target="_blank" rel="noopener" aria-label="Instagram profile" title="Instagram">
-                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z" />
-                </svg>
-            </a>
+        @* The footer's straight rule gave way to a horizon: the twin moons hang in a
+           band of open sky, and three dune crests step forward in deepening panel
+           tones. The moons render before the dunes so their glow melts into the
+           crests instead of floating over them. The nearest crest shares the content
+           area's fill, so the footer reads as the shadowed face of the closest dune. *@
+        <div class="footer-horizon" aria-hidden="true">
+            <TwinMoons />
+            <svg class="horizon-dunes" viewBox="0 0 1440 90" preserveAspectRatio="none"
+                 xmlns="http://www.w3.org/2000/svg" focusable="false">
+                @* Depth runs light to dark: the far crests catch the moonlight, the
+                   near dune sits in its own shadow, matching the footer fill below. *@
+                <path fill="#2f251a" d="M0 46 C 90 34 200 28 340 36 C 470 43 560 56 720 50 C 850 45 930 32 1060 36 C 1180 40 1300 52 1440 44 L 1440 90 L 0 90 Z" />
+                <path fill="#292017" d="M0 64 C 130 68 250 52 420 55 C 590 58 680 70 850 66 C 1010 62 1120 48 1250 54 C 1340 58 1400 62 1440 64 L 1440 90 L 0 90 Z" />
+                <path fill="#241c16" d="M0 76 C 150 68 320 62 540 70 C 720 76 830 83 1020 79 C 1190 75 1320 68 1440 74 L 1440 90 L 0 90 Z" />
+                @* Moonlight catching the nearest crest: the same curve, unclosed, as a
+                   faint gold stroke. non-scaling-stroke keeps it hairline while the
+                   stretched viewBox distorts everything else. *@
+                <path fill="none" stroke="rgba(224, 164, 88, 0.16)" stroke-width="1.2" vector-effect="non-scaling-stroke" d="M0 76 C 150 68 320 62 540 70 C 720 76 830 83 1020 79 C 1190 75 1320 68 1440 74" />
+            </svg>
+        </div>
+        <div class="footer-content">
+            <span>An unofficial encyclopedia of the Dune universe.</span>
+            <div class="social-links">
+                <a href="https://x.com/notlukearnold" target="_blank" rel="noopener" aria-label="X profile" title="X">
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                    </svg>
+                </a>
+                <a href="https://instagram.com/notlukearnold" target="_blank" rel="noopener" aria-label="Instagram profile" title="Instagram">
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z" />
+                    </svg>
+                </a>
+            </div>
         </div>
     </footer>
 </div>
