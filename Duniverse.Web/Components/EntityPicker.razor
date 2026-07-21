@@ -31,7 +31,10 @@
                         <button type="button" @onclick="() => PickAsync(suggestion)">
                             <span class="endpoint-dot connection-cat category-@GraphLayoutService.CategorySlug(suggestion)"></span>
                             <span>@suggestion.Name</span>
-                            <span class="muted">@suggestion.ShortDescription</span>
+                            @if (ShowDescriptions)
+                            {
+                                <span class="muted">@suggestion.ShortDescription</span>
+                            }
                         </button>
                     </li>
                 }
@@ -46,6 +49,12 @@
 
     [Parameter]
     public string Placeholder { get; set; } = "";
+
+    @* The Mentat Trial turns these off: its opening clue is the answer's own description
+       with the name struck out, so suggestions that spell descriptions out would let a
+       reader check candidates against the clue without spending a guess. *@
+    [Parameter]
+    public bool ShowDescriptions { get; set; } = true;
 
     [Parameter]
     public DuneEntity? Selected { get; set; }
