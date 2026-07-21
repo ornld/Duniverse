@@ -4,10 +4,65 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Duniverse</title>
+    <!-- A crawler never runs the app, so the per-page PageTitle components never fire for it and
+         this tag is the whole title as far as a search result is concerned. It reads long for a
+         browser tab, which is fine: Home.razor replaces it the moment the app boots. -->
+    <title>Duniverse, an unofficial Dune encyclopedia</title>
     <base href="/" />
+
+    <!-- Every page is drawn client side, so a search crawler or a chat unfurler that does not
+         run scripts sees this file and nothing else. What follows is the entire description of
+         the site as far as those readers are concerned, which is why it lives here rather than
+         in any page component. -->
+    <!-- The deploy copies this file to 404.html to make SPA routing work, so every deep route
+         is answered with these same tags under a 404 status. Nothing served that way can be
+         indexed in the first place, so the fixed canonical below only ever takes effect on the
+         one page it names. -->
+    <meta name="description" content="An unofficial encyclopedia of Frank Herbert's Dune and its Expanded Universe. Search every record, follow the connections, and read it without spoilers." />
+    <link rel="canonical" href="https://www.duniverse.org/" />
+    <meta name="theme-color" content="#171310" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Duniverse" />
+    <meta property="og:title" content="Duniverse, an unofficial Dune encyclopedia" />
+    <meta property="og:description" content="An unofficial encyclopedia of Frank Herbert's Dune and its Expanded Universe. Search every record, follow the connections, and read it without spoilers." />
+    <meta property="og:url" content="https://www.duniverse.org/" />
+    <meta property="og:image" content="https://www.duniverse.org/images/og-card.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="A great hall hung with red and gold banners, lined with guards, a small figure enthroned at the far end." />
+    <meta property="og:locale" content="en_US" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:creator" content="@notlukearnold" />
+    <meta name="twitter:title" content="Duniverse, an unofficial Dune encyclopedia" />
+    <meta name="twitter:description" content="An unofficial encyclopedia of Frank Herbert's Dune and its Expanded Universe. Search every record, follow the connections, and read it without spoilers." />
+    <meta name="twitter:image" content="https://www.duniverse.org/images/og-card.jpg" />
+    <meta name="twitter:image:alt" content="A great hall hung with red and gold banners, lined with guards, a small figure enthroned at the far end." />
+
     <link rel="icon" type="image/png" href="favicon.png" />
+    <!-- Saved to an iOS home screen the page would otherwise be given a screenshot of itself;
+         this hands it the same mark the browser tab already uses. -->
+    <link rel="apple-touch-icon" href="icon-192.png" />
     <link rel="preload" href="fonts/marcellus-400.woff2" as="font" type="font/woff2" crossorigin />
+    <!-- Home and About are the only routes that paint this plate, and it is half a megabyte
+         racing the framework download. Since the deploy answers every deep link with this same
+         file, a plain preload tag would spend that half megabyte on the ten routes that never
+         show it. Injecting it instead costs a parser pause here and still beats waiting for the
+         app to boot before the request starts, which is what stops the hero popping in late. -->
+    <script>
+        (function () {
+            const path = location.pathname.replace(/\/+$/, '') || '/';
+            if (path !== '/' && path !== '/about') {
+                return;
+            }
+            const preload = document.createElement('link');
+            preload.rel = 'preload';
+            preload.as = 'image';
+            preload.href = 'images/main-menu-background.jpg';
+            document.head.appendChild(preload);
+        })();
+    </script>
     <link rel="preload" id="webassembly" />
     <link rel="stylesheet" href="css/app.css" />
     <!-- If you add any scoped CSS files, uncomment the following to load them
@@ -42,32 +97,199 @@
          visitor would download ~7 MB uncompressed. The publish output already contains a
          Brotli twin of every boot resource at roughly a third the size; this hook fetches
          those twins and decodes them in the browser (decode.min.js is Google's reference
-         decoder, MIT licensed). On localhost the dev server negotiates compression
-         itself, so the hook steps aside and dev behaves stock. -->
+         decoder, MIT licensed). On a local origin the dev server negotiates compression
+         itself and builds no twins at all, so the hook steps aside and dev behaves stock. -->
+    <!-- Decoding those twins costs real main-thread time on every visit, and GitHub Pages
+         caps Cache-Control at ten minutes, so the HTTP cache cannot carry that work across
+         visits. This keeps the decoded bytes in the Cache Storage API under a versioned
+         name, keyed by each resource's own URL, so a repeat visit returns them with no fetch
+         and no decode. Boot filenames are content-fingerprinted, so a name that still
+         resolves can never hold stale content. Every cache step is optional: if storage is
+         missing or refuses us the hook falls back to the fetch-and-decode path above, and
+         once boot settles it prunes any entry this visit never asked for, along with any
+         cache left behind by an older version of this scheme, so dead bytes do not pile up.
+         A boot that never finishes drops the cache and retries once, which is the only way
+         a visitor holding a bad entry could ever get out of it. -->
     <script type="module">
         import { BrotliDecode } from './js/decode.min.js';
 
-        Blazor.start({
+        const CACHE_NAME = 'duniverse-boot-v1';
+
+        // The dev server negotiates compression itself and its build output holds no .br twins at
+        // all, so on any local origin the hook has to step aside completely or boot dies on a 404.
+        // Hostname is a blunt test, but the alternative is probing for a twin on every visit and
+        // the deployed domain is the only host that ever needs the production path. Matching the
+        // bare word 'localhost' was not enough on its own: the loopback address typed as a number,
+        // and the machine's LAN address used to check the site on a phone, both fell through to
+        // the Brotli path and left the boot screen up with nothing to explain it.
+        const host = location.hostname;
+        const isLocal = ['localhost', '127.0.0.1', '[::1]', '::1'].includes(host)
+            || host.endsWith('.local')
+            || /^(10|127|192\.168|172\.(1[6-9]|2\d|3[01]))\.[\d.]+$/.test(host);
+
+        // The absolute URLs this visit actually asked for, so the post-boot prune can tell a
+        // live fingerprint from an abandoned one.
+        const requested = new Set();
+
+        // Opened once and shared. Cache Storage is absent in non-secure contexts and can throw
+        // in some private-browsing modes, so any failure here resolves to null and every caller
+        // simply treats caching as unavailable and stays on the network path.
+        let cachePromise;
+        function openBootCache() {
+            if (cachePromise === undefined) {
+                cachePromise = (async () => {
+                    try {
+                        return self.caches ? await caches.open(CACHE_NAME) : null;
+                    } catch {
+                        return null;
+                    }
+                })();
+            }
+            return cachePromise;
+        }
+
+        // A hit is rebuilt from its stored bytes rather than handed back as-is, so the
+        // content-type is always the one this boot expects. The length check catches an empty or
+        // truncated body and nothing further: it is measured against a header written from these
+        // same bytes, so it cannot notice a body of the right size holding the wrong content.
+        // Handing the runtime a Response also skips its own integrity check, which is why the
+        // only thing standing behind this is the recovery reload at the foot of the file. Any
+        // error reading the cache is treated as a miss.
+        async function readFromCache(cache, key, contentType) {
+            if (!cache) {
+                return undefined;
+            }
+            try {
+                const hit = await cache.match(key);
+                if (!hit) {
+                    return undefined;
+                }
+                const buffer = await hit.arrayBuffer();
+                const expected = Number(hit.headers.get('x-decoded-length'));
+                if (buffer.byteLength === 0 || buffer.byteLength !== expected) {
+                    return undefined;
+                }
+                return new Response(buffer, { headers: { 'content-type': contentType } });
+            } catch {
+                return undefined;
+            }
+        }
+
+        // Storing is best-effort and never awaited on the boot path: a full quota or any other
+        // rejection is swallowed, since failing to remember a resource is not failing to serve it.
+        function writeToCache(cache, key, response) {
+            if (!cache) {
+                return;
+            }
+            try {
+                cache.put(key, response).catch(() => {});
+            } catch {
+                // A synchronous throw (an unusable cache handle) is as harmless as a rejection.
+            }
+        }
+
+        // Runs once boot has settled and off the critical path. Every stored entry this visit
+        // did not request belongs to a superseded fingerprint, so it is deleted and the cache
+        // tracks the current build instead of growing without bound.
+        async function pruneBootCache() {
+            const cache = await openBootCache();
+            if (!cache) {
+                return;
+            }
+            try {
+                // Bumping CACHE_NAME abandons the whole previous cache, several megabytes of
+                // decoded payload nothing will read again, so earlier versions go first. Browsers
+                // evict an origin's storage all at once, and a bucket weighed down by dead builds
+                // is one that takes the live entries with it when it goes.
+                const names = await caches.keys();
+                await Promise.all(names
+                    .filter(name => name.startsWith('duniverse-boot-') && name !== CACHE_NAME)
+                    .map(name => caches.delete(name).catch(() => {})));
+
+                const keys = await cache.keys();
+                await Promise.all(keys.map(request =>
+                    requested.has(request.url) ? undefined : cache.delete(request).catch(() => {})));
+            } catch {
+                // Leaving stale entries in place is a storage cost, never a correctness problem.
+            }
+        }
+
+        const started = Blazor.start({
             loadBootResource: (type, name, defaultUri, integrity) => {
                 if (type === 'dotnetjs' || type === 'manifest' || type === 'configuration') {
                     // The runtime's own script must load as a URL, not a Response.
                     return defaultUri;
                 }
-                if (location.hostname === 'localhost') {
+                if (isLocal) {
                     return undefined;
                 }
                 return (async function () {
+                    const contentType = type === 'dotnetwasm' ? 'application/wasm' : 'application/octet-stream';
+                    const key = new URL(defaultUri, document.baseURI).href;
+                    requested.add(key);
+
+                    const cache = await openBootCache();
+                    const cached = await readFromCache(cache, key, contentType);
+                    if (cached) {
+                        return cached;
+                    }
+
                     const response = await fetch(defaultUri + '.br', { cache: 'no-cache' });
                     if (!response.ok) {
                         throw new Error(response.statusText);
                     }
                     const buffer = await response.arrayBuffer();
                     const decompressed = BrotliDecode(new Int8Array(buffer));
-                    const contentType = type === 'dotnetwasm' ? 'application/wasm' : 'application/octet-stream';
-                    return new Response(decompressed, { headers: { 'content-type': contentType } });
+                    const fresh = new Response(decompressed, {
+                        headers: { 'content-type': contentType, 'x-decoded-length': String(decompressed.length) }
+                    });
+                    // Clone before returning: the app consumes the original body, the cache the copy.
+                    writeToCache(cache, key, fresh.clone());
+                    return fresh;
                 })();
             }
         });
+
+        // The stored bytes are only ever length-checked, so a cache entry that is wrong rather
+        // than short is handed to the runtime and boot never finishes. A hard reload does not
+        // touch Cache Storage, so left alone that visitor meets the same dead boot screen on
+        // every future visit and only clearing site data by hand would free them. The cache is
+        // the one thing this page can throw away, so a failed start throws it away and retries.
+        // The session flag holds the retry to one attempt, which means a boot that is broken for
+        // any other reason fails the second time and stays failed instead of reloading forever.
+        const RETRY_FLAG = 'duniverse-boot-retry';
+        async function retryWithoutCache() {
+            try {
+                if (!self.caches || sessionStorage.getItem(RETRY_FLAG)) {
+                    return;
+                }
+                sessionStorage.setItem(RETRY_FLAG, '1');
+                await caches.delete(CACHE_NAME);
+                location.reload();
+            } catch {
+                // Storage that refuses to answer had nothing worth blaming in it either.
+            }
+        }
+
+        // Cache maintenance waits for boot and then for the main thread to fall idle, so it never
+        // competes with the app's first frame. Skipped on a local origin so a cached build cannot
+        // haunt local dev.
+        if (!isLocal) {
+            started.then(() => {
+                try {
+                    // Cleared on success so a later bad entry in this same tab still gets its one
+                    // retry rather than inheriting a spent flag.
+                    sessionStorage.removeItem(RETRY_FLAG);
+                } catch {
+                    // Nothing to clear if storage is unavailable.
+                }
+                if (window.requestIdleCallback) {
+                    requestIdleCallback(() => pruneBootCache());
+                } else {
+                    setTimeout(() => pruneBootCache(), 3000);
+                }
+            }).catch(() => retryWithoutCache());
+        }
     </script>
 </body>
 

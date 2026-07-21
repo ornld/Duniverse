@@ -1,6 +1,7 @@
 @page "/universe"
 @inject EntityRegistry Registry
 @inject GraphLayoutService LayoutService
+@inject UniverseLayoutCache LayoutCache
 @inject SpoilerSettings Spoiler
 @inject NavigationManager Nav
 @inject IJSRuntime JS
@@ -126,12 +127,18 @@
         Rebuild();
     }
 
-    // The whole visible archive, laid out fresh. Hidden entities are excluded before the
-    // simulation runs, so they neither appear nor bend the shape of what does.
+    // The whole visible archive. Hidden entities are excluded before the simulation runs, so
+    // they neither appear nor bend the shape of what does. The layout is deterministic for a
+    // given visible set, so the cache settles it once per set and hands back a copy on every
+    // later visit; the simulation only runs on the first sight of a reading progress. Building
+    // the graph stays cheap and has to happen anyway, because its ordered node ids are the key.
     private void Rebuild()
     {
-        graph = LayoutService.BuildFullGraph(Registry, Spoiler.IsVisible);
-        LayoutService.ApplyForceDirectedLayout(graph, Width, Height, iterations: 220, gravity: 0.08, repulsionRange: 240);
+        var fresh = LayoutService.BuildFullGraph(Registry, Spoiler.IsVisible);
+        graph = LayoutCache.GetOrAdd(
+            UniverseLayoutCache.KeyFor(fresh),
+            fresh,
+            g => LayoutService.ApplyForceDirectedLayout(g, Width, Height, iterations: 220, gravity: 0.08, repulsionRange: 240));
         nodesById = graph.Nodes.ToDictionary(n => n.Id, StringComparer.OrdinalIgnoreCase);
         neighborsById = BuildNeighbors(graph);
         hoveredNodeId = null;
