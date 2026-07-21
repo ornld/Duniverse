@@ -15,6 +15,7 @@ builder.Services.AddSingleton(RegistryFactory.CreateSeeded());
 builder.Services.AddSingleton<GraphLayoutService>();
 builder.Services.AddSingleton<UniverseLayoutCache>();
 builder.Services.AddSingleton<PathFinderService>();
+builder.Services.AddSingleton<MentatTrialService>();
 builder.Services.AddScoped<SpoilerSettings>();
 
 await builder.Build().RunAsync();

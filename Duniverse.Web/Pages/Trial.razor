@@ -1,0 +1,332 @@
+@page "/trial"
+@using System.Text.Json
+@inject EntityRegistry Registry
+@inject MentatTrialService Engine
+@inject SpoilerSettings Spoiler
+@inject IJSRuntime JS
+
+<PageTitle>The Mentat Trial - Duniverse</PageTitle>
+
+<div class="hero" style="background-image: linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/entity-graph-background.jpg');">
+    <h1>The Mentat Trial</h1>
+    <p class="tagline">
+        Each day the archive seals one record and deals five clues, vague to specific.
+        Name it within six guesses; every miss reports how many links your guess sits
+        from the answer.
+    </p>
+
+    @if (answer is null)
+    {
+        <p class="no-results">
+            No records are visible at your reading progress, so no trial can convene today.
+        </p>
+    }
+    else
+    {
+        <ol class="trial-clues">
+            @for (int i = 0; i < RevealedClues; i++)
+            {
+                var clue = clues[i];
+                <li class="trial-clue" style="--i: @i" @key="i">
+                    <span class="trial-clue-label">Clue @(i + 1)</span>
+                    <span class="trial-clue-text">@clue</span>
+                </li>
+            }
+        </ol>
+
+        @if (!finished)
+        {
+            <p class="trial-counter">
+                Guess @(history.Count + 1) of @MentatTrialService.MaxGuesses.
+                @if (RevealedClues == MentatTrialService.ClueCount && history.Count == MentatTrialService.MaxGuesses - 1)
+                {
+                    <span>The clues are spent. One computation remains.</span>
+                }
+            </p>
+            <div class="trial-guess">
+                @* Keyed by an epoch bumped on every selection, so each handled guess
+                   remounts the picker empty. The cleared value alone cannot reach it: the
+                   parameter is null before and after a guess, and an unchanged parameter
+                   never overwrites the chip the picker set for itself when the suggestion
+                   was clicked. *@
+                <EntityPicker @key="pickerEpoch" Label="Name the record"
+                              Placeholder="e.g. Chani, Arrakis, the Spacing Guild..."
+                              Selected="@pickerSelection" SelectedChanged="OnGuess" />
+            </div>
+        }
+
+        @if (history.Count > 0)
+        {
+            <div class="trial-history">
+                @for (int j = 0; j < history.Count; j++)
+                {
+                    var row = history[j];
+                    <div class="trial-guess-row connection-cat category-@GraphLayoutService.CategorySlug(row.Entity) @(row.Result.IsCorrect ? "is-correct" : null)"
+                         style="--i: @j" @key="row.Entity.Id">
+                        <span class="endpoint-dot"></span>
+                        <span class="trial-guess-name">@row.Entity.Name</span>
+                        <span class="trial-guess-verdict muted">@Verdict(row.Result)</span>
+                    </div>
+                }
+            </div>
+        }
+
+        @if (finished)
+        {
+            <div class="trial-reveal category-@GraphLayoutService.CategorySlug(answer)" style="--i: @history.Count">
+                <p class="trial-verdict">
+                    @(won
+                        ? "The computation is complete. The record is named."
+                        : "Six projections, and the record stands unnamed. The archive opens it regardless.")
+                </p>
+                <a class="trial-record" href="@($"/entity/{answer.Id}")">
+                    <span class="endpoint-dot connection-cat"></span>
+                    <span>@answer.Name</span>
+                </a>
+                <p class="trial-record-meta muted">
+                    Filed among the @MentatTrialService.CategoryLabel(answer). @answer.ShortDescription
+                </p>
+                <p class="trial-streak muted">@StreakLine()</p>
+            </div>
+        }
+    }
+
+    <p class="timeline-footnote muted">
+        The trial honors your spoiler settings. Records past your reading progress stay out
+        of the pool, so the day's answer never spoils what you have not read.
+    </p>
+</div>
+
+@code {
+    private const string StorageKey = "duniverse.trial.v1";
+
+    private IReadOnlyList<DuneEntity> pool = Array.Empty<DuneEntity>();
+    private string fingerprint = "";
+    private DuneEntity? answer;
+    private IReadOnlyList<string> clues = Array.Empty<string>();
+    private List<GuessRow> history = new();
+    private bool finished;
+    private bool won;
+    private DuneEntity? pickerSelection;
+    private int pickerEpoch;
+
+    // The streak ledger survives across days in the same stored record as the day's trial.
+    private int streak;
+    private int longestStreak;
+    private string? lastFinishedDate;
+
+    // The trial's date freezes when the page loads, and every comparison against it,
+    // including the streak's idea of yesterday, stays on that clock. A trial begun before
+    // midnight and finished after it still counts for the day it was dealt.
+    private DateOnly puzzleDate;
+    private string today = "";
+
+    private record GuessRow(DuneEntity Entity, TrialGuessResult Result);
+
+    // The whole persisted state under duniverse.trial.v1: today's trial by date and pool
+    // fingerprint, plus the streak ledger that outlives it.
+    private record StoredTrial(
+        string Date,
+        string AnswerId,
+        string PoolFingerprint,
+        List<string> GuessIds,
+        bool Finished,
+        bool Won,
+        int Streak,
+        int LongestStreak,
+        string? LastFinishedDate);
+
+    // The first clue is free; each miss buys the next. A win freezes the count where it
+    // stood, so the reveal shows only the clues that were actually earned.
+    private int RevealedClues =>
+        Math.Min(history.Count(row => !row.Result.IsCorrect) + 1, MentatTrialService.ClueCount);
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Spoiler.LoadAsync();
+
+        puzzleDate = DateOnly.FromDateTime(DateTime.Now);
+        today = puzzleDate.ToString("yyyy-MM-dd");
+
+        pool = Engine.BuildPool(Spoiler.IsVisible);
+        fingerprint = Engine.PoolFingerprint(pool);
+        answer = Engine.SelectDaily(puzzleDate, pool);
+        if (answer is not null)
+        {
+            clues = Engine.BuildClues(answer, Spoiler.IsVisible);
+        }
+
+        await RestoreAsync();
+    }
+
+    /// <summary>
+    /// Rehydrates a trial saved earlier. The streak ledger always carries over; the day's
+    /// guesses only do when the date and the pool fingerprint both match, so a reader who
+    /// moved their reading progress mid-day starts that tier's puzzle fresh instead of
+    /// replaying guesses against a different answer. A stored answer no longer visible is
+    /// discarded without comment; its name must never surface from stale state.
+    /// </summary>
+    private async Task RestoreAsync()
+    {
+        StoredTrial? stored = null;
+        try
+        {
+            var raw = await JS.InvokeAsync<string?>("localStorage.getItem", StorageKey);
+            if (!string.IsNullOrEmpty(raw))
+            {
+                stored = JsonSerializer.Deserialize<StoredTrial>(raw);
+            }
+        }
+        catch
+        {
+            // localStorage can be blocked. The trial still plays; it just forgets overnight.
+        }
+
+        if (stored is null)
+        {
+            return;
+        }
+
+        streak = stored.Streak;
+        longestStreak = stored.LongestStreak;
+        lastFinishedDate = stored.LastFinishedDate;
+
+        bool sameTrial = stored.Date == today
+            && stored.PoolFingerprint == fingerprint
+            && answer is not null
+            && string.Equals(stored.AnswerId, answer.Id, StringComparison.OrdinalIgnoreCase)
+            && Spoiler.IsVisible(answer);
+
+        if (!sameTrial)
+        {
+            return;
+        }
+
+        // Replay the saved guesses through the live engine rather than trusting stored
+        // verdicts, so the compass always reflects the current graph. Anything no longer
+        // visible is dropped rather than named.
+        foreach (var guessId in stored.GuessIds.Take(MentatTrialService.MaxGuesses))
+        {
+            var guess = Registry.GetEntity(guessId);
+            if (guess is null || !Spoiler.IsVisible(guess))
+            {
+                continue;
+            }
+
+            var result = Engine.EvaluateGuess(guess, answer!, Spoiler.IsVisible);
+            history.Add(new GuessRow(guess, result));
+            if (result.IsCorrect)
+            {
+                break;
+            }
+        }
+
+        won = history.Any(row => row.Result.IsCorrect);
+        finished = won || history.Count >= MentatTrialService.MaxGuesses;
+    }
+
+    private async Task OnGuess(DuneEntity? entity)
+    {
+        pickerSelection = null;
+        pickerEpoch++;
+
+        if (entity is null || finished || answer is null)
+        {
+            return;
+        }
+
+        // Naming the same record twice teaches nothing, so it costs nothing.
+        if (history.Any(row => string.Equals(row.Entity.Id, entity.Id, StringComparison.OrdinalIgnoreCase)))
+        {
+            return;
+        }
+
+        var result = Engine.EvaluateGuess(entity, answer, Spoiler.IsVisible);
+        history.Add(new GuessRow(entity, result));
+
+        if (result.IsCorrect || history.Count >= MentatTrialService.MaxGuesses)
+        {
+            finished = true;
+            won = result.IsCorrect;
+            ApplyStreak();
+        }
+
+        await SaveAsync();
+    }
+
+    /// <summary>
+    /// Finishing a trial extends the run when yesterday's was finished too, restarts it
+    /// after a missed day, and counts at most once per day no matter how the state is
+    /// replayed. Win or loss makes no difference; showing up and finishing is the run.
+    /// </summary>
+    private void ApplyStreak()
+    {
+        if (lastFinishedDate == today)
+        {
+            return;
+        }
+
+        var yesterday = puzzleDate.AddDays(-1).ToString("yyyy-MM-dd");
+        streak = lastFinishedDate == yesterday ? streak + 1 : 1;
+        longestStreak = Math.Max(longestStreak, streak);
+        lastFinishedDate = today;
+    }
+
+    private async Task SaveAsync()
+    {
+        try
+        {
+            var stored = new StoredTrial(
+                today,
+                answer?.Id ?? "",
+                fingerprint,
+                history.Select(row => row.Entity.Id).ToList(),
+                finished,
+                won,
+                streak,
+                longestStreak,
+                lastFinishedDate);
+            await JS.InvokeVoidAsync("localStorage.setItem", StorageKey, JsonSerializer.Serialize(stored));
+        }
+        catch
+        {
+            // If persistence fails the trial still plays out in memory for this visit.
+        }
+    }
+
+    private static string Verdict(TrialGuessResult result)
+    {
+        if (result.IsCorrect)
+        {
+            return "The record itself.";
+        }
+
+        var category = result.SameCategory ? "Same category" : "Different category";
+        return $"{category}, {DistanceProse(result.LinkDistance)}.";
+    }
+
+    private static string DistanceProse(int? distance) => distance switch
+    {
+        null => "no visible chain joins them",
+        1 => "one link from the answer",
+        2 => "two links from the answer",
+        3 => "three links from the answer",
+        4 => "four links from the answer",
+        5 => "five links from the answer",
+        _ => $"{distance} links from the answer",
+    };
+
+    private string StreakLine()
+    {
+        var line = streak == 1
+            ? "Day one of a run. Return tomorrow to extend it."
+            : $"You have finished the trial {streak} days running.";
+
+        if (longestStreak > streak)
+        {
+            line += $" Your longest run reached {longestStreak} days.";
+        }
+
+        return line;
+    }
+}

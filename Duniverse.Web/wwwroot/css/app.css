@@ -1645,7 +1645,8 @@ button.chip {
    Every route change re-mounts the page wrapper (keyed by path in MainLayout), and
    the fresh element settles in with one short fade. Kept under a fifth of a second:
    any longer and the whole site starts to feel slower, not smoother. Record pages
-   opt out through :has, since their dossier entrance below already stages the arrival. */
+   and the trial opt out through :has, since their own staged entrances already
+   cover the arrival. */
 
 @keyframes page-enter {
     from {
@@ -1658,7 +1659,8 @@ button.chip {
     animation: page-enter 0.18s ease-out;
 }
 
-    .page-enter:has(.dossier-item) {
+    .page-enter:has(.dossier-item),
+    .page-enter:has(.trial-clues) {
         animation: none;
     }
 
@@ -1932,15 +1934,32 @@ button.chip {
 }
 
 /* Inert while the whole nav fits one row; on phones and tablets it becomes a
-   full-width flex break so the rows land 3 / 3 / 2 + Index by design. The 920px
-   threshold sits just above where a single row runs out of room, so the bar never
-   passes through the awkward in-between wraps on its way down. */
+   full-width flex break so the rows land in fixed threes, with the Mentat Trial and
+   the Index closing the third. The 920px threshold sits just above where a single
+   row runs out of room, so the bar never passes through the awkward in-between
+   wraps on its way down. */
 .nav-break {
     display: none;
 }
 
 @media (max-width: 920px) {
     .nav-break {
+        display: block;
+        flex-basis: 100%;
+        height: 0;
+    }
+}
+
+/* The third break wakes only at phone widths. Five items cannot share the last
+   tablet row on a 375px screen, and the narrowest phones lack the room even with
+   the gap squeezed to nothing, so below 600px Terminology and Sayings take a row
+   of their own and the Mentat Trial sits beside the Index on a fourth. */
+.nav-break-phone {
+    display: none;
+}
+
+@media (max-width: 600px) {
+    .nav-break-phone {
         display: block;
         flex-basis: 100%;
         height: 0;
@@ -2530,8 +2549,8 @@ button.chip {
     }
 
     .top-nav {
-        /* Narrow screens keep the larger type but pull the links closer together,
-           so the bar wraps to two rows instead of four. */
+        /* Narrow screens keep the larger type but pull the links closer together
+           and trim the side padding, so the four fixed rows sit compact. */
         gap: 0.4rem 1rem;
         padding: 0.6rem 1rem;
     }
@@ -2613,5 +2632,158 @@ button.chip {
     .ritual-spine {
         width: 44px;
         height: 188px;
+    }
+}
+/* ---- The Mentat Trial ---- */
+
+/* Clues stack as dossier lines: each one a labeled strip of the day's file, dealt onto
+   the desk as it is earned. The reveal below reads the category palette the same way
+   the connection finder does (--cat-color set by a category-* class). */
+.trial-clues {
+    list-style: none;
+    margin: 1.5rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+    max-width: 44rem;
+}
+
+.trial-clue {
+    display: flex;
+    align-items: baseline;
+    gap: 0.8rem;
+    padding: 0.6rem 0.8rem;
+    background: rgba(36, 28, 22, 0.72);
+    border: 1px solid var(--dune-border);
+    border-left: 3px solid var(--dune-accent);
+    border-radius: 4px;
+}
+
+.trial-clue-label {
+    flex: none;
+    width: 3.6rem;
+    color: var(--dune-muted);
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.trial-clue-text {
+    line-height: 1.5;
+}
+
+/* Trial elements stage their own arrival the way the dossier does: the page-enter
+   fade stands down (the :has rule beside the dossier's) and each clue, guess row,
+   and the reveal settles on its own --i beat. The page sets --i from its loop
+   indexes, so a return visit deals the whole stack in order, and a clue earned
+   mid-game lands one beat after the verdict row that bought it. */
+@keyframes trial-clue-settle {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+}
+
+.trial-clue {
+    animation: trial-clue-settle 0.4s ease-out backwards;
+    animation-delay: calc(var(--i, 0) * 0.12s);
+}
+
+.trial-counter {
+    margin: 1.25rem 0 0.4rem;
+    color: var(--dune-muted);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.trial-guess {
+    max-width: 34rem;
+}
+
+/* Guess history rows borrow the endpoint chip's anatomy: the category dot and tinted
+   left edge come from the connection-cat color, the verdict rides along as plain prose. */
+.trial-history {
+    margin-top: 1.1rem;
+    display: grid;
+    gap: 0.5rem;
+    max-width: 44rem;
+}
+
+.trial-guess-row {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    padding: 0.5rem 0.8rem;
+    background: var(--dune-panel);
+    border: 1px solid var(--dune-border);
+    border-left: 3px solid currentColor;
+    border-radius: 4px;
+    animation: trial-clue-settle 0.3s ease-out backwards;
+    animation-delay: calc(var(--i, 0) * 0.12s);
+}
+
+    .trial-guess-row.is-correct {
+        border-color: var(--dune-accent);
+        box-shadow: 0 0 12px rgba(224, 164, 88, 0.25);
+    }
+
+.trial-guess-name {
+    color: var(--dune-text);
+    font-weight: 600;
+}
+
+.trial-guess-verdict {
+    font-size: 0.85rem;
+}
+
+/* The end of the trial: the record laid open, tinted by its category along the top
+   edge the way entity cards are. */
+.trial-reveal {
+    margin-top: 1.5rem;
+    max-width: 44rem;
+    padding: 1.1rem 1.25rem;
+    background: var(--dune-panel);
+    border: 1px solid var(--dune-border);
+    border-top: 2px solid var(--cat-color, var(--dune-border));
+    border-radius: 8px;
+    animation: trial-clue-settle 0.45s ease-out backwards;
+    animation-delay: calc(var(--i, 0) * 0.12s);
+}
+
+.trial-verdict {
+    margin: 0 0 0.75rem;
+    color: var(--dune-accent-bright);
+    font-size: 1.05rem;
+}
+
+.trial-record {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-size: 1.15rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.trial-record-meta {
+    margin: 0.6rem 0 0;
+    line-height: 1.5;
+}
+
+.trial-streak {
+    margin: 0.9rem 0 0;
+    padding-top: 0.7rem;
+    border-top: 1px solid var(--dune-border);
+    font-size: 0.85rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .trial-clue,
+    .trial-guess-row,
+    .trial-reveal {
+        animation: none;
     }
 }
