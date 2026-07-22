@@ -2772,16 +2772,26 @@ button.chip {
 }
 /* ---- The Mentat Trial ---- */
 
+/* On desktop the trial card stretches to reach near the bottom of the viewport, the
+   category pages' own trick, so a short or finished trial does not strand a band of
+   bare page below itself. 160 accounts for the header, nav, and page padding above
+   the card; the trial has no back link, so it runs 30 shy of the category figure. */
+@media (min-width: 900px) {
+    .trial-hero {
+        min-height: calc(100vh - 160px);
+    }
+}
+
 /* Clues stack as dossier lines: each one a labeled strip of the day's file, dealt onto
-   the desk as it is earned. The reveal below reads the category palette the same way
-   the connection finder does (--cat-color set by a category-* class). */
+   the desk as it is earned, spanning the card the way every other tab's content fills
+   its hero. The reveal below reads the category palette the same way the connection
+   finder does (--cat-color set by a category-* class). */
 .trial-clues {
     list-style: none;
     margin: 1.5rem 0 0;
     padding: 0;
     display: grid;
     gap: 0.5rem;
-    max-width: 44rem;
 }
 
 .trial-clue {
@@ -2844,7 +2854,6 @@ button.chip {
     margin-top: 1.1rem;
     display: grid;
     gap: 0.5rem;
-    max-width: 44rem;
 }
 
 .trial-guess-row {
@@ -2883,7 +2892,6 @@ button.chip {
     position: relative;
     overflow: clip;
     margin-top: 1.5rem;
-    max-width: 44rem;
     padding: 1.1rem 1.25rem;
     background: var(--dune-panel);
     border: 1px solid var(--dune-border);
