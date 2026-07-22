@@ -363,8 +363,13 @@ html {
 
 /* Grain over the hero art. The heroes set their backgrounds inline per page, so the
    tile cannot join those stacks from here; it rides its own layer instead, painted
-   after the ::before repaint and under the z-indexed content. */
-.hero::after {
+   after the ::before repaint and under the z-indexed content.
+
+   About Dune opts out: it is the one page whose hero wraps the whole essay rather
+   than a banner, so the tile would spread behind several screens of long-form prose
+   instead of dressing a card. Grain belongs on the archive's sheets, not under
+   sustained reading. */
+.hero:not(.about-hero)::after {
     content: "";
     position: absolute;
     inset: 0;
