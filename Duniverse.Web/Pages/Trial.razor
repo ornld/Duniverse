@@ -75,11 +75,61 @@
         @if (finished)
         {
             <div class="trial-reveal category-@GraphLayoutService.CategorySlug(answer)" style="--i: @history.Count">
-                <p class="trial-verdict">
-                    @(won
-                        ? "The computation is complete. The record is named."
-                        : "Six projections, and the record stands unnamed. The archive opens it regardless.")
-                </p>
+                @if (won)
+                {
+                    @* Muad'Dib rising: naming the sealed record earns the naming moon, the way
+                       taking the name of the second moon's shadow earned Paul his place in the
+                       sietch. It climbs from behind the card's lower edge only at the moment of
+                       the solve; a solved trial reopened later shows it already risen, a
+                       completion mark rather than a replayed celebration. The mouse in the disc
+                       is mare-like shading, not a drawing: it should resolve only for someone
+                       who goes looking, the way the Fremen found it in the real moon. *@
+                    <svg class="trial-moon @(justSolved ? "is-rising" : null)" width="64" height="64"
+                         viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+                        <defs>
+                            <radialGradient id="trial-moon-glow" cx="0.5" cy="0.5" r="0.5">
+                                <stop offset="0%" stop-color="rgba(236, 222, 194, 0.18)" />
+                                <stop offset="70%" stop-color="rgba(236, 222, 194, 0.05)" />
+                                <stop offset="100%" stop-color="rgba(236, 222, 194, 0)" />
+                            </radialGradient>
+                            <radialGradient id="trial-moon-face" cx="0.36" cy="0.3" r="0.9">
+                                <stop offset="0%" stop-color="#d9cdb6" />
+                                <stop offset="100%" stop-color="#a3957b" />
+                            </radialGradient>
+                            <clipPath id="trial-moon-disc">
+                                <circle cx="32" cy="34" r="19" />
+                            </clipPath>
+                            <filter id="trial-moon-soft" x="-30%" y="-30%" width="160%" height="160%">
+                                <feGaussianBlur stdDeviation="1.1" />
+                            </filter>
+                        </defs>
+                        <circle cx="32" cy="34" r="30" fill="url(#trial-moon-glow)" />
+                        <circle cx="32" cy="34" r="19" fill="url(#trial-moon-face)" />
+                        <g class="trial-moon-mark" clip-path="url(#trial-moon-disc)"
+                           filter="url(#trial-moon-soft)" fill="#5e5040" opacity="0.19">
+                            @* Seated kangaroo mouse facing left: haunch, shoulder, head, one
+                               ear, the tail swept beneath. One stray mare, held apart from the
+                               figure, keeps the disc from reading as only a drawing. *@
+                            <ellipse cx="37" cy="38" rx="8" ry="7" />
+                            <ellipse cx="29.5" cy="35.5" rx="5.5" ry="4.6" />
+                            <circle cx="24.5" cy="29.5" r="3.4" />
+                            <ellipse cx="25.8" cy="24.4" rx="1.7" ry="3.1" transform="rotate(-12 25.8 24.4)" />
+                            <path d="M41 42.5 C 38.5 47.5, 31 49.5, 23.5 46" fill="none" stroke="#5e5040"
+                                  stroke-width="1.6" stroke-linecap="round" />
+                            <ellipse cx="43" cy="23.5" rx="3" ry="2.1" opacity="0.45" />
+                        </g>
+                    </svg>
+                    <blockquote class="epigraph trial-epigraph">
+                        <p class="epigraph-text">@SolveLine()</p>
+                        <footer class="epigraph-source">From the archivist's ledger</footer>
+                    </blockquote>
+                }
+                else
+                {
+                    <p class="trial-verdict">
+                        Six projections, and the record stands unnamed. The archive opens it regardless.
+                    </p>
+                }
                 <a class="trial-record" href="@($"/entity/{answer.Id}")">
                     <span class="endpoint-dot connection-cat"></span>
                     <span>@answer.Name</span>
@@ -108,6 +158,11 @@
     private List<GuessRow> history = new();
     private bool finished;
     private bool won;
+
+    // True only for the render where the winning guess just landed, never on restore:
+    // it gates the moonrise animation, so the moon climbs once at the moment of the
+    // solve and simply hangs risen when a finished trial is reopened.
+    private bool justSolved;
     private DuneEntity? pickerSelection;
     private int pickerEpoch;
 
@@ -249,6 +304,7 @@
         {
             finished = true;
             won = result.IsCorrect;
+            justSolved = result.IsCorrect;
             ApplyStreak();
         }
 
@@ -315,6 +371,33 @@
         4 => "four links from the answer",
         5 => "five links from the answer",
         _ => $"{distance} links from the answer",
+    };
+
+    /// <summary>
+    /// The solve set as an epigraph line. Guess counts arrive spelled out because the line
+    /// is set type, and a chronicle does not print figures in its verse.
+    /// </summary>
+    private string SolveLine()
+    {
+        int used = history.Count;
+        return used switch
+        {
+            1 => "Named in one, on the first projection.",
+            5 => "Named in five, with one guess to spare.",
+            6 => "Named in six, on the last computation.",
+            _ => $"Named in {NumberWord(used)}, with {NumberWord(MentatTrialService.MaxGuesses - used)} guesses to spare.",
+        };
+    }
+
+    private static string NumberWord(int n) => n switch
+    {
+        1 => "one",
+        2 => "two",
+        3 => "three",
+        4 => "four",
+        5 => "five",
+        6 => "six",
+        _ => n.ToString(),
     };
 
     private string StreakLine()

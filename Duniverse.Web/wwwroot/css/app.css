@@ -139,7 +139,12 @@ code {
     --dune-muted: #a89478;
     --dune-accent: #e0a458;
     --dune-accent-bright: #f4c07c;
-}
+    /* Ridulian grain: one 128px tile of sparse fractal noise, generated offline and
+       inlined so it costs no request and no runtime filter. The tile carries its own
+       faint alpha (flecks at 2-7%, most pixels fully clear), so wherever it layers it
+       reads as paper tooth, never as static. Declared once here because several
+       background stacks below fold it in and the data URI should exist in one place. */
+    --ridulian-grain: url('data:image/png;base64,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');
 
 *, *::before, *::after {
     box-sizing: border-box;
@@ -151,6 +156,16 @@ code {
 h1, h2, h3, .site-title {
     font-family: "Marcellus", Georgia, serif;
     font-weight: 400;
+}
+
+/* Letterpress bite for the display sizes: a dark edge over the strokes and a faint
+   gold lip beneath, as if the type were struck into the sheet rather than laid on
+   glass. Kept off h3 and the small sayings headings, where one-pixel shadows stop
+   reading as depth and start muddying the letterforms. */
+h1,
+h2:not(.sayings-source),
+.site-title {
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.55), 0 1px 0 rgba(244, 192, 124, 0.1);
 }
 
 html, body {
@@ -328,6 +343,10 @@ html {
     border-radius: 8px;
     padding: 2rem;
     margin-bottom: 1.5rem;
+    /* Plate impression: a hairline of light along the top edge and a soft shade
+       gathering low, so the border reads as a pressed plate rather than a drawn
+       stroke. The same pair sits on the entity cards. */
+    box-shadow: inset 0 1px 0 rgba(241, 230, 214, 0.05), inset 0 -14px 28px -20px rgba(0, 0, 0, 0.45);
 }
 
 /* Some source pictures have a frame baked into their own pixels (vehicles.jpg has a white
@@ -340,6 +359,17 @@ html {
     inset: -3%;
     z-index: 0;
     background: inherit;
+}
+
+/* Grain over the hero art. The heroes set their backgrounds inline per page, so the
+   tile cannot join those stacks from here; it rides its own layer instead, painted
+   after the ::before repaint and under the z-indexed content. */
+.hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-image: var(--ridulian-grain);
 }
 
 .hero > * {
@@ -801,6 +831,26 @@ html {
     text-align: left;
 }
 
+/* ---- Crestline dividers ----
+   Printed chronicles close their sections with an ornament, not with empty space:
+   the twin moons over dune-crest hairlines tapering off to nothing, about a
+   kilobyte of SVG carried as a mask so it tints from the theme rather than
+   shipping its own colors. Reserved for true section breaks, between groups of
+   sayings and between the About page's essays; sprinkled anywhere smaller it
+   would turn to wallpaper. */
+.sayings-group + .sayings-group::before,
+.home-section + .home-section::before {
+    content: "";
+    display: block;
+    width: min(260px, 70%);
+    height: 16px;
+    margin: 1rem auto 2.25rem;
+    background-color: var(--dune-muted);
+    opacity: 0.55;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20260%2016'%3E%3Cpath%20d='M4%209.5%20C%2060%207.8%2095%207.4%20116%208.1%20L116%209.3%20C%2095%209.4%2060%2010.4%204%209.5%20Z'%20fill-opacity='0.9'/%3E%3Ccircle%20cx='126'%20cy='6.4'%20r='3.2'%20fill-opacity='0.8'/%3E%3Ccircle%20cx='138'%20cy='8.6'%20r='5'/%3E%3Cpath%20d='M256%209.5%20C%20200%207.8%20165%207.4%20144%208.1%20L144%209.3%20C%20165%209.4%20200%2010.4%20256%209.5%20Z'%20fill-opacity='0.9'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20260%2016'%3E%3Cpath%20d='M4%209.5%20C%2060%207.8%2095%207.4%20116%208.1%20L116%209.3%20C%2095%209.4%2060%2010.4%204%209.5%20Z'%20fill-opacity='0.9'/%3E%3Ccircle%20cx='126'%20cy='6.4'%20r='3.2'%20fill-opacity='0.8'/%3E%3Ccircle%20cx='138'%20cy='8.6'%20r='5'/%3E%3Cpath%20d='M256%209.5%20C%20200%207.8%20165%207.4%20144%208.1%20L144%209.3%20C%20165%209.4%20200%2010.4%20256%209.5%20Z'%20fill-opacity='0.9'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
 .sayings-source {
     font-size: 1.05rem;
     color: var(--dune-accent-bright);
@@ -808,31 +858,85 @@ html {
     padding-bottom: 0.4rem;
 }
 
+/* ---- The Irulan rule ----
+   Epigraphs set as type, not as interface. Herbert opens every chapter of Dune the
+   same way: an italic excerpt, then the source alone on the next line behind a short
+   dash. The card box gives way to hairline rules above and below, an oversized
+   Marcellus quote hangs in the left padding, and the attribution renders its dash as
+   a CSS rule element, which honors the page geometry of the novels and the site's
+   ban on typed dashes in the same stroke. */
+
 .epigraph {
+    position: relative;
+    max-width: 60ch;
     margin: 1rem 0 0;
-    padding: 1rem 1.25rem;
-    background: rgba(36, 28, 22, 0.5);
-    border: 1px solid var(--dune-border);
-    border-left: 3px solid var(--dune-accent);
-    border-radius: 6px;
+    padding: 1.1rem 1.25rem 1rem 2.4rem;
+    border-top: 1px solid var(--dune-border);
+    border-bottom: 1px solid var(--dune-border);
 }
+
+    .epigraph::before {
+        content: "\201C";
+        position: absolute;
+        left: 0.3rem;
+        top: 0.5rem;
+        font-family: "Marcellus", Georgia, serif;
+        font-size: 2.5rem;
+        line-height: 1;
+        color: var(--dune-accent);
+        opacity: 0.55;
+    }
 
 .epigraph-text {
     margin: 0;
     font-style: italic;
+    line-height: 1.7;
     color: var(--dune-text);
     white-space: pre-line;
 }
 
 .epigraph-source {
-    margin-top: 0.6rem;
+    margin-top: 0.8rem;
     color: var(--dune-muted);
-    font-size: 0.85rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
     text-align: right;
 }
 
+    /* The dash Herbert prints before a source, drawn instead of typed. */
+    .epigraph-source::before {
+        content: "";
+        display: inline-block;
+        width: 2.5em;
+        height: 1px;
+        background: var(--dune-muted);
+        opacity: 0.7;
+        vertical-align: middle;
+        margin-right: 0.6em;
+    }
+
+/* Quotes stacked under one source heading read as a continuous run of set type:
+   later entries drop their own top rule and lean on the previous entry's bottom
+   one, and only the first in the run hangs the big quote mark. Padding stays put
+   so the whole run keeps one left edge. */
+.sayings-group .epigraph + .epigraph {
+    margin-top: 0;
+    border-top: none;
+}
+
+/* The first quote in a group leans on the source heading's own underline instead of
+   opening with a second rule a few pixels beneath it. */
+.sayings-group .epigraph:first-of-type {
+    border-top: none;
+}
+
+.sayings-group .epigraph:not(:first-of-type)::before {
+    content: none;
+}
+
 .daily-saying {
-    margin-top: 1.5rem;
+    margin: 1.5rem auto 0;
     text-align: left;
 }
 
@@ -860,25 +964,38 @@ html {
 
 .entity-card {
     background-color: var(--dune-panel);
-    background-size: cover;
-    background-position: center;
+    /* Plain cards carry the grain alone. The photo variants below repeat it at the
+       head of their own stacks, because background-image lists replace rather than
+       merge, and each stack then sizes its layers one by one: the tile stays at its
+       native 128px while the art keeps covering the card. */
+    background-image: var(--ridulian-grain);
     border: 1px solid var(--dune-border);
     border-radius: 8px;
     padding: 1.5rem;
     margin-bottom: 1.5rem;
+    box-shadow: inset 0 1px 0 rgba(241, 230, 214, 0.05), inset 0 -14px 28px -20px rgba(0, 0, 0, 0.45);
 }
 
 .entity-card.front {
     border-left: 4px solid var(--dune-accent);
-    background-image: linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/entity-front-background.jpg');
+    background-image: var(--ridulian-grain), linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/entity-front-background.jpg');
+    background-size: auto, cover, cover;
+    background-position: 0 0, center, center;
+    background-repeat: repeat, no-repeat, no-repeat;
 }
 
 .entity-card.back {
-    background-image: linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/entity-back-background.png');
+    background-image: var(--ridulian-grain), linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/entity-back-background.png');
+    background-size: auto, cover, cover;
+    background-position: 0 0, center, center;
+    background-repeat: repeat, no-repeat, no-repeat;
 }
 
 .entity-card.graph-card {
-    background-image: linear-gradient(rgba(23, 19, 16, 0.9), rgba(23, 19, 16, 0.94)), url('/images/entity-graph-background.jpg');
+    background-image: var(--ridulian-grain), linear-gradient(rgba(23, 19, 16, 0.9), rgba(23, 19, 16, 0.94)), url('/images/entity-graph-background.jpg');
+    background-size: auto, cover, cover;
+    background-position: 0 0, center, center;
+    background-repeat: repeat, no-repeat, no-repeat;
     padding: 1.25rem 1rem;
 }
 
@@ -1028,11 +1145,13 @@ html {
     position: relative;
     padding: 0.75rem;
     background-color: var(--dune-panel);
-    background-image: linear-gradient(rgba(23, 19, 16, 0.92), rgba(23, 19, 16, 0.95)), url('/images/entity-graph-background.jpg');
-    background-size: cover;
-    background-position: center;
+    background-image: var(--ridulian-grain), linear-gradient(rgba(23, 19, 16, 0.92), rgba(23, 19, 16, 0.95)), url('/images/entity-graph-background.jpg');
+    background-size: auto, cover, cover;
+    background-position: 0 0, center, center;
+    background-repeat: repeat, no-repeat, no-repeat;
     border: 1px solid var(--dune-border);
     border-radius: 8px;
+    box-shadow: inset 0 1px 0 rgba(241, 230, 214, 0.05), inset 0 -14px 28px -20px rgba(0, 0, 0, 0.45);
 }
 
 .universe-graph {
@@ -1759,14 +1878,26 @@ button.chip {
     letter-spacing: 0.08em;
 }
 
+    /* Each flank is a dune-crest hairline tapering toward the page edge with one
+       moon riding beside the words: the twin moons split across the break. The
+       right flank is the same asset mirrored, which also mirrors its moon to the
+       inner end where it belongs. */
     .connections-divider::before,
     .connections-divider::after {
         content: "";
         display: inline-block;
-        width: 2.5rem;
-        border-top: 1px solid var(--dune-border);
+        width: 5.5rem;
+        height: 14px;
+        background-color: var(--dune-muted);
+        opacity: 0.6;
         vertical-align: middle;
-        margin: 0 0.75rem;
+        margin: 0 0.6rem;
+        -webkit-mask: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20120%2014'%3E%3Cpath%20d='M2%208.5%20C%2040%206.9%2072%206.6%2098%207.2%20L98%208.4%20C%2072%208.5%2040%209.3%202%208.5%20Z'%20fill-opacity='0.9'/%3E%3Ccircle%20cx='110'%20cy='7'%20r='4.6'/%3E%3C/svg%3E") center / contain no-repeat;
+        mask: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20120%2014'%3E%3Cpath%20d='M2%208.5%20C%2040%206.9%2072%206.6%2098%207.2%20L98%208.4%20C%2072%208.5%2040%209.3%202%208.5%20Z'%20fill-opacity='0.9'/%3E%3Ccircle%20cx='110'%20cy='7'%20r='4.6'/%3E%3C/svg%3E") center / contain no-repeat;
+    }
+
+    .connections-divider::after {
+        transform: scaleX(-1);
     }
 
 .related-section {
@@ -2740,8 +2871,12 @@ button.chip {
 }
 
 /* The end of the trial: the record laid open, tinted by its category along the top
-   edge the way entity cards are. */
+   edge the way entity cards are. The card is also the sky the naming moon climbs
+   through: relative for the moon's anchor, clip so the moon waiting below the lower
+   edge stays unseen until it rises. */
 .trial-reveal {
+    position: relative;
+    overflow: clip;
     margin-top: 1.5rem;
     max-width: 44rem;
     padding: 1.1rem 1.25rem;
@@ -2751,6 +2886,36 @@ button.chip {
     border-radius: 8px;
     animation: trial-clue-settle 0.45s ease-out backwards;
     animation-delay: calc(var(--i, 0) * 0.12s);
+}
+
+/* ---- Muad'Dib rising ----
+   The win's verdict sets itself as an epigraph, and the naming moon hangs high in
+   the card's corner. The epigraph cedes the moon's column so the two never collide,
+   and the rise waits out the card's own settle before it begins. The climb plays
+   once, at the solve; the is-rising class never accompanies a restored trial. */
+.trial-epigraph {
+    margin: 0.25rem 0 0.9rem;
+    max-width: min(60ch, calc(100% - 4.25rem));
+}
+
+.trial-moon {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.9rem;
+}
+
+.trial-moon.is-rising {
+    animation: trial-moonrise 1.15s cubic-bezier(0.22, 0.61, 0.36, 1) 0.4s backwards;
+}
+
+@keyframes trial-moonrise {
+    from {
+        transform: translateY(120px);
+        opacity: 0;
+    }
+    30% {
+        opacity: 1;
+    }
 }
 
 .trial-verdict {
@@ -2784,6 +2949,11 @@ button.chip {
     .trial-clue,
     .trial-guess-row,
     .trial-reveal {
+        animation: none;
+    }
+
+    /* The moon takes its risen place without the climb. */
+    .trial-moon.is-rising {
         animation: none;
     }
 }
