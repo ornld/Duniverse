@@ -45,11 +45,11 @@
          this hands it the same mark the browser tab already uses. -->
     <link rel="apple-touch-icon" href="icon-192.png" />
     <link rel="preload" href="fonts/marcellus-400.woff2" as="font" type="font/woff2" crossorigin />
-    <!-- Home and About are the only routes that paint this plate, and it is half a megabyte
-         racing the framework download. Since the deploy answers every deep link with this same
-         file, a plain preload tag would spend that half megabyte on the ten routes that never
-         show it. Injecting it instead costs a parser pause here and still beats waiting for the
-         app to boot before the request starts, which is what stops the hero popping in late. -->
+    <!-- Home and About are the only routes that paint this plate, and it races the framework
+         download. Since the deploy answers every deep link with this same file, a plain preload
+         tag would spend those bytes on the ten routes that never show it. Injecting it instead
+         costs a parser pause here and still beats waiting for the app to boot before the request
+         starts, which is what stops the hero popping in late. -->
     <script>
         (function () {
             const path = location.pathname.replace(/\/+$/, '') || '/';
@@ -59,7 +59,7 @@
             const preload = document.createElement('link');
             preload.rel = 'preload';
             preload.as = 'image';
-            preload.href = 'images/main-menu-background.jpg';
+            preload.href = 'images/main-menu-background.webp';
             document.head.appendChild(preload);
         })();
     </script>
@@ -290,6 +290,47 @@
                 }
             }).catch(() => retryWithoutCache());
         }
+
+        // Every tab paints its hero over one of a handful of photographs, and the first
+        // visit to a tab used to pay for that photograph's download on the spot: a beat
+        // of bare grain before the art arrived. Once boot settles and the thread goes
+        // idle, walk the set in nav order and let the browser's cache take them, one at
+        // a time so the warm-up never crowds a request the visitor makes mid-list. The
+        // landing page's own art tops the list and resolves instantly from cache, and a
+        // reader who asked their connection for less data keeps that bargain: the
+        // warm-up stands down. Category art stays out of the list; those pages sit two
+        // clicks deep and their heaviest file outweighs any hero here.
+        const heroArt = [
+            '/images/main-menu-background.webp',
+            '/images/entity-front-background.webp',
+            '/images/timelinebackground.webp',
+            '/images/entity-graph-background.webp',
+            '/images/terminology.webp',
+            '/images/sayingsbackground.webp',
+            '/images/entity-back-background.webp',
+        ];
+        function warmHeroArt() {
+            if (navigator.connection && navigator.connection.saveData) {
+                return;
+            }
+            let next = 0;
+            const step = () => {
+                if (next >= heroArt.length) {
+                    return;
+                }
+                const img = new Image();
+                img.onload = img.onerror = () => step();
+                img.src = heroArt[next++];
+            };
+            step();
+        }
+        started.then(() => {
+            if (window.requestIdleCallback) {
+                requestIdleCallback(() => warmHeroArt());
+            } else {
+                setTimeout(() => warmHeroArt(), 3500);
+            }
+        }).catch(() => {});
     </script>
 </body>
 

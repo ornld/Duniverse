@@ -349,7 +349,7 @@ html {
     box-shadow: inset 0 1px 0 rgba(241, 230, 214, 0.05), inset 0 -14px 28px -20px rgba(0, 0, 0, 0.45);
 }
 
-/* Some source pictures have a frame baked into their own pixels (vehicles.jpg has a white
+/* Some source pictures have a frame baked into their own pixels (vehicles.webp has a white
    border, worlds.webp a dark edge line). Repaint the background on a slightly oversized
    layer so those baked-in edges fall outside the card and are clipped, keeping the visible
    picture flush with the card. The images themselves stay untouched. */
@@ -983,21 +983,21 @@ html {
 
 .entity-card.front {
     border-left: 4px solid var(--dune-accent);
-    background-image: var(--ridulian-grain), linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/entity-front-background.jpg');
+    background-image: var(--ridulian-grain), linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/entity-front-background.webp');
     background-size: auto, cover, cover;
     background-position: 0 0, center, center;
     background-repeat: repeat, no-repeat, no-repeat;
 }
 
 .entity-card.back {
-    background-image: var(--ridulian-grain), linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/entity-back-background.png');
+    background-image: var(--ridulian-grain), linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/entity-back-background.webp');
     background-size: auto, cover, cover;
     background-position: 0 0, center, center;
     background-repeat: repeat, no-repeat, no-repeat;
 }
 
 .entity-card.graph-card {
-    background-image: var(--ridulian-grain), linear-gradient(rgba(23, 19, 16, 0.9), rgba(23, 19, 16, 0.94)), url('/images/entity-graph-background.jpg');
+    background-image: var(--ridulian-grain), linear-gradient(rgba(23, 19, 16, 0.9), rgba(23, 19, 16, 0.94)), url('/images/entity-graph-background.webp');
     background-size: auto, cover, cover;
     background-position: 0 0, center, center;
     background-repeat: repeat, no-repeat, no-repeat;
@@ -1150,7 +1150,7 @@ html {
     position: relative;
     padding: 0.75rem;
     background-color: var(--dune-panel);
-    background-image: var(--ridulian-grain), linear-gradient(rgba(23, 19, 16, 0.92), rgba(23, 19, 16, 0.95)), url('/images/entity-graph-background.jpg');
+    background-image: var(--ridulian-grain), linear-gradient(rgba(23, 19, 16, 0.92), rgba(23, 19, 16, 0.95)), url('/images/entity-graph-background.webp');
     background-size: auto, cover, cover;
     background-position: 0 0, center, center;
     background-repeat: repeat, no-repeat, no-repeat;
@@ -1612,7 +1612,7 @@ button.chip {
     margin: auto;
     padding: 2.25rem 2rem 1.75rem;
     background-color: var(--dune-panel);
-    background-image: linear-gradient(rgba(23, 19, 16, 0.88), rgba(23, 19, 16, 0.93)), url('/images/main-menu-background.jpg');
+    background-image: linear-gradient(rgba(23, 19, 16, 0.88), rgba(23, 19, 16, 0.93)), url('/images/main-menu-background.webp');
     background-size: cover;
     background-position: center;
     border: 1px solid var(--dune-border);
