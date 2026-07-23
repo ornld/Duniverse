@@ -1,6 +1,7 @@
 @page "/terminology"
 @inject EntityRegistry Registry
 @inject SpoilerSettings Spoiler
+@inject IJSRuntime JS
 
 <PageTitle>Terminology - Duniverse</PageTitle>
 
@@ -12,14 +13,14 @@
     </p>
 
     <div class="search-box">
-        <input @bind="filter" @bind:event="oninput" placeholder="Filter terms... e.g. kanly, sietch, water" />
+        <input value="@filter" @oninput="OnFilterChanged" placeholder="Filter terms... e.g. kanly, sietch, water" />
     </div>
 
     <div class="letter-chips">
-        <button class="book-chip @(selectedLetter is null ? "selected" : "")" @onclick="() => selectedLetter = null">All</button>
+        <button class="book-chip @(selectedLetter is null ? "selected" : "")" @onclick="() => SelectLetter(null)">All</button>
         @foreach (var letter in Letters)
         {
-            <button class="book-chip @(selectedLetter == letter ? "selected" : "")" @onclick="() => selectedLetter = letter">@letter</button>
+            <button class="book-chip @(selectedLetter == letter ? "selected" : "")" @onclick="() => SelectLetter(letter)">@letter</button>
         }
     </div>
 
@@ -30,7 +31,7 @@
     else
     {
         <dl class="glossary">
-            @foreach (var term in FilteredTerms)
+            @foreach (var term in PagedTerms)
             {
                 <div class="glossary-entry">
                     <dt>@term.Term</dt>
@@ -44,12 +45,32 @@
                 </div>
             }
         </dl>
+
+        @if (PageCount > 1)
+        {
+            <nav class="glossary-pager" aria-label="Terminology pages">
+                <span class="pager-status">Page @CurrentPage of @PageCount</span>
+                <button class="pager-btn" disabled="@(CurrentPage == 1)" @onclick="() => GoToPage(CurrentPage - 1)" aria-label="Previous page">‹</button>
+                @foreach (var page in PageNumbers)
+                {
+                    <button class="book-chip @(page == CurrentPage ? "selected" : "")"
+                            @onclick="() => GoToPage(page)"
+                            aria-current="@AriaCurrent(page)">
+                        @(page)
+                    </button>
+                }
+                <button class="pager-btn" disabled="@(CurrentPage == PageCount)" @onclick="() => GoToPage(CurrentPage + 1)" aria-label="Next page">›</button>
+            </nav>
+        }
     }
 </div>
 
 @code {
+    private const int PageSize = 13;
+
     private string filter = "";
     private char? selectedLetter;
+    private int currentPage = 1;
     private List<GlossaryTerm> visibleTerms = new();
 
     protected override void OnInitialized()
@@ -73,6 +94,46 @@
             || term.Term.Contains(filter.Trim(), StringComparison.OrdinalIgnoreCase)
             || term.Definition.Contains(filter.Trim(), StringComparison.OrdinalIgnoreCase))
         .ToList();
+
+    private int PageCount => Math.Max(1, (int)Math.Ceiling(FilteredTerms.Count / (double)PageSize));
+
+    // A filter that shrinks the list could otherwise strand the reader on a page that no
+    // longer exists, so the current page is always clamped to what the filter leaves behind.
+    private int CurrentPage => Math.Clamp(currentPage, 1, PageCount);
+
+    private IEnumerable<int> PageNumbers => Enumerable.Range(1, PageCount);
+
+    private string? AriaCurrent(int page) => page == CurrentPage ? "page" : null;
+
+    private IEnumerable<GlossaryTerm> PagedTerms => FilteredTerms
+        .Skip((CurrentPage - 1) * PageSize)
+        .Take(PageSize);
+
+    // Any change to the filter can resize the result set, so paging starts over at one.
+    private void OnFilterChanged(ChangeEventArgs e)
+    {
+        filter = e.Value?.ToString() ?? "";
+        currentPage = 1;
+    }
+
+    private void SelectLetter(char? letter)
+    {
+        selectedLetter = letter;
+        currentPage = 1;
+    }
+
+    private async Task GoToPage(int page)
+    {
+        var target = Math.Clamp(page, 1, PageCount);
+        if (target == currentPage)
+        {
+            return;
+        }
+
+        currentPage = target;
+        // Send the reader back to the top of the list, so a new page never opens mid-scroll.
+        await JS.InvokeVoidAsync("scrollTo", new { top = 0, behavior = "smooth" });
+    }
 
     // The full record a term points at, shown only when the reader is allowed to see that
     // entity. A gated see-link would leak the name it points to, so it vanishes instead.

@@ -645,6 +645,45 @@ html {
     white-space: nowrap;
 }
 
+.glossary-pager {
+    margin: 1.75rem 0 0.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+}
+
+.pager-status {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--dune-muted);
+    letter-spacing: 0.03em;
+}
+
+.pager-btn {
+    padding: 0.35rem 0.7rem;
+    background: var(--dune-panel);
+    border: 1px solid var(--dune-border);
+    border-radius: 999px;
+    color: var(--dune-text);
+    font-size: 0.95rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+    .pager-btn:hover:not(:disabled) {
+        border-color: var(--dune-accent);
+    }
+
+    .pager-btn:disabled {
+        opacity: 0.35;
+        cursor: default;
+    }
+
 /* ---- Bloodlines ---- */
 
 .bloodline-legend {
