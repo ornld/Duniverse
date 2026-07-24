@@ -86,7 +86,24 @@ else if (entity is not null)
         </div>
     }
 
-    <div class="entity-card back dossier-item" style="--i: 3">
+    @* Doors out of the record and into the site's larger tools, each already aimed at
+       this entity. Bloodlines only appears for people who actually stand in the chart. *@
+    <nav class="entity-explore dossier-item" style="--i: 3" aria-label="Explore this record further">
+        <a class="explore-link" href="@($"/connections?from={entity.Id}")">
+            <span class="explore-glyph" aria-hidden="true">&#8596;</span>Trace a connection from here
+        </a>
+        <a class="explore-link" href="@($"/universe?focus={entity.Id}")">
+            <span class="explore-glyph" aria-hidden="true">&#9673;</span>See it in the whole Duniverse
+        </a>
+        @if (InBloodline)
+        {
+            <a class="explore-link" href="@($"/bloodlines?focus={entity.Id}")">
+                <span class="explore-glyph" aria-hidden="true">&#9906;</span>View in the bloodlines
+            </a>
+        }
+    </nav>
+
+    <div class="entity-card back dossier-item" style="--i: 4">
         @foreach (var group in Sections)
         {
             <RelatedSection Title="@group.Title" Items="related.Where(group.Matches)" RoleFor="RoleFor" />
@@ -144,6 +161,14 @@ else
         entity is not null && GraphLayoutService.CategorySlug(entity) != "unknown"
             ? $"Back to {GraphLayoutService.CategoryTitle(entity)}"
             : "Back to Archives";
+
+    // True only when this record actually stands in the Bloodlines chart at the reader's
+    // progress, so the "View in the bloodlines" door never points at a chart without them.
+    private bool InBloodline =>
+        entity is not null
+        && BloodlineMap.Nodes.FirstOrDefault(n =>
+            string.Equals(n.EntityId, entity.Id, StringComparison.OrdinalIgnoreCase)) is { } node
+        && Spoiler.IsVisible(node.Tier);
     private List<House> rivals = new();
     private List<DuneEntity> candidates = new();
     private List<DuneEntity> related = new();

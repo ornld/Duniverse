@@ -108,6 +108,11 @@
 @code {
     private static readonly System.Globalization.CultureInfo Inv = System.Globalization.CultureInfo.InvariantCulture;
 
+    // An entity page can hand off a starting record via /connections?from={id}. The reader
+    // lands with the first endpoint already chosen and only needs to pick the second.
+    [Parameter, SupplyParameterFromQuery(Name = "from")]
+    public string? FromId { get; set; }
+
     private DuneEntity? from;
     private DuneEntity? to;
     private IReadOnlyList<DuneEntity>? path;
@@ -118,6 +123,17 @@
     private int traceId;
 
     private enum TraceOutcome { None, Found, SamePick, BeyondProgress, NoRecord }
+
+    protected override void OnInitialized()
+    {
+        // Apply a handed-off starting record once, only if the reader is cleared to see it.
+        // A missing or sealed id simply lands on the blank pickers, never an error.
+        if (FromId is not null && Registry.GetEntity(FromId) is { } entity && Spoiler.IsVisible(entity))
+        {
+            from = entity;
+            Trace();
+        }
+    }
 
     private static readonly (string Label, string FromId, string ToId)[] ExamplePairs =
     {

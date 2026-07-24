@@ -804,6 +804,24 @@ html {
         filter: drop-shadow(0 0 6px currentColor);
     }
 
+/* A person reached through /bloodlines?focus= holds a steady spice halo so the reader
+   can pick them out of a crowded generation. Gold, the site's attention cue, never blue. */
+    .bloodline-node.is-focused circle {
+        stroke: var(--dune-accent-bright);
+        stroke-width: 4px;
+        filter: drop-shadow(0 0 6px var(--dune-accent-bright));
+        animation: blood-focus-pulse 2.2s ease-in-out infinite;
+    }
+
+@keyframes blood-focus-pulse {
+    0%, 100% { filter: drop-shadow(0 0 3px var(--dune-accent-bright)); }
+    50% { filter: drop-shadow(0 0 11px var(--dune-accent-bright)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .bloodline-node.is-focused circle { animation: none; }
+}
+
 /* ---- Chart entrance ----
    The chart settles one generation at a time, oldest first: a row's people land
    (fade on the group, an overshoot pop on the circle), their lines flow toward the
@@ -1042,6 +1060,47 @@ html {
     background-position: 0 0, center, center;
     background-repeat: repeat, no-repeat, no-repeat;
     padding: 1.25rem 1rem;
+}
+
+/* Doors from a record into the site's larger tools, each already aimed at this entity.
+   Tactile pills that lift on hover, the same language as the chips and the footer icons. */
+.entity-explore {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 1.5rem;
+}
+
+.explore-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    background: var(--dune-panel);
+    border: 1px solid var(--dune-border);
+    border-radius: 999px;
+    color: var(--dune-text);
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+    .explore-link:hover {
+        border-color: var(--dune-accent);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px -10px rgba(0, 0, 0, 0.6);
+    }
+
+    .explore-glyph {
+        color: var(--dune-accent);
+        font-size: 1rem;
+        line-height: 1;
+    }
+
+@media (prefers-reduced-motion: reduce) {
+    .explore-link:hover {
+        transform: none;
+    }
 }
 
 /* ---- Relationship graph ---- */

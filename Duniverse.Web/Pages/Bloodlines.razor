@@ -2,6 +2,7 @@
 @inject EntityRegistry Registry
 @inject SpoilerSettings Spoiler
 @inject NavigationManager Nav
+@inject IJSRuntime JS
 
 <PageTitle>Bloodlines - Duniverse</PageTitle>
 
@@ -64,7 +65,8 @@
                 <g class="bloodline-nodes">
                     @foreach (var node in placed.Values)
                     {
-                        <g class="bloodline-node lineage-@node.Fill @(node.Ring is not null ? $"ring-{node.Ring}" : "")"
+                        <g class="bloodline-node lineage-@node.Fill @(node.Ring is not null ? $"ring-{node.Ring}" : "") @(node.EntityId == focusedId ? "is-focused" : null)"
+                           id="@(node.EntityId == focusedId ? "bloodline-focus" : null)"
                            transform="translate(@node.X.ToString(Inv), @node.Y.ToString(Inv))"
                            style="--row: @node.Row"
                            @onclick="() => GoTo(node.EntityId)">
@@ -117,9 +119,32 @@
     private List<DrawnBand> visibleBands = new();
     private double chartHeight;
 
+    // An entity page can point here at one person via /bloodlines?focus={id}. Only records
+    // that actually stand in the chart at the reader's progress light up; anyone else is
+    // ignored, so the link never promises a highlight the chart cannot show.
+    [Parameter, SupplyParameterFromQuery(Name = "focus")]
+    public string? FocusId { get; set; }
+
+    private string? focusedId;
+
     protected override void OnInitialized()
     {
         BuildChart();
+
+        if (FocusId is not null && placed.ContainsKey(FocusId))
+        {
+            focusedId = FocusId;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Bring the highlighted ancestor into view once, since a deep generation can sit
+        // below the fold and the reader would otherwise land on a chart that looks untouched.
+        if (firstRender && focusedId is not null)
+        {
+            await JS.InvokeVoidAsync("duneScroll.toId", "bloodline-focus");
+        }
     }
 
     private void BuildChart()

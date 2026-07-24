@@ -92,6 +92,11 @@
     private const double Width = 1600;
     private const double Height = 1200;
 
+    // An entity page can hand off a record via /universe?focus={id}. The reader lands with
+    // that star already selected and the camera gliding to it once the graph is attached.
+    [Parameter, SupplyParameterFromQuery(Name = "focus")]
+    public string? FocusId { get; set; }
+
     private ElementReference container;
     private EntityGraph graph = new();
     private Dictionary<string, GraphNode> nodesById = new();
@@ -125,6 +130,14 @@
     protected override void OnInitialized()
     {
         Rebuild();
+
+        // A handed-off record selects its star, so the picker shows the chip and the camera
+        // knows where to fly once the graph attaches. A sealed or missing id is ignored.
+        if (FocusId is not null && nodesById.ContainsKey(FocusId)
+            && Registry.GetEntity(FocusId) is { } entity && Spoiler.IsVisible(entity))
+        {
+            found = entity;
+        }
     }
 
     // The whole visible archive. Hidden entities are excluded before the simulation runs, so
@@ -200,6 +213,13 @@
         if (firstRender)
         {
             await JS.InvokeVoidAsync("duneUniverse.attach", container);
+
+            // A record handed in through ?focus= glides into view the same way the find
+            // picker does, once the canvas is attached and can accept a camera move.
+            if (found is not null && nodesById.TryGetValue(found.Id, out var target))
+            {
+                await JS.InvokeVoidAsync("duneUniverse.focusOn", target.X, target.Y, 2.6);
+            }
         }
 
         if (pendingReset)
