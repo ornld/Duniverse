@@ -300,5 +300,25 @@ namespace Duniverse.Services
             World => "worlds",
             _ => "unknown",
         };
+
+        /// <summary>
+        /// The reader-facing name of an entity's category, matching the heading its browse
+        /// page carries. Pairs with <see cref="CategorySlug"/> so a link can name the same
+        /// category page it points at.
+        /// </summary>
+        public static string CategoryTitle(DuneEntity entity) => entity switch
+        {
+            Artifact => "Artifacts",
+            Discipline => "Disciplines",
+            FloraFauna => "Flora & Fauna",
+            HistoricalEvent => "Historical Events",
+            House => "Houses",
+            Organization => "Organizations",
+            Persona => "Personas",
+            TheologicalSystem => "Theological Systems",
+            Vehicle => "Vehicles",
+            World => "Worlds & Locations",
+            _ => "the archive",
+        };
     }
 }

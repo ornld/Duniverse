@@ -5,7 +5,7 @@
 
 <PageTitle>@((entity is not null && isGated && !revealed) ? "Spoiler-protected entry" : (entity?.Name ?? "Not Found")) - Duniverse</PageTitle>
 
-<a class="back-link" href="/archives">&larr; Back to Archives</a>
+<a class="back-link" href="@BackHref">&larr; @BackLabel</a>
 
 @if (entity is not null && isGated && !revealed)
 {
@@ -130,6 +130,20 @@ else
     private DuneEntity? entity;
     private bool isGated;
     private bool revealed;
+
+    // A resolved record sends "back" to its own category page, so paging Index -> category
+    // -> record returns the reader where they started. Unresolved states (a typo with
+    // several matches, or nothing found) have no single category, so they keep the Archives
+    // fallback.
+    private string BackHref =>
+        entity is not null && GraphLayoutService.CategorySlug(entity) is var slug and not "unknown"
+            ? $"/category/{slug}"
+            : "/archives";
+
+    private string BackLabel =>
+        entity is not null && GraphLayoutService.CategorySlug(entity) != "unknown"
+            ? $"Back to {GraphLayoutService.CategoryTitle(entity)}"
+            : "Back to Archives";
     private List<House> rivals = new();
     private List<DuneEntity> candidates = new();
     private List<DuneEntity> related = new();
