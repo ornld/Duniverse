@@ -1178,6 +1178,41 @@ html {
     border-left: 2px solid var(--cat-color, var(--dune-border));
 }
 
+/* A record's front card wears its own category's backdrop, the same art that heads
+   that category's browse page, so an artifact reads as an artifact before a word of
+   it is read. Only the photo swaps here; the darker front-card overlay and the
+   size/position/repeat from .entity-card.front carry over, so dense entry text stays
+   legible. Categories without a themed card fall back to the shared front backdrop. */
+.entity-card.front.category-artifacts {
+    background-image: var(--ridulian-grain), linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/categories/artifacts.webp');
+}
+.entity-card.front.category-disciplines {
+    background-image: var(--ridulian-grain), linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/categories/disciplines.webp');
+}
+.entity-card.front.category-flora-fauna {
+    background-image: var(--ridulian-grain), linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/categories/flora-fauna.webp');
+}
+.entity-card.front.category-historical-events {
+    background-image: var(--ridulian-grain), linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/categories/historical-events.webp');
+}
+.entity-card.front.category-houses {
+    background-image: var(--ridulian-grain), linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/categories/houses.webp');
+}
+.entity-card.front.category-organizations {
+    background-image: var(--ridulian-grain), linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/categories/organizations.webp');
+}
+/* Personas deliberately keep the neutral front backdrop: the category art is a single
+   literal figure, which repeats across every person and works against each card. */
+.entity-card.front.category-theological-systems {
+    background-image: var(--ridulian-grain), linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/categories/theological-systems.webp');
+}
+.entity-card.front.category-vehicles {
+    background-image: var(--ridulian-grain), linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/categories/vehicles.webp');
+}
+.entity-card.front.category-worlds {
+    background-image: var(--ridulian-grain), linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/categories/worlds.webp');
+}
+
 .graph-hint {
     margin-top: 0.5rem;
     font-size: 0.8rem;
