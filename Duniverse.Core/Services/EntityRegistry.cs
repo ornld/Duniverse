@@ -76,6 +76,29 @@ namespace Duniverse.Services
         }
 
         /// <summary>
+        /// Every Persona who names the given house or organization as their affiliation. The
+        /// archive records affiliation as free text and some figures serve two masters at once
+        /// ("House Vernius / House Atreides", "Honored Matres (later Bene Gesserit)"), so the
+        /// match is a substring rather than an equality and such a figure appears on both
+        /// rosters, which is the truthful answer. Callers apply their own spoiler filter.
+        ///
+        /// This is the reverse of the link a Persona already shows: a member's record names
+        /// their house, but the house's record had no way to name its members.
+        /// </summary>
+        public IEnumerable<Persona> GetAffiliates(string organizationName)
+        {
+            if (string.IsNullOrWhiteSpace(organizationName))
+            {
+                return Array.Empty<Persona>();
+            }
+
+            return _database.Values
+                .OfType<Persona>()
+                .Where(persona => !string.IsNullOrWhiteSpace(persona.Affiliation)
+                    && persona.Affiliation.Contains(organizationName, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
         /// Returns a single entity chosen at random from the whole databank, or null if the
         /// databank is empty. Backs the "Surprise me" control, which drops a reader on an
         /// arbitrary entity page as a starting point for exploring the archive. An optional

@@ -85,20 +85,30 @@ else if (entity is not null)
         }
     </div>
 
-    <div class="connections-divider dossier-item" style="--i: 1">
+    @* Who belongs to this house or order, gathered from the affiliation each person's own
+       record already declares. Sits beside the house's description rather than down among
+       the connections, because membership is part of what the house IS, not a link out. *@
+    @if (members.Count > 0)
+    {
+        <div class="entity-card roster-card dossier-item" style="--i: 1">
+            <RelatedSection Title="Known Members" Items="members" />
+        </div>
+    }
+
+    <div class="connections-divider dossier-item" style="--i: 2">
         <span>Connected relationships throughout the Duniverse</span>
     </div>
 
     @if (hasAnyConnections)
     {
-        <div class="entity-card graph-card dossier-item" style="--i: 2">
+        <div class="entity-card graph-card dossier-item" style="--i: 3">
             <RelationshipGraph CenterId="@entity.Id" />
         </div>
     }
 
     @* Doors out of the record and into the site's larger tools, each already aimed at
        this entity. Bloodlines only appears for people who actually stand in the chart. *@
-    <nav class="entity-explore dossier-item" style="--i: 3" aria-label="Explore this record further">
+    <nav class="entity-explore dossier-item" style="--i: 4" aria-label="Explore this record further">
         <a class="explore-link" href="@($"/connections?from={entity.Id}")">
             <span class="explore-glyph" aria-hidden="true">&#8596;</span>Trace a connection from here
         </a>
@@ -113,7 +123,7 @@ else if (entity is not null)
         }
     </nav>
 
-    <div class="entity-card back dossier-item" style="--i: 4">
+    <div class="entity-card back dossier-item" style="--i: 5">
         @foreach (var group in Sections)
         {
             <RelatedSection Title="@group.Title" Items="related.Where(group.Matches)" RoleFor="RoleFor" />
@@ -180,6 +190,7 @@ else
             string.Equals(n.EntityId, entity.Id, StringComparison.OrdinalIgnoreCase)) is { } node
         && Spoiler.IsVisible(node.Tier);
     private List<House> rivals = new();
+    private List<DuneEntity> members = new();
     private List<DuneEntity> candidates = new();
     private List<DuneEntity> related = new();
     private bool hasAnyConnections;
@@ -230,6 +241,16 @@ else
         rivals = entity is House house
             ? Registry.GetRivalHouses(house.Id).Where(Spoiler.IsVisible).ToList()
             : new List<House>();
+
+        // A house or order can now name the people who belong to it, which until now only ran
+        // the other way. Alphabetical, since a roster has no natural order of importance.
+        members = entity is House or Organization
+            ? Registry.GetAffiliates(entity.Name)
+                .Where(Spoiler.IsVisible)
+                .OrderBy(person => person.Name, StringComparer.OrdinalIgnoreCase)
+                .Cast<DuneEntity>()
+                .ToList()
+            : new List<DuneEntity>();
 
         related = Registry.GetDirectlyRelated(entity.Id).Where(Spoiler.IsVisible).ToList();
         hasAnyConnections = related.Count > 0;
