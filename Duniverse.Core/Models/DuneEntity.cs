@@ -18,6 +18,19 @@ namespace Duniverse.Models
         public required string Name { get; set; }
 
         /// <summary>
+        /// Other names this entity is known by in the saga, searchable alongside the display
+        /// name and shown on the record as "Also known as". Dune treats names as substance
+        /// rather than labels, so a reader who knows a figure only as Muad'Dib or the Maker
+        /// has to be able to find them by that name.
+        ///
+        /// Only names safe at the entity's own <see cref="SpoilerTier"/> belong here. An alias
+        /// that is itself a revelation would leak through search results and through the line
+        /// on the page, neither of which the spoiler gate inspects, so those are left out
+        /// entirely rather than half-protected.
+        /// </summary>
+        public List<string> Aliases { get; set; } = new List<string>();
+
+        /// <summary>
         /// A brief summary displayed on the front of the encyclopedia card.
         /// </summary>
         public string? ShortDescription { get; set; }

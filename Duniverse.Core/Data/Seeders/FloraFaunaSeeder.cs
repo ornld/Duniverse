@@ -13,6 +13,7 @@ namespace Duniverse.Data.Seeders
                 {
                     Id = "bio_ShaiHulud",
                     Name = "Shai-Hulud (Sandworm)",
+                    Aliases = new List<string> { "Maker", "Old Man of the Desert", "Old Father Eternity", "Grandfather of the Desert" },
                     ShortDescription = "Colossal, near-immortal, and worshipped as a god. The sandworms of Arrakis sit at the center of both the spice cycle and Fremen faith.",
                     DetailedHistory = "Sandworms grow to hundreds of meters and live for centuries. They guard their territory with a temper close to rage. Any rhythmic vibration on open sand pulls one straight toward the source. Their biology alone explains why Arrakis matters to the Imperium. The worm takes the deep-buried, water-poisoned sandtrout stage and turns it into pre-spice mass. That mass surfaces, gets processed, and becomes melange. The worm is danger and fortune wearing the same skin. Fremen religion treats Shai-Hulud as far more than a threat to survive. He is the 'Old Man of the Desert,' a divine presence whose favor decides whether a tribe lives through the season. His teeth, pulled after death, become the crysknives every Fremen carries at the hip. Riding a captured worm calls for hooks that force its sensitive segments up, away from the abrasive sand. Fremen learned this trick generations ago. It became both their standard way to cross the desert and the rite that marks a boy's passage into manhood.",
                     ImagePath = "images/biology/shai_hulud.jpg",
@@ -46,6 +47,7 @@ namespace Duniverse.Data.Seeders
                 {
                     Id = "bio_Melange",
                     Name = "Melange (Geriatric Spice)",
+                    Aliases = new List<string> { "The Spice" },
                     ShortDescription = "The 'geriatric spice,' a life-extending, mind-opening substance that exists nowhere else in the universe.",
                     DetailedHistory = "The sandworm life cycle produces it start to finish. Sandtrout give way to pre-spice mass, and that mass eventually erupts as raw melange onto the surface. Nothing else like it exists anywhere in known space. Regular use stretches the human lifespan and sharpens the mind and body well past normal limits. Sustained, concentrated doses can even unlock a limited form of prescience. That is the same trait that lets Guild Navigators fold space without killing everyone aboard. Its grip is total. Withdrawal after long-term use can kill. That dependence has bound entire populations and institutions, the Spacing Guild chief among them, to a supply chain only the ruler of Arrakis can turn on or off. Necessity, scarcity, and addiction combined to make melange the real engine of Imperial politics. Houses fell, religions rose, and wars got fought, all over who controlled its flow.",
                     ImagePath = "images/biology/melange.jpg",

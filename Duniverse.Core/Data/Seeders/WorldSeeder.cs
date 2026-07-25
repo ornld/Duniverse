@@ -13,6 +13,8 @@ namespace Duniverse.Data.Seeders
                 {
                     Id = "loc_Arrakis",
                     Name = "Arrakis",
+                    // Its later name belongs to the world's own record for that era, not here.
+                    Aliases = new List<string> { "Dune" },
                     ShortDescription = "Dune itself: a scoured desert planet and the only known source of the spice melange.",
                     DetailedHistory = "Arrakis is the third planet out from the star Canopus. It offers almost nothing in the way of open water. What it has instead are dune seas without end and sandworms of terrifying size. The life cycle of those worms manufactures the geriatric spice found on no other world in the universe. That aridity pushed the native Fremen toward a culture built around hoarding moisture. Stillsuits reclaim sweat and breath. Sietch cisterns collect water drop by drop across generations, all aimed at a dream of turning the planet green. Melange underwrites Guild navigation, extends human life, and threads through commerce across the Imperium. So whoever held Arrakis as a fief inherited both staggering wealth and a target on their back. That combination pulled House Atreides, House Harkonnen, and eventually Paul Atreides into a fight over the planet that rewrote galactic history. Paul's Fremen legions took it by force in the end. After that, Arrakis stopped being a fief any Emperor could hand out or revoke. It became the throne from which the Atreides Imperium, and later Leto II's Golden Path, governed everything.",
                     ImagePath = "images/worlds/arrakis.jpg",

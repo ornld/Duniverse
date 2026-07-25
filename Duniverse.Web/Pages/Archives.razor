@@ -142,7 +142,14 @@
             return;
         }
 
-        rawCandidates = result.Candidates.ToList();
+        // A record the query actually names outranks one that merely contains it inside a
+        // longer title, so searching "Muad'Dib" leads with the man rather than the church
+        // built around him. Without this the order is whatever the databank happens to yield.
+        rawCandidates = result.Candidates
+            .OrderByDescending(entity => ExactlyNamed(entity, lastQuery))
+            .ThenBy(entity => entity.Name.Length)
+            .ThenBy(entity => entity.Name)
+            .ToList();
 
         // A record already listed by name is not listed again as a text match.
         var alreadyNamed = new HashSet<string>(rawCandidates.Select(c => c.Id), StringComparer.OrdinalIgnoreCase);
@@ -202,6 +209,18 @@
         {
             yield return word;
         }
+    }
+
+    // Whether one of the names this record answers to is exactly what the reader typed,
+    // rather than merely containing it.
+    private static bool ExactlyNamed(DuneEntity entity, string query)
+    {
+        if (string.Equals(entity.Name, query, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        return entity.Aliases.Any(alias => string.Equals(alias, query, StringComparison.OrdinalIgnoreCase));
     }
 
     // Whether the record's one-line summary carries the search, which makes it a better

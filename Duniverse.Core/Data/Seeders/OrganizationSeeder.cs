@@ -13,6 +13,7 @@ namespace Duniverse.Data.Seeders
                 {
                     Id = "org_BeneGesserit",
                     Name = "Bene Gesserit",
+                    Aliases = new List<string> { "The Sisterhood" },
                     ShortDescription = "An ancient sisterhood working the long game of politics, bloodlines, and belief across the Imperium.",
                     DetailedHistory = "Ninety generations of quiet matchmaking went into the Bene Gesserit breeding program. The scheme reached into nearly every Great House in the Imperium. Marriages were arranged, bloodlines nudged, traits concentrated. All of it pointed at one outcome: a male who could do what only a Reverend Mother could do, hold the full weight of ancestral memory, and see further still, forward through time. Genetics only got them halfway there. The Missionaria Protectiva handled the rest. Its agents planted prophecies and ready-made religious scaffolding on backward worlds generations before they'd be needed. It was insurance a stranded Sister could cash in the moment she found herself surrounded and outnumbered. The order called its training the Bene Gesserit Way, a punishing regimen of physical and mental drilling. It turned ordinary women into something else entirely. They gained bodies under total control, minds that read truth from a voice's tremor, and hands that moved the people around them like pieces on a board. Almost no one outside the Sisterhood grasped the plan in full. Paul Atreides arrived a generation ahead of schedule and proved to be exactly what they'd bred for. He proved something else too, the one thing the Sisterhood dreaded most: a result too powerful for them to steer.",
                     ImagePath = "images/organizations/bene_gesserit.jpg",
@@ -35,6 +36,7 @@ namespace Duniverse.Data.Seeders
                 {
                     Id = "org_SpacingGuild",
                     Name = "Spacing Guild",
+                    Aliases = new List<string> { "The Guild" },
                     ShortDescription = "The monopoly that owns interstellar travel itself, run by prescient Navigators no longer quite human.",
                     DetailedHistory = "Guild Navigators eat melange in quantities no ordinary human body could stand. The spice remakes them slowly into something else. What emerges gains a narrow window of prescience, just enough to fold space safely across light-years in a single instant. It loses, permanently, any resemblance to the human shape it started in. Navigators live out their lives sealed inside orange-gas tanks aboard the vast Heighliners. They never again set foot in open air. They traded their humanity for a monopoly nothing else in the Imperium can touch. No substitute for this kind of travel exists. That single fact hands the Guild leverage to rival, maybe exceed, the Emperor's own throne. They wield it quietly, cutting off any House or cause reckless enough to threaten the spice supply. The arrangement leaves the Guild both the most powerful institution in known space and the most fragile. Everything it has rests on a substance that grows in exactly one place.",
                     ImagePath = "images/organizations/spacing_guild.jpg",
@@ -46,6 +48,7 @@ namespace Duniverse.Data.Seeders
                 {
                     Id = "org_BeneTleilax",
                     Name = "Bene Tleilax",
+                    Aliases = new List<string> { "The Tleilaxu" },
                     ShortDescription = "A secretive society of genetic manipulators, makers of gholas and Face Dancers alike.",
                     DetailedHistory = "The Tleilaxu keep to their hidden, heavily guarded homeworld. They grow things there that unsettle the rest of the Imperium. Gholas come rebuilt from a dead person's cellular remains. Face Dancers can wear another person's face and voice down to the last detail. All of it happens inside artificial axlotl tanks, and the true mechanics of those tanks rank among the best-kept secrets the Tleilaxu hold. To outsiders they play the part of humble, pious tradesmen, devout followers of a faith nobody else fully understands. The whole time, they work the Imperium's politics from underneath. Clients need them badly and trust them barely. Only a Tleilaxu can bring back a swordmaster like Duncan Idaho from the dead. Yet no one who buys a Tleilaxu construct can say for certain what conditioning or hidden purpose came bundled with it. Patience is their real weapon. Centuries of careful scheming let them outlast, and repeatedly outmaneuver, powers as old as the Bene Gesserit and the Spacing Guild.",
                     ImagePath = "images/organizations/bene_tleilax.jpg",

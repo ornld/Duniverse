@@ -28,6 +28,9 @@ namespace Duniverse.Data.Seeders
                 {
                     Id = "char_PaulAtreides",
                     Name = "Paul Atreides",
+                    // The names he answers to inside Dune itself. His later name is a
+                    // revelation in its own right and is deliberately not listed here.
+                    Aliases = new List<string> { "Muad'Dib", "Usul", "Lisan al-Gaib", "Kwisatz Haderach" },
                     ShortDescription = "The prophesied Kwisatz Haderach who became Emperor of the Known Universe.",
                     DetailedHistory = "Paul was the son of Duke Leto Atreides and Lady Jessica, who trained him in secret in the Bene Gesserit arts. On the surface he was a Great House heir. Underneath, he was a boy drilled in Mentat logic, sword work, and the Sisterhood's harsh mental discipline. House Atreides fell within weeks of taking Arrakis. The Harkonnens and Sardaukar struck together, and Paul and his mother fled into the deep desert. The Fremen took them in. Skill, prescience, and a prophecy planted generations before his birth carried him up through their ranks until he led them as Muad'Dib. He took Arrakeen, broke Emperor Shaddam IV, and claimed the Golden Lion Throne. But the jihad fought in his name spread across the galaxy and swallowed billions of lives. He saw the slaughter coming and could never quite stop it. He was the Kwisatz Haderach the Bene Gesserit had bred toward for generations. He was the first mind able to hold both male and female ancestral memory, and to see further than any prescient being before him. That gift made him the most powerful man in the Imperium. It made him its prisoner too. In the end he chose the desert and exile over ruling as the mask for a faith that had slipped from his hands.",
                     ImagePath = "",
@@ -64,6 +67,7 @@ namespace Duniverse.Data.Seeders
                 {
                     Id = "char_BaronHarkonnen",
                     Name = "Vladimir Harkonnen",
+                    Aliases = new List<string> { "Baron Harkonnen", "The Baron" },
                     ShortDescription = "The ruthless and cunning head of House Harkonnen.",
                     DetailedHistory = "Vladimir Harkonnen was grotesquely fat and endlessly scheming. He clawed his family back onto the Arrakis fief through a conspiracy built with Emperor Shaddam IV. It took disguised Sardaukar troops, a bought physician in Dr. Yueh, and a single devastating strike that crushed House Atreides. The Baron handed Arrakis first to his brutal nephew Rabban. He planned to hand it next to the sharper, more presentable Feyd-Rautha. The point was to bleed the planet dry, then groom a false savior to replace Rabban's tyranny with the appearance of mercy. Suspensors carried his enormous body wherever he wished to go, a fitting crutch for a man built from indulgence, cruelty, and a real appetite for manipulation. His boast of plans within plans within plans became shorthand for everything Harkonnen scheming stood for. His reign of terror over Arrakis ended at the hands of his own granddaughter. Alia Atreides killed him during the battle for Arrakeen, closing out a blood feud that had simmered between the two Houses for generations.",
                     ImagePath = "",
@@ -232,6 +236,8 @@ namespace Duniverse.Data.Seeders
                 {
                     Id = "char_LietKynes",
                     Name = "Liet-Kynes",
+                    // "Liet" alone is already inside the display name, so it needs no entry here.
+                    Aliases = new List<string> { "The Imperial Planetologist" },
                     ShortDescription = "Imperial Planetologist and secret leader of the Fremen.",
                     DetailedHistory = "In public, Liet-Kynes was the Imperial Planetologist assigned to Arrakis. In secret, he used that position to carry on his father Pardot's generations-long project: turning the desert planet into a water-rich world. He recruited the Fremen themselves into the patient, hidden work required to make it happen. As Chani's father, Kynes kept close ties to both the sietches and the Imperial administration. That made him a critical, if quiet, ally to Duke Leto Atreides once the Duke arrived on Arrakis. When House Atreides fell to the Harkonnen-Sardaukar assault, Kynes's loyalty to the Atreides cause made him a liability the Harkonnens would not tolerate. They abandoned him in the open desert without proper equipment and left him to die in a spice blow rather than execute him outright. His death did not end his influence. The ecological vision and the secret Fremen alliance he had built over decades passed straight into the movement that would carry Paul Atreides to power.",
                     ImagePath = "",

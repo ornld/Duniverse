@@ -94,15 +94,28 @@ namespace Duniverse.Services
         }
 
         /// <summary>
-        /// Finds every entity whose Name contains the given query. Names and queries are
-        /// normalized (punctuation stripped, case folded) first, so "muaddib" still matches
-        /// "Muad'Dib" despite the apostrophe.
+        /// Finds every entity whose Name or any of its <see cref="DuneEntity.Aliases"/> contains
+        /// the given query. Names and queries are normalized (punctuation stripped, case folded)
+        /// first, so "muaddib" still matches "Muad'Dib" despite the apostrophe. Aliases count as
+        /// fully as the display name, since the name a reader happens to know a figure by is not
+        /// always the one the record is filed under.
         /// </summary>
         public IEnumerable<DuneEntity> SearchByName(string query)
         {
             var normalizedQuery = Normalize(query);
             return _database.Values
-                .Where(entity => Normalize(entity.Name).Contains(normalizedQuery, StringComparison.Ordinal));
+                .Where(entity => NamesOf(entity)
+                    .Any(name => Normalize(name).Contains(normalizedQuery, StringComparison.Ordinal)));
+        }
+
+        /// <summary>Every name an entity answers to: its display name first, then its aliases.</summary>
+        private static IEnumerable<string> NamesOf(DuneEntity entity)
+        {
+            yield return entity.Name;
+            foreach (var alias in entity.Aliases)
+            {
+                yield return alias;
+            }
         }
 
         /// <summary>
@@ -165,8 +178,12 @@ namespace Duniverse.Services
 
             int maxDistance = Math.Max(2, normalizedQuery.Length / 3);
 
+            // Scored against every name the entity answers to, so a typo on an alias
+            // ("Muaddib", "Usal") is corrected as readily as a typo on the display name.
             var withinRange = _database.Values
-                .Select(entity => (Entity: entity, Distance: LevenshteinDistance(normalizedQuery, Normalize(entity.Name))))
+                .Select(entity => (
+                    Entity: entity,
+                    Distance: NamesOf(entity).Min(name => LevenshteinDistance(normalizedQuery, Normalize(name)))))
                 .Where(scored => scored.Distance <= maxDistance)
                 .OrderBy(scored => scored.Distance)
                 .ToList();

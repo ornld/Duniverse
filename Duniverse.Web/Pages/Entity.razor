@@ -264,6 +264,13 @@ else
     // reader-facing rather than field names: EnvironmentalData reads as "Environment".
     private static IReadOnlyList<MetaRow> MetaRowsFor(DuneEntity entity)
     {
+        // Other names come first and apply to every kind of record, so a reader who arrived
+        // knowing one name learns the others before reading anything else. Joined into a
+        // single line rather than stacked, since these are short and belong together.
+        var aliasRow = entity.Aliases.Count > 0
+            ? new[] { new MetaRow("Also Known As", string.Join(", ", entity.Aliases)) }
+            : Array.Empty<MetaRow>();
+
         var rows = entity switch
         {
             Persona persona => new[]
@@ -321,7 +328,8 @@ else
             _ => Array.Empty<MetaRow>(),
         };
 
-        return rows
+        return aliasRow
+            .Concat(rows)
             .Where(row => row.Items is { Count: > 0 } || HasFact(row.Value))
             .ToList();
     }
