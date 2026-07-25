@@ -106,6 +106,48 @@ namespace Duniverse.Services
         }
 
         /// <summary>
+        /// Finds every entity whose entry text mentions the given query, searching the summary
+        /// and the history rather than the name. Readers remember facts before they remember
+        /// names ("the tooth with the poison gas"), and a name-only search answers none of
+        /// those. Text is normalized the same way names are, so an apostrophe or a capital
+        /// never decides a match.
+        ///
+        /// Deliberately kept out of <see cref="Resolve"/>: that chain decides what a URL and a
+        /// bare Enter press mean, and it navigates on a single hit. A phrase found in the body
+        /// of an entry is a weaker signal than a name, so it belongs in a list the reader
+        /// chooses from, never in a redirect. Short queries are refused because two letters
+        /// appear in almost every entry and would return the whole archive.
+        /// </summary>
+        public IEnumerable<DuneEntity> SearchByContent(string query)
+        {
+            var normalizedQuery = Normalize(query);
+            if (normalizedQuery.Length < 3)
+            {
+                return Array.Empty<DuneEntity>();
+            }
+
+            // Every word has to appear, but not side by side. A reader recalling a fact rarely
+            // recalls the archive's exact phrasing ("sandworm tooth" for "tooth of a slain
+            // sandworm"), so demanding the literal phrase would fail the very searches this is
+            // here to answer. Requiring all the words keeps it from matching on one loose word.
+            var terms = normalizedQuery
+                .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Distinct()
+                .ToArray();
+
+            if (terms.Length == 0)
+            {
+                return Array.Empty<DuneEntity>();
+            }
+
+            return _database.Values.Where(entity =>
+            {
+                var text = Normalize((entity.ShortDescription ?? string.Empty) + " " + (entity.DetailedHistory ?? string.Empty));
+                return terms.All(term => text.Contains(term, StringComparison.Ordinal));
+            });
+        }
+
+        /// <summary>
         /// Finds the entities whose Name is the closest edit-distance match to the given query,
         /// for suggesting corrections when an exact ID and a substring name search both come up
         /// empty (e.g. a typo like "Pull Atriedes"). The allowed distance scales with the

@@ -1019,6 +1019,17 @@ html {
     border-radius: 6px;
 }
 
+/* Records found by their text rather than their name. A muted edge marks the whole block
+   as the weaker answer, sitting below the name matches without competing with them. */
+.candidates.text-matches {
+    border-left: 3px solid var(--dune-muted);
+}
+
+    /* The excerpt is quoted out of an entry, so it is set apart from the site's own voice. */
+    .candidates.text-matches .muted {
+        font-style: italic;
+    }
+
 .back-link {
     display: inline-block;
     margin-bottom: 1rem;

@@ -38,6 +38,28 @@
         </div>
     }
 
+    @* Records the query never names, but whose entry text says it. Kept visually below the
+       name matches, and always a list rather than a jump, because a phrase found in a body
+       of prose is a weaker claim than a name. *@
+    @if (contentMatches.Count > 0)
+    {
+        <div class="candidates text-matches">
+            <p>
+                @(candidates.Count > 0 ? "Also mentioned" : "Mentioned")
+                in the text of @contentMatchTotal @(contentMatchTotal == 1 ? "record" : "records")@(contentMatchTotal > contentMatches.Count ? $", closest {contentMatches.Count} first" : ""):
+            </p>
+            <ul>
+                @foreach (var match in contentMatches)
+                {
+                    <li>
+                        <a href="@($"/entity/{match.Id}")">@match.Name</a>
+                        <span class="muted">@(Snippet(match, lastQuery) ?? match.ShortDescription)</span>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+
     <div class="examples">
         <span class="examples-label">Try:</span>
         @foreach (var example in Examples)
@@ -60,6 +82,15 @@
     private bool notFound;
     private List<DuneEntity> rawCandidates = new();
     private List<DuneEntity> candidates = new();
+    private List<DuneEntity> rawContentMatches = new();
+    private List<DuneEntity> contentMatches = new();
+
+    // Enough to be useful without letting a common word bury the page in a hundred entries.
+    private const int MaxContentMatches = 10;
+
+    // How many records mention the phrase in total, before the display cap. Kept separate so
+    // the heading can be honest about a list it is only showing the top of.
+    private int contentMatchTotal;
 
     private static readonly (string Label, string Id)[] Examples =
     {
@@ -93,6 +124,8 @@
         notFound = false;
         rawCandidates = new List<DuneEntity>();
         candidates = new List<DuneEntity>();
+        rawContentMatches = new List<DuneEntity>();
+        contentMatches = new List<DuneEntity>();
         lastQuery = query.Trim();
 
         if (string.IsNullOrWhiteSpace(lastQuery))
@@ -102,28 +135,138 @@
 
         var result = Registry.Resolve(lastQuery);
 
+        // An exact ID or an unambiguous name still goes straight through to the record.
         if (result.Entity is not null)
         {
             Nav.NavigateTo($"/entity/{result.Entity.Id}");
             return;
         }
 
-        if (result.Candidates.Count > 0)
-        {
-            rawCandidates = result.Candidates.ToList();
-            candidates = rawCandidates.Where(Spoiler.IsVisible).ToList();
-            notFound = candidates.Count == 0;
-            return;
-        }
+        rawCandidates = result.Candidates.ToList();
 
-        notFound = true;
+        // A record already listed by name is not listed again as a text match.
+        var alreadyNamed = new HashSet<string>(rawCandidates.Select(c => c.Id), StringComparer.OrdinalIgnoreCase);
+        rawContentMatches = Registry.SearchByContent(lastQuery)
+            .Where(entity => !alreadyNamed.Contains(entity.Id))
+            .ToList();
+
+        ApplySpoilerFilter();
     }
 
-    // Re-apply spoiler filtering to the current suggestions when the reader changes their
+    // Re-apply spoiler filtering to the current results when the reader changes their
     // reading progress without running a new search.
-    private void RefilterCandidates()
+    private void RefilterCandidates() => ApplySpoilerFilter();
+
+    private void ApplySpoilerFilter()
     {
         candidates = rawCandidates.Where(Spoiler.IsVisible).ToList();
-        notFound = rawCandidates.Count > 0 && candidates.Count == 0;
+
+        var ranked = rawContentMatches
+            .Where(Spoiler.IsVisible)
+            // A phrase in the one-line summary answers the reader better than the same phrase
+            // buried deep in a history, and an entry that returns to the phrase repeatedly is
+            // more about it than one that mentions it once in passing. Name breaks ties only,
+            // so alphabetical order never outranks relevance.
+            .OrderByDescending(entity => InSummary(entity, lastQuery))
+            .ThenByDescending(entity => Mentions(entity, lastQuery))
+            .ThenBy(entity => entity.Name)
+            .ToList();
+
+        contentMatchTotal = ranked.Count;
+        contentMatches = ranked.Take(MaxContentMatches).ToList();
+
+        // Only speak of a failed search once one has actually been run, so changing reading
+        // progress on an untouched page never announces that nothing was found.
+        notFound = !string.IsNullOrWhiteSpace(lastQuery)
+            && candidates.Count == 0
+            && contentMatches.Count == 0;
+    }
+
+    // The phrase itself, then its words longest first. The words of a query are often
+    // scattered through an entry rather than sitting together, so anything reading the text
+    // for display or ranking has to fall back from the whole phrase to its parts.
+    private static IEnumerable<string> Needles(string query)
+    {
+        var trimmed = query.Trim();
+        if (trimmed.Length >= 3)
+        {
+            yield return trimmed;
+        }
+
+        var words = trimmed
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Where(word => word.Length >= 3)
+            .OrderByDescending(word => word.Length);
+
+        foreach (var word in words)
+        {
+            yield return word;
+        }
+    }
+
+    // Whether the record's one-line summary carries the search, which makes it a better
+    // answer than one that only mentions it deep in a history.
+    private static bool InSummary(DuneEntity entity, string query)
+    {
+        var summary = entity.ShortDescription ?? string.Empty;
+        return Needles(query).Any(needle => summary.Contains(needle, StringComparison.OrdinalIgnoreCase));
+    }
+
+    // How often a record's text returns to the reader's strongest search word, as a rough
+    // measure of how much the entry is actually about it rather than mentioning it once.
+    private static int Mentions(DuneEntity entity, string query)
+    {
+        var needle = Needles(query).LastOrDefault();
+        if (string.IsNullOrEmpty(needle))
+        {
+            return 0;
+        }
+
+        var text = (entity.ShortDescription ?? string.Empty) + " " + (entity.DetailedHistory ?? string.Empty);
+
+        int count = 0;
+        int at = text.IndexOf(needle, StringComparison.OrdinalIgnoreCase);
+        while (at >= 0)
+        {
+            count++;
+            at = text.IndexOf(needle, at + needle.Length, StringComparison.OrdinalIgnoreCase);
+        }
+
+        return count;
+    }
+
+    // The stretch of an entry around the reader's phrase, so a match explains itself instead
+    // of arriving as a bare name. Falls back to null when the phrase only matched after
+    // punctuation was normalized away, in which case the summary is shown instead.
+    private static string? Snippet(DuneEntity entity, string query, int radius = 70)
+    {
+        foreach (var needle in Needles(query))
+        {
+            foreach (var source in new[] { entity.DetailedHistory, entity.ShortDescription })
+            {
+                if (string.IsNullOrEmpty(source))
+                {
+                    continue;
+                }
+
+                int found = source.IndexOf(needle, StringComparison.OrdinalIgnoreCase);
+                if (found < 0)
+                {
+                    continue;
+                }
+
+                int start = Math.Max(0, found - radius);
+                int end = Math.Min(source.Length, found + needle.Length + radius);
+
+                // Grow out to whole words so the excerpt never opens or closes mid-word.
+                while (start > 0 && !char.IsWhiteSpace(source[start - 1])) start--;
+                while (end < source.Length && !char.IsWhiteSpace(source[end])) end++;
+
+                var excerpt = source[start..end].Trim();
+                return (start > 0 ? "…" : string.Empty) + excerpt + (end < source.Length ? "…" : string.Empty);
+            }
+        }
+
+        return null;
     }
 }
