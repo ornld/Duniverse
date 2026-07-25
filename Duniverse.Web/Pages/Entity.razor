@@ -32,21 +32,31 @@ else if (entity is not null)
         <h1>@entity.Name</h1>
         <p class="short-desc">@entity.ShortDescription</p>
 
-        @if (entity is Persona metaPersona && (!string.IsNullOrWhiteSpace(metaPersona.Role) || !string.IsNullOrWhiteSpace(metaPersona.Affiliation)))
+        @* The record's own field data, whatever kind of record it is. Every category keeps its
+           facts in different fields; MetaRowsFor turns each into the same labeled rows, so a
+           world's environment and a house's motto read as one archive rather than nine formats. *@
+        @if (MetaRowsFor(entity) is { Count: > 0 } metaRows)
         {
             <dl class="entity-meta">
-                @if (!string.IsNullOrWhiteSpace(metaPersona.Role))
+                @foreach (var row in metaRows)
                 {
                     <div class="meta-row">
-                        <dt>Role</dt>
-                        <dd>@metaPersona.Role</dd>
-                    </div>
-                }
-                @if (!string.IsNullOrWhiteSpace(metaPersona.Affiliation))
-                {
-                    <div class="meta-row">
-                        <dt>Affiliation</dt>
-                        <dd>@metaPersona.Affiliation</dd>
+                        <dt>@row.Label</dt>
+                        <dd>
+                            @if (row.Items is not null)
+                            {
+                                <ul class="meta-list">
+                                    @foreach (var item in row.Items)
+                                    {
+                                        <li>@item</li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                @row.Value
+                            }
+                        </dd>
                     </div>
                 }
             </dl>
@@ -244,6 +254,88 @@ else
             ? label.Role
             : null;
     }
+
+    // One labeled fact from a record. Value carries a single string; Items carries a list
+    // field (a world's customs, a faith's texts), which renders as a list rather than prose.
+    private sealed record MetaRow(string Label, string? Value = null, IReadOnlyList<string>? Items = null);
+
+    // The per-category fields each record type carries, mapped to the labels a reader sees.
+    // Rows with nothing in them drop out, so a record never shows an empty line. Labels are
+    // reader-facing rather than field names: EnvironmentalData reads as "Environment".
+    private static IReadOnlyList<MetaRow> MetaRowsFor(DuneEntity entity)
+    {
+        var rows = entity switch
+        {
+            Persona persona => new[]
+            {
+                new MetaRow("Role", persona.Role),
+                new MetaRow("Affiliation", persona.Affiliation),
+            },
+            World world => new[]
+            {
+                new MetaRow("Environment", world.EnvironmentalData),
+                new MetaRow("Ruling House", world.RulingHouse),
+                new MetaRow("Local Customs", Items: world.LocalCustoms),
+            },
+            House house => new[]
+            {
+                new MetaRow("Sigil", house.Sigil),
+                new MetaRow("Motto", house.Motto),
+            },
+            Organization org => new[]
+            {
+                new MetaRow("Headquarters", org.Headquarters),
+                new MetaRow("Directive", org.PrimaryDirective),
+            },
+            Artifact artifact => new[]
+            {
+                new MetaRow("Material", artifact.PrimaryMaterial),
+                new MetaRow("Function", artifact.Functionality),
+            },
+            Vehicle vehicle => new[]
+            {
+                new MetaRow("Operates In", vehicle.OperatingEnvironment),
+                new MetaRow("Capacity", vehicle.Capacity),
+            },
+            Discipline discipline => new[]
+            {
+                new MetaRow("Requirements", discipline.Requirements),
+                new MetaRow("Method", discipline.Mechanics),
+            },
+            TheologicalSystem theology => new[]
+            {
+                new MetaRow("Core Tenets", theology.CoreTenets),
+                new MetaRow("Foundational Texts", Items: theology.FoundationalTexts),
+            },
+            FloraFauna floraFauna => new[]
+            {
+                new MetaRow("Classification", floraFauna.BiologicalClassification),
+                new MetaRow("Derived Products", floraFauna.DerivedProducts),
+            },
+            HistoricalEvent historicalEvent => new[]
+            {
+                new MetaRow("Date", historicalEvent.DateAG),
+                new MetaRow("Timeframe", historicalEvent.Timeframe),
+                new MetaRow("Lasting Impact", historicalEvent.LastingImpact),
+            },
+            _ => Array.Empty<MetaRow>(),
+        };
+
+        return rows
+            .Where(row => row.Items is { Count: > 0 } || HasFact(row.Value))
+            .ToList();
+    }
+
+    // Whether a value says anything a reader did not already know from its absence. The
+    // archive's usual way of recording a gap explains itself ("None; purely an ecological
+    // scavenger", "Unknown (beyond the Scattering)"), and those are kept: the absence is the
+    // fact. A bare "Not widely recorded" is the one form that adds nothing, and it sits on
+    // both the sigil and the motto of most minor houses, where the repetition reads as a
+    // template artifact rather than an archival note. Matched exactly, so a qualified version
+    // that does carry information ("Not widely recorded outside Grumman") still shows.
+    private static bool HasFact(string? value) =>
+        !string.IsNullOrWhiteSpace(value)
+        && !string.Equals(value.Trim(), "Not widely recorded", StringComparison.OrdinalIgnoreCase);
 
     // Reader-facing description of the tier a gated entry belongs to, used in the spoiler notice.
     private static string BookName(SpoilerTier tier) => tier switch

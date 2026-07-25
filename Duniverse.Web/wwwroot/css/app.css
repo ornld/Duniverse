@@ -1978,8 +1978,10 @@ button.chip {
         align-items: baseline;
     }
 
+    /* Wide enough for the longest label the archive uses ("Foundational Texts") to sit on
+       one line, so every record's facts line up in the same column whatever kind it is. */
     .entity-meta dt {
-        flex: 0 0 6.5rem;
+        flex: 0 0 9rem;
         margin: 0;
         color: var(--dune-muted);
         text-transform: uppercase;
@@ -1991,6 +1993,35 @@ button.chip {
         margin: 0;
         color: var(--dune-text);
     }
+
+    /* List-valued facts (a world's customs, a faith's texts). Stacked rather than run
+       together, since each entry is a phrase of its own, with a spice dot to separate
+       them without the weight of a full bulleted list. */
+    .entity-meta .meta-list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 0.2rem;
+    }
+
+        .entity-meta .meta-list li::before {
+            content: "·";
+            margin-right: 0.45rem;
+            color: var(--dune-accent);
+        }
+
+/* Narrow screens cannot afford a fixed label column beside the value, so the label sits
+   above its fact instead of beside it. */
+@media (max-width: 600px) {
+    .entity-meta .meta-row {
+        display: block;
+    }
+
+    .entity-meta dt {
+        margin-bottom: 0.15rem;
+    }
+}
 
 .entity-quotes {
     margin-top: 1.25rem;
