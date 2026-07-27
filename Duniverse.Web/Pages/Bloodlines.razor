@@ -27,10 +27,11 @@
         <div class="bloodline-wrapper">
             <svg class="bloodline-chart" viewBox="0 0 @W @((int)chartHeight)" preserveAspectRatio="xMidYMid meet">
                 @* Every element carries its generation's row index (--row), and the CSS
-                   staggers the entrance by it: a generation's people settle, their lines
-                   flow down, and the next generation follows. Solid lines truly draw
-                   (pathLength normalizes them for the dash trick); dashed lines fade in
-                   instead, since the trick would destroy their dash pattern. *@
+                   staggers the entrance by it: a generation's people settle, their
+                   lines flow down, and the next generation follows. Solid lines
+                   actually draw themselves in (pathLength normalizes them for the
+                   dash trick); dashed lines fade in instead, since the trick would
+                   wreck their dash pattern. *@
                 <g class="bloodline-bands">
                     @foreach (var band in visibleBands)
                     {
@@ -106,7 +107,7 @@
     private sealed record PlacedNode(string EntityId, string Name, string ShortDescription,
         string Fill, string? Ring, double X, double Y, int Row)
     {
-        // Vertical offset of the name below the node. Neighbors in a crowded generation
+        // How far the name sits below the node. Neighbors in a crowded generation
         // alternate between two heights so long names never run into each other.
         public double LabelY { get; set; } = 30;
     }
@@ -119,9 +120,10 @@
     private List<DrawnBand> visibleBands = new();
     private double chartHeight;
 
-    // An entity page can point here at one person via /bloodlines?focus={id}. Only records
-    // that actually stand in the chart at the reader's progress light up; anyone else is
-    // ignored, so the link never promises a highlight the chart cannot show.
+    // An entity page can point here at one person via /bloodlines?focus={id}. Only
+    // records that actually stand in the chart at the reader's progress light up.
+    // Anyone else gets ignored, so the link never promises a highlight the chart
+    // can't show.
     [Parameter, SupplyParameterFromQuery(Name = "focus")]
     public string? FocusId { get; set; }
 
@@ -139,8 +141,8 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        // Bring the highlighted ancestor into view once, since a deep generation can sit
-        // below the fold and the reader would otherwise land on a chart that looks untouched.
+        // Bring the highlighted ancestor into view once, since a deep generation can
+        // sit below the fold and the page would otherwise look untouched.
         if (firstRender && focusedId is not null)
         {
             await JS.InvokeVoidAsync("duneScroll.toId", "bloodline-focus");
@@ -154,9 +156,10 @@
         visibleUnions = new List<DrawnEdge>();
         visibleBands = new List<DrawnBand>();
 
-        // A person appears only when their entity is safe for the reader AND their presence
-        // in the chart is (Duncan belongs to a later book's marriage). Everyone hidden takes
-        // every touching line with them, so the chart never hints at what it holds back.
+        // A person only appears when their entity is safe for the reader AND their
+        // presence in the chart is (Duncan belongs to a later book's marriage).
+        // Everyone hidden takes every touching line with them, so the chart never
+        // hints at what it holds back.
         var visibleNodes = BloodlineMap.Nodes
             .Select(node => (Node: node, Entity: Registry.GetEntity(node.EntityId)))
             .Where(pair => pair.Entity is not null
@@ -216,8 +219,9 @@
             }
         }
 
-        // Unions: both partners visible and the bond itself safe to show. Partners standing
-        // apart get a dashed arc over the row instead of a bar through their neighbors.
+        // Unions: both partners visible and the bond itself safe to show. Partners
+        // standing far apart get a dashed arc over the row instead of a bar through
+        // their neighbors.
         foreach (var union in BloodlineMap.Unions)
         {
             if (!Spoiler.IsVisible(union.Tier)
@@ -244,8 +248,8 @@
             visibleUnions.Add(new DrawnEdge(path, union.Label, union.Dashed, left.Row));
         }
 
-        // Descents: drop from the midpoint of both parents when both are visible, from the
-        // one who is when only one survives the gate, and not at all otherwise.
+        // Descents: drop from the midpoint of both parents when both are visible, from
+        // whichever one is when only one survives the gate, and not at all otherwise.
         foreach (var descent in BloodlineMap.Descents)
         {
             if (!placed.TryGetValue(descent.ChildId, out var child))
@@ -280,8 +284,8 @@
             string path = FormattableString.Invariant(
                 $"M {sourceX} {sourceY} V {elbowY} H {child.X} V {child.Y - NodeRadius}");
 
-            // Descents flow once the parents' generation has settled, so they enter on
-            // the row above the child.
+            // Descents flow once the parents' generation settles, so they enter on the
+            // row above the child.
             visibleDescents.Add(new DrawnEdge(path, descent.Label, descent.Dashed, Math.Max(0, child.Row - 1)));
         }
     }

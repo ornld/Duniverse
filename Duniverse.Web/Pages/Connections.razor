@@ -108,8 +108,8 @@
 @code {
     private static readonly System.Globalization.CultureInfo Inv = System.Globalization.CultureInfo.InvariantCulture;
 
-    // An entity page can hand off a starting record via /connections?from={id}. The reader
-    // lands with the first endpoint already chosen and only needs to pick the second.
+    // An entity page can hand off a starting record via /connections?from={id}. You
+    // land with the first endpoint already chosen and just pick the second.
     [Parameter, SupplyParameterFromQuery(Name = "from")]
     public string? FromId { get; set; }
 
@@ -118,16 +118,18 @@
     private IReadOnlyList<DuneEntity>? path;
     private TraceOutcome outcome = TraceOutcome.None;
 
-    // Bumped on every successful trace and used as the result card's @key, so Blazor builds
-    // fresh SVG elements each time and the draw-in animation restarts from the first link.
+    // Bumped on every successful trace and used as the result card's @key, so Blazor
+    // builds fresh SVG elements each time and the draw-in restarts from the first
+    // link.
     private int traceId;
 
     private enum TraceOutcome { None, Found, SamePick, BeyondProgress, NoRecord }
 
     protected override void OnInitialized()
     {
-        // Apply a handed-off starting record once, only if the reader is cleared to see it.
-        // A missing or sealed id simply lands on the blank pickers, never an error.
+        // Apply a handed-off starting record once, and only if the reader is cleared
+        // to see it. A missing or sealed id just lands on the blank pickers, never an
+        // error.
         if (FromId is not null && Registry.GetEntity(FromId) is { } entity && Spoiler.IsVisible(entity))
         {
             from = entity;
@@ -144,10 +146,10 @@
     };
 
     // ---- Chain geometry ----
-    // Nodes sit on a gentle zigzag so edge labels above the lines and names below the
-    // circles never fight for the same pixels. The viewBox grows with the path length and
-    // the SVG carries a matching max-width, so short chains stay small instead of scaling
-    // up to fill the card.
+    // Nodes sit on a gentle zigzag so the edge labels above the lines and the names
+    // below the circles never fight for the same pixels. The viewBox grows with the
+    // path length and the SVG carries a matching max-width, so short chains stay
+    // small instead of scaling up to fill the card.
 
     private const double Spacing = 150;
     private const double Margin = 78;
@@ -161,8 +163,9 @@
     private static double NodeY(int i) => BaselineY + (i % 2 == 0 ? 0 : Zigzag);
     private static double MidX(int i) => (NodeX(i - 1) + NodeX(i)) / 2;
 
-    // Labels ride above the higher of an edge's two endpoints. Anchoring on the edge's own
-    // midpoint puts long labels level with a node circle, which then paints over the text.
+    // Labels ride above the higher of an edge's two endpoints. Anchored on the edge's
+    // own midpoint, a long label would sit level with a node circle and get painted
+    // over.
     private static double LabelY(int i) => Math.Min(NodeY(i - 1), NodeY(i)) - 20;
 
     private void OnFromChanged(DuneEntity? entity)
@@ -184,9 +187,9 @@
         Trace();
     }
 
-    // A change in reading progress can hide a chosen endpoint, reroute a chain around newly
-    // sealed records, or open a shorter chain through newly revealed ones. Re-resolve from
-    // scratch either way.
+    // A change in reading progress can hide a chosen endpoint, reroute a chain around
+    // newly sealed records, or open a shorter chain through newly revealed ones. So
+    // just re-resolve from scratch either way.
     private void OnSpoilerChanged()
     {
         if (from is not null && !Spoiler.IsVisible(from))
@@ -224,8 +227,8 @@
             return;
         }
 
-        // Distinguish "no chain at your reading progress" from "no chain at all", without
-        // revealing anything about what the sealed records are.
+        // Tell apart "no chain at your reading progress" from "no chain at all",
+        // without giving away anything about what the sealed records are.
         outcome = PathFinder.FindShortestPath(Registry, from.Id, to.Id) is not null
             ? TraceOutcome.BeyondProgress
             : TraceOutcome.NoRecord;
@@ -246,7 +249,7 @@
         _ => $"The chain runs {steps} links long.",
     };
 
-    // Spoiler-checked phrase describing what "next" is to "prev", shown along the edge.
+    // The spoiler-checked phrase for what "next" is to "prev", shown along the edge.
     private string? StepRole(DuneEntity prev, DuneEntity next)
     {
         return Registry.GetRelationshipLabel(prev.Id, next.Id) is { } label && Spoiler.IsVisible(label.Tier)

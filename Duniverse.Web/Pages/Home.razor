@@ -75,8 +75,9 @@
 
     protected override void OnInitialized()
     {
-        // One saying per day, chosen by date rather than chance, so everyone visiting on the
-        // same day sees the same line. Only spoiler-safe sayings enter the rotation.
+        // One saying per day, picked by date instead of chance, so everyone visiting
+        // on the same day sees the same line. Only spoiler-safe sayings enter the
+        // rotation.
         var pool = EpigraphSeeder.GetEpigraphs()
             .Where(epigraph => Spoiler.IsVisible(epigraph.Tier))
             .ToList();

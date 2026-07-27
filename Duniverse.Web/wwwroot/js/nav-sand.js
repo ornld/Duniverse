@@ -1,17 +1,14 @@
-// Melange sand for the Index dropdown and the clearance ritual. Snow falls; sand
-// blows. Grains enter high on the windward side and are carried across the panel by
-// a shared wind that surges and lulls (three offset sine waves at unrelated periods,
-// so the gusts never quite repeat), sinking slowly as they go until they settle at
-// scattered depths and dissolve. A grain in flight is drawn as a streak along its own
-// motion, so a gust reads as driven sand rather than drifting flakes; a settled grain
-// is a resting dot. The smallest grains ride the wind hardest while the heavy ones
-// sag out of it early, and a rare glint grain catches the light for the spice. Faded
-// and blown-out grains respawn upwind after a random pause, so the opening gust
-// relaxes into a steady sift that lasts as long as the panel is open. The loop keys
-// off canvas.isConnected: when Blazor removes the panel, the canvas leaves the
-// document and the animation stops itself. The canvas is sized against
-// devicePixelRatio so grains stay single-pixel sharp on retina screens, and the whole
-// effect skips itself for readers who ask the OS for reduced motion.
+// The blowing sand in the Index dropdown and the first-visit ritual. I wanted sand,
+// not snow. Snow falls straight down; sand gets carried sideways in gusts. Grains blow
+// in from the upwind side, ride a shared wind that surges and dies (three sine waves
+// at different speeds, so the gusts never quite repeat), and slowly sink until they
+// settle and fade out. A moving grain draws as a streak along its path, a settled one
+// as a dot. Small grains catch the wind harder than heavy ones, and a rare brighter
+// glint stands in for the spice. Faded grains respawn upwind after a short pause, so
+// the effect keeps going as long as the panel stays open. The loop watches
+// canvas.isConnected and stops itself once Blazor removes the panel. The canvas is
+// sized for devicePixelRatio so grains stay sharp on retina screens, and the whole
+// thing skips itself for anyone with reduced motion turned on.
 window.duneNav = {
     sandSettle: function (canvas) {
         if (!canvas || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -26,14 +23,14 @@ window.duneNav = {
         const w = canvas.width;
         const h = canvas.height;
 
-        // Spice palette, bright grains rarer than dark ones so the drift reads as depth.
+        // Spice colors. The bright ones are rarer, which makes the drift feel deeper.
         const palette = ["#f4c07c", "#e0a458", "#e0a458", "#c97f3d", "#a05c22", "#8a4a1a"];
 
         function spawn(grain, now, initial) {
-            // Two ways into the panel: over the top rim, biased upwind, or straight
-            // through the upwind edge at any height, like a cross-section of a sand
-            // sheet. Without the edge entries the wind carries everything out the far
-            // side before it can sink, and the lower panel never sees a grain.
+            // Grains come in two ways: over the top, or straight through the upwind
+            // edge at any height. Without the edge entries, the wind sweeps everything
+            // out the far side before it can sink and the bottom of the panel stays
+            // empty.
             if (Math.random() < 0.55) {
                 grain.x = (Math.random() * 1.1 - 0.35) * w;
                 grain.y = -Math.random() * h * 0.5;
@@ -45,18 +42,18 @@ window.duneNav = {
             grain.py = grain.y;
             grain.vy = (0.3 + Math.random() * 0.65) * dpr;
             grain.size = (0.6 + Math.random() * 1.2) * dpr;
-            // Lighter grains ride the wind harder than heavy ones, which spreads one
-            // shared gust into layers of different speeds.
+            // Light grains catch the wind more than heavy ones, so one gust turns
+            // into layers moving at different speeds.
             grain.carry = 1.55 - (grain.size / dpr - 0.6) * 0.7;
             const glint = Math.random() < 0.05;
             grain.color = glint ? "#ffdf9e" : palette[(Math.random() * palette.length) | 0];
             grain.alpha = glint ? 0.5 + Math.random() * 0.35 : 0.15 + Math.random() * 0.55;
-            // Every grain settles a plausible sink below wherever it entered.
+            // Each grain picks a believable settling spot below wherever it came in.
             grain.settleY = Math.min(h * 0.95, Math.max(grain.y, 0) + h * (0.15 + Math.random() * 0.55));
             grain.restFrames = 0;
-            // The first wave blows in at once; respawns pause only briefly, so the
-            // steady state holds a full airborne haze: a window onto Arrakis, kept
-            // legible by the calm wind rather than by thinning the sand.
+            // The first wave arrives all at once. After that, respawns pause only
+            // briefly, so there's always a full haze of sand in the air. The calm wind
+            // is what keeps it readable, not fewer grains.
             grain.startAt = now + (initial ? 0 : 400 + Math.random() * 1400);
             return grain;
         }
@@ -73,9 +70,9 @@ window.duneNav = {
                 return;
             }
 
-            // The shared wind, always blowing one way: a steady push plus gusts that
-            // swell and die on their own rhythm. Tuned to a sift, not a storm; the
-            // directional pull, not raw speed, is what keeps it reading as sand.
+            // The wind every grain shares, always blowing the same way: a steady push
+            // plus gusts that come and go. Tuned to a gentle sift, not a storm. The
+            // sideways pull is what sells it as sand, not raw speed.
             const gust =
                 0.5 * Math.sin(now * 0.00055) +
                 0.3 * Math.sin(now * 0.0016 + 2.1) +
@@ -93,8 +90,8 @@ window.duneNav = {
                 if (g.restFrames === 0 && g.y < g.settleY) {
                     g.px = g.x;
                     g.py = g.y;
-                    // Directional turbulence, not sway: the jitter roughens the path
-                    // but never pushes a grain back against the wind.
+                    // A little turbulence, never backwards: the jitter roughens the
+                    // path without pushing a grain against the wind.
                     g.x += wind * g.carry + (Math.random() - 0.5) * 0.3 * dpr;
                     g.y += g.vy + (Math.random() - 0.5) * 0.2 * dpr;
                     if (g.x > w + 4 * dpr) {
@@ -119,13 +116,13 @@ window.duneNav = {
 
                 ctx.globalAlpha = a;
                 if (g.restFrames > 0) {
-                    // At rest: a grain of settled sand, not a streak.
+                    // Settled grains are just dots.
                     ctx.fillStyle = g.color;
                     ctx.fillRect(g.x, g.y, g.size, g.size);
                 } else {
-                    // In flight: stretched along the last stretch of its own path, so
-                    // speed itself is what the eye reads. Gusts draw long streaks,
-                    // lulls relax back toward dots.
+                    // Flying grains stretch along their own path, so the faster one
+                    // moves the longer its streak. Gusts draw long lines, lulls shrink
+                    // back toward dots.
                     ctx.strokeStyle = g.color;
                     ctx.lineWidth = g.size;
                     ctx.beginPath();

@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Only the home page is listed. The deploy copies index.html to 404.html so that SPA routing
-     works, which means GitHub Pages answers every other route with a 404 status, and index.html
-     names this one URL as the canonical for all of them. The eight page routes and the ten
-     category routes therefore cannot be indexed no matter what this file claims, and listing
-     them would only report eighteen missing pages in Search Console. They belong here once the
-     routes are served as real files and each one carries its own canonical tag.
+<!-- Just the home page for now. The way this site deploys, every other route gets served
+     with a 404 status, so search engines can't index them no matter what this file claims.
+     Listing them would just fill Search Console with missing-page reports. Once those routes
+     get served as real files, they belong in here too.
 
-     Google ignores changefreq and priority, so neither appears. It does read lastmod, which is
-     the date the markup a crawler sees was last changed, not the date of the last deploy. -->
+     Google ignores changefreq and priority, so I left them out. It does read lastmod, which
+     is the date the page content last changed, not the date of the last deploy. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://www.duniverse.org/</loc>

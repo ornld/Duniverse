@@ -75,7 +75,7 @@
 
     protected override void OnInitialized()
     {
-        // Spoiler-gated terms drop out here, the same contract entity pages follow.
+        // Spoiler-gated terms drop out here, the same deal entity pages follow.
         visibleTerms = GlossarySeeder.GetTerms()
             .Where(term => Spoiler.IsVisible(term.Tier))
             .OrderBy(term => term.Term, StringComparer.OrdinalIgnoreCase)
@@ -97,8 +97,8 @@
 
     private int PageCount => Math.Max(1, (int)Math.Ceiling(FilteredTerms.Count / (double)PageSize));
 
-    // A filter that shrinks the list could otherwise strand the reader on a page that no
-    // longer exists, so the current page is always clamped to what the filter leaves behind.
+    // A filter that shrinks the list could strand you on a page that no longer
+    // exists, so the current page always clamps to what the filter leaves behind.
     private int CurrentPage => Math.Clamp(currentPage, 1, PageCount);
 
     private IEnumerable<int> PageNumbers => Enumerable.Range(1, PageCount);
@@ -131,7 +131,8 @@
         }
 
         currentPage = target;
-        // Send the reader back to the top of the list, so a new page never opens mid-scroll.
+        // Send the reader back to the top of the list, so a new page never opens
+        // mid-scroll.
         await JS.InvokeVoidAsync("scrollTo", new { top = 0, behavior = "smooth" });
     }
 

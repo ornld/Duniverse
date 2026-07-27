@@ -79,8 +79,8 @@
         return map;
     }
 
-    // The hovered node and its direct neighbors keep full presence while the rest of
-    // the graph recedes; a node counts as near itself so it never fades under the cursor.
+    // The hovered node and its direct neighbors keep full presence as the rest of the
+    // graph fades back. A node counts as near itself so it never fades under the cursor.
     private bool IsNearHovered(GraphNode node)
     {
         return hoveredNodeId is not null
@@ -95,9 +95,9 @@
 
     private static string Truncate(string name) => name.Length > 18 ? name[..17] + "…" : name;
 
-    // Edges hover-highlight two ways: has-label marks pairs whose relationship carries a
-    // tooltip, touches-hovered lights every line into the node under the cursor, labeled
-    // or not, so a node's whole web reads at a glance.
+    // Edges highlight two ways on hover: has-label marks pairs whose relationship has a
+    // tooltip, and touches-hovered lights every line into the node under the cursor,
+    // labeled or not, so you can read a node's whole web at a glance.
     private string? EdgeClasses(GraphEdge edge, string? tip)
     {
         var touchesHovered = hoveredNodeId is not null
@@ -113,7 +113,7 @@
         };
     }
 
-    // Spoiler-checked role phrase describing what otherId is to viewedId, or null.
+    // The spoiler-checked role phrase for what otherId is to viewedId, or null.
     private string? VisibleRole(string viewedId, string otherId)
     {
         return Registry.GetRelationshipLabel(viewedId, otherId) is { } label && Spoiler.IsVisible(label.Tier)
@@ -122,7 +122,7 @@
     }
 
     // Hover text for an edge: both sides of the relationship when the pair has one.
-    // "Lady Jessica: Mother / Paul Atreides: Son", collapsing to a single phrase when
+    // "Lady Jessica: Mother / Paul Atreides: Son", collapsed to a single phrase when
     // the label reads the same from both ends (rivals, twins, fellow conspirators).
     private string? EdgeTip(GraphEdge edge)
     {
@@ -141,8 +141,8 @@
             : $"{source.Name}: {roleOfSource} / {target.Name}: {roleOfTarget}";
     }
 
-    // Hover text for a node: its role relative to the graph's center, when one is recorded,
-    // folded into the existing name-and-description tooltip.
+    // Hover text for a node: its role relative to the graph's center, when one is
+    // recorded, folded into the name-and-description tooltip it already has.
     private string NodeTip(GraphNode node)
     {
         var role = node.IsCenter ? null : VisibleRole(CenterId, node.Id);

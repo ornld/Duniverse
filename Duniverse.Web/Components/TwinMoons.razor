@@ -1,5 +1,5 @@
-@* The two moons of Arrakis, plain pale discs over the horizon. Purely decorative;
-   hosts position it and hide it from readers. *@
+@* The two moons of Arrakis, plain pale discs over the horizon. Pure decoration;
+   hosts position it and hide it from screen readers. *@
 
 <svg class="twin-moons @CssClass" width="150" height="92" viewBox="0 0 150 92"
      xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
@@ -25,7 +25,7 @@
 @code {
     [Parameter] public string? CssClass { get; set; }
 
-    // SVG ids are document-global; the suffix keeps two renders of this component
-    // (the footer plus any future sky) from resolving to each other's defs.
+    // SVG ids are global to the page, so the suffix keeps two copies of this
+    // component (the footer plus any future sky) from grabbing each other's defs.
     private readonly string uid = Guid.NewGuid().ToString("N")[..8];
 }

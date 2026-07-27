@@ -6,11 +6,11 @@
     <NavLink href="/about">About Dune</NavLink>
     <NavLink href="/archives">Archives</NavLink>
     <NavLink href="/timeline">Timeline</NavLink>
-    @* Forced wrap points, alive on phone and tablet widths: the bar breaks into fixed
-       rows instead of wrapping wherever the text happens to run out. Tablets take three
-       rows of three tabs with the Index closing the third. Phones cannot fit that third
-       row, so a further break below 600px gives Terminology and Sayings a row of their
-       own and seats the Mentat Trial beside the Index on a fourth. *@
+    @* Forced wrap points that wake at phone and tablet widths: the bar breaks into
+       fixed rows instead of wrapping wherever the text runs out. Tablets get three
+       rows of three tabs with the Index closing the third. Phones can't fit that
+       third row, so a further break below 600px gives Terminology and Sayings a row
+       of their own and seats the Mentat Trial next to the Index on a fourth. *@
     <span class="nav-break" aria-hidden="true"></span>
     <NavLink href="/bloodlines">Bloodlines</NavLink>
     <NavLink href="/connections">Connections</NavLink>
@@ -58,9 +58,9 @@
     private bool runSand;
     private ElementReference sandCanvas;
 
-    // The trigger carries the Eyes of Ibad glow whenever the reader is inside any
-    // category, so the "blue marks where you are" rule survives the links moving
-    // into a dropdown.
+    // The trigger carries the Eyes of Ibad glow whenever you're inside any category,
+    // so the "blue marks where you are" rule survives the links moving into a
+    // dropdown.
     private bool IsCategoryPage => Nav.Uri.Contains("/category/");
 
     protected override void OnInitialized()
@@ -98,8 +98,8 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        // The canvas only exists while the panel is open, so the sand can only be
-        // started here, after the render that created it.
+        // The canvas only exists when the panel is open, so the sand can only start
+        // here, after the render that created it.
         if (open && runSand)
         {
             runSand = false;

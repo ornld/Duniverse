@@ -1,10 +1,10 @@
 @inject EntityRegistry Registry
 @inject SpoilerSettings Spoiler
 
-@* One endpoint of a connection trace: a search input that narrows to a picked record.
-   Once picked, the record shows as a colored chip with a clear button; clearing returns
-   to the input. Suggestions run through the spoiler gate, so a reader can only anchor a
-   trace on records they are cleared to see. *@
+@* One endpoint of a connection trace: a search box that narrows to a picked record.
+   Once picked, the record shows as a colored chip with a clear button, and clearing
+   brings the input back. Suggestions run through the spoiler gate, so you can only
+   anchor a trace on records you're cleared to see. *@
 
 <div class="endpoint-picker">
     <span class="endpoint-label">@Label</span>
@@ -50,9 +50,9 @@
     [Parameter]
     public string Placeholder { get; set; } = "";
 
-    @* The Mentat Trial turns these off: its opening clue is the answer's own description
-       with the name struck out, so suggestions that spell descriptions out would let a
-       reader check candidates against the clue without spending a guess. *@
+    @* The Mentat Trial turns these off. Its opening clue is the answer's own description
+       with the name blacked out, so suggestions that print descriptions would let a
+       player check candidates against the clue without spending a guess. *@
     [Parameter]
     public bool ShowDescriptions { get; set; } = true;
 
@@ -69,7 +69,7 @@
     {
         var trimmed = query.Trim();
 
-        // A single letter matches half the archive; wait for two before suggesting.
+        // A single letter matches half the archive, so wait for two before suggesting.
         if (trimmed.Length < 2)
         {
             suggestions.Clear();
@@ -77,7 +77,7 @@
         }
 
         // Shortest names first: for a query like "atreides" that puts "House Atreides"
-        // ahead of longer compound names, which tends to match what the reader meant.
+        // ahead of the longer compound names, which is usually what was meant.
         suggestions = Registry.SearchByName(trimmed)
             .Where(Spoiler.IsVisible)
             .OrderBy(entity => entity.Name.Length)
@@ -93,8 +93,8 @@
             return;
         }
 
-        // Enter takes the archive's best resolution of the text (exact ID, unique name,
-        // or typo correction), and otherwise falls back to the top suggestion.
+        // Enter takes the archive's best read of the text (exact ID, unique name, or
+        // typo fix), and otherwise falls back to the top suggestion.
         var resolved = Registry.Resolve(query.Trim()).Entity;
         if (resolved is not null && Spoiler.IsVisible(resolved))
         {

@@ -1,13 +1,10 @@
-// A record handed into a page through a query param may sit below the fold. This centers
-// the matching element in the viewport so the reader lands already looking at the
-// highlight, rather than at a page that appears unchanged.
+// When a link brings someone in with ?focus=, the record they want might sit way down
+// the page. This scrolls it to the center of the screen so they land looking right at it.
 //
-// It scrolls by computed offset rather than element.scrollIntoView, because the targets
-// are SVG <g> nodes inside the charts, and scrollIntoView on an SVG sub-element does not
-// reliably move the document in Chromium. getBoundingClientRect reads the same on SVG and
-// HTML, so centering by hand is the portable path. The jump is instant on purpose: a
-// smooth scroll from the top on first load reads as jank, and a deep-link landing wants
-// the record framed immediately.
+// I can't just use scrollIntoView here: the targets are SVG <g> nodes, and Chrome doesn't
+// reliably scroll the page for those. Measuring with getBoundingClientRect and scrolling
+// by hand works for SVG and regular elements alike. The jump is instant on purpose, since
+// a slow scroll from the top on page load just looks broken.
 window.duneScroll = {
     toId: function (id) {
         const el = document.getElementById(id);

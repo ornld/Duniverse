@@ -3,14 +3,14 @@
 @inject IJSRuntime JS
 @implements IDisposable
 
-@* The first-visit clearance ritual. A brand-new reader gets one full-screen moment: mark
-   the last Dune novel you finished, and the archive seals everything past it before you
-   see a single record. The main menu and the About page are deliberately exempt, so the
+@* The first-visit ritual. A brand-new reader gets one full-screen moment: mark the
+   last Dune novel you finished, and the archive seals everything past it before you
+   see a single record. The main menu and the About page are exempt on purpose, so the
    site's first impression stays clean and a curious newcomer can read about the book
-   unbothered; the ritual waits at the threshold and appears on the reader's first step
-   deeper in (any other route, clicked or landed on directly). Any action here (a spine,
-   the full archive, or skip) saves a preference, so the ritual never returns. Returning
-   readers, who already own a saved choice, never see it at all. *@
+   in peace. The ritual waits for the first step deeper in (any other route, clicked
+   or landed on directly). Any action here (a spine, the full archive, or skip) saves
+   a preference, so it only ever asks once. Returning readers with a saved choice
+   never see it at all. *@
 
 @if (ShouldShow)
 {
@@ -46,7 +46,7 @@
 
 @code {
     // Raised after the reader commits a choice, so the layout can re-mount the page
-    // underneath and let it re-filter against the new reading progress.
+    // underneath and re-filter it against the new progress.
     [Parameter] public EventCallback OnApplied { get; set; }
 
     private bool dismissed;
@@ -57,9 +57,9 @@
 
     private bool ShouldShow => Spoiler.Loaded && !Spoiler.HasStoredChoice && !dismissed && !OnExemptPage;
 
-    // The main menu and the About page hold no records, so the ritual never covers them;
-    // it waits for the first step into the archive proper. Query strings and fragments
-    // are stripped before the check, so "/?utm=..." still counts as home.
+    // The main menu and the About page hold no records, so the ritual never covers
+    // them. It waits for the first step into the archive proper. Query strings and
+    // fragments get stripped before the check, so "/?utm=..." still counts as home.
     private bool OnExemptPage
     {
         get
@@ -90,14 +90,14 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // Re-evaluate on every route change: that is the moment a fresh reader steps off
+        // Re-check on every route change: that's the moment a fresh reader steps off
         // the main menu and the ritual is due.
         Nav.LocationChanged += OnLocationChanged;
 
-        // Await the (idempotent) storage read directly instead of leaning on the layout's
-        // copy of it. A parent re-render does not reach this component when its parameters
-        // compare equal, so without this await the ritual would stay stuck on the render
-        // from before the settings finished loading, and never appear.
+        // Await the (idempotent) storage read directly instead of leaning on the
+        // layout's copy. A parent re-render doesn't reach this component when its
+        // parameters compare equal, so without this await the ritual would stay stuck
+        // on the render from before the settings finished loading, and never show up.
         await Spoiler.LoadAsync();
     }
 
@@ -113,12 +113,12 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        // The overlay enters the DOM the first time a fresh reader leaves the main menu,
-        // so the sand and the focus grab can only start here, after the render that
-        // created it. Focus lands on the panel so Escape works immediately and screen
-        // readers enter the dialog. Browser-back to the main menu unmounts the panel
-        // (which also stops the sand loop); "activated" resets so a return trip gets the
-        // full entrance again.
+        // The overlay only enters the DOM the first time a fresh reader leaves the
+        // main menu, so the sand and the focus grab can only start here, after the
+        // render that created it. Focus lands on the panel so Escape works right away
+        // and screen readers enter the dialog. Browser-back to the main menu unmounts
+        // the panel (which stops the sand loop too); "activated" resets so a return
+        // trip gets the full entrance again.
         if (ShouldShow)
         {
             if (!activated)
@@ -146,9 +146,9 @@
         await CloseAsync(applied: true);
     }
 
-    // Skipping keeps the safe default (guarded at Dune) and records it as a real choice,
-    // so the ritual asks exactly once. The page underneath already rendered with these
-    // defaults, so nothing needs to re-filter.
+    // Skipping keeps the safe default (guarded at Dune) and records it as a real
+    // choice, so the ritual only asks once. The page underneath already rendered with
+    // these defaults, so nothing needs to re-filter.
     private async Task SkipAsync()
     {
         await Spoiler.UpdateAsync(Spoiler.Enabled, Spoiler.NovelProgress, Spoiler.IncludeExpandedUniverse);
@@ -165,7 +165,7 @@
 
     private async Task CloseAsync(bool applied)
     {
-        // A short outward fade instead of a hard vanish; the delay matches the CSS.
+        // A short fade out instead of a hard vanish; the delay matches the CSS.
         closing = true;
         StateHasChanged();
         await Task.Delay(300);

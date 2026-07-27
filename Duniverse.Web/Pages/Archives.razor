@@ -38,9 +38,9 @@
         </div>
     }
 
-    @* Records the query never names, but whose entry text says it. Kept visually below the
-       name matches, and always a list rather than a jump, because a phrase found in a body
-       of prose is a weaker claim than a name. *@
+    @* Records the query never names, but whose entry text mentions it. Kept visually
+       below the name matches, and always a list instead of a jump, since a phrase
+       found in a body of prose is a weaker claim than a name. *@
     @if (contentMatches.Count > 0)
     {
         <div class="candidates text-matches">
@@ -85,11 +85,11 @@
     private List<DuneEntity> rawContentMatches = new();
     private List<DuneEntity> contentMatches = new();
 
-    // Enough to be useful without letting a common word bury the page in a hundred entries.
+    // Enough to be useful without a common word burying the page in a hundred entries.
     private const int MaxContentMatches = 10;
 
-    // How many records mention the phrase in total, before the display cap. Kept separate so
-    // the heading can be honest about a list it is only showing the top of.
+    // How many records mention the phrase in total, before the display cap. Kept
+    // separate so the heading can be honest about a list it only shows the top of.
     private int contentMatchTotal;
 
     private static readonly (string Label, string Id)[] Examples =
@@ -135,23 +135,24 @@
 
         var result = Registry.Resolve(lastQuery);
 
-        // An exact ID or an unambiguous name still goes straight through to the record.
+        // An exact ID or an unambiguous name still goes straight to the record.
         if (result.Entity is not null)
         {
             Nav.NavigateTo($"/entity/{result.Entity.Id}");
             return;
         }
 
-        // A record the query actually names outranks one that merely contains it inside a
-        // longer title, so searching "Muad'Dib" leads with the man rather than the church
-        // built around him. Without this the order is whatever the databank happens to yield.
+        // A record the query actually names outranks one that just contains it inside
+        // a longer title, so searching "Muad'Dib" leads with the man instead of the
+        // church built around him. Without this the order is whatever the databank
+        // happens to hand back.
         rawCandidates = result.Candidates
             .OrderByDescending(entity => ExactlyNamed(entity, lastQuery))
             .ThenBy(entity => entity.Name.Length)
             .ThenBy(entity => entity.Name)
             .ToList();
 
-        // A record already listed by name is not listed again as a text match.
+        // A record already listed by name doesn't get listed again as a text match.
         var alreadyNamed = new HashSet<string>(rawCandidates.Select(c => c.Id), StringComparer.OrdinalIgnoreCase);
         rawContentMatches = Registry.SearchByContent(lastQuery)
             .Where(entity => !alreadyNamed.Contains(entity.Id))
@@ -160,8 +161,8 @@
         ApplySpoilerFilter();
     }
 
-    // Re-apply spoiler filtering to the current results when the reader changes their
-    // reading progress without running a new search.
+    // Re-apply the spoiler filter to the current results when the reader changes
+    // their reading progress without running a new search.
     private void RefilterCandidates() => ApplySpoilerFilter();
 
     private void ApplySpoilerFilter()
@@ -170,10 +171,10 @@
 
         var ranked = rawContentMatches
             .Where(Spoiler.IsVisible)
-            // A phrase in the one-line summary answers the reader better than the same phrase
-            // buried deep in a history, and an entry that returns to the phrase repeatedly is
-            // more about it than one that mentions it once in passing. Name breaks ties only,
-            // so alphabetical order never outranks relevance.
+            // A phrase in the one-line summary answers the reader better than the same
+            // phrase buried deep in a history, and an entry that keeps coming back to
+            // the phrase is more about it than one that mentions it once. Name only
+            // breaks ties, so alphabetical order never outranks relevance.
             .OrderByDescending(entity => InSummary(entity, lastQuery))
             .ThenByDescending(entity => Mentions(entity, lastQuery))
             .ThenBy(entity => entity.Name)
@@ -182,16 +183,16 @@
         contentMatchTotal = ranked.Count;
         contentMatches = ranked.Take(MaxContentMatches).ToList();
 
-        // Only speak of a failed search once one has actually been run, so changing reading
-        // progress on an untouched page never announces that nothing was found.
+        // Only talk about a failed search once one has actually run, so changing
+        // reading progress on an untouched page never claims that nothing was found.
         notFound = !string.IsNullOrWhiteSpace(lastQuery)
             && candidates.Count == 0
             && contentMatches.Count == 0;
     }
 
     // The phrase itself, then its words longest first. The words of a query are often
-    // scattered through an entry rather than sitting together, so anything reading the text
-    // for display or ranking has to fall back from the whole phrase to its parts.
+    // scattered through an entry instead of sitting together, so anything reading the
+    // text for display or ranking falls back from the whole phrase to its parts.
     private static IEnumerable<string> Needles(string query)
     {
         var trimmed = query.Trim();
@@ -211,8 +212,8 @@
         }
     }
 
-    // Whether one of the names this record answers to is exactly what the reader typed,
-    // rather than merely containing it.
+    // Whether one of the names this record answers to is exactly what was typed,
+    // instead of just containing it.
     private static bool ExactlyNamed(DuneEntity entity, string query)
     {
         if (string.Equals(entity.Name, query, StringComparison.OrdinalIgnoreCase))
@@ -231,8 +232,8 @@
         return Needles(query).Any(needle => summary.Contains(needle, StringComparison.OrdinalIgnoreCase));
     }
 
-    // How often a record's text returns to the reader's strongest search word, as a rough
-    // measure of how much the entry is actually about it rather than mentioning it once.
+    // How often a record's text comes back to the strongest search word, as a rough
+    // measure of how much the entry is actually about it.
     private static int Mentions(DuneEntity entity, string query)
     {
         var needle = Needles(query).LastOrDefault();
@@ -254,9 +255,9 @@
         return count;
     }
 
-    // The stretch of an entry around the reader's phrase, so a match explains itself instead
-    // of arriving as a bare name. Falls back to null when the phrase only matched after
-    // punctuation was normalized away, in which case the summary is shown instead.
+    // The stretch of an entry around the reader's phrase, so a match explains itself
+    // instead of arriving as a bare name. Falls back to null when the phrase only
+    // matched after punctuation was stripped, in which case the summary shows instead.
     private static string? Snippet(DuneEntity entity, string query, int radius = 70)
     {
         foreach (var needle in Needles(query))

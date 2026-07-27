@@ -25,16 +25,17 @@
 }
 else if (entity is not null)
 {
-    @* One keyed wrapper per record: navigating from one entity to another rebuilds this
+    @* One keyed wrapper per record: walking from one entity to another rebuilds this
        subtree, so the dossier entrance below replays for every newly opened record. *@
     <div @key="entity.Id">
     <div class="entity-card front dossier-item category-@GraphLayoutService.CategorySlug(entity)" style="--i: 0">
         <h1>@entity.Name</h1>
         <p class="short-desc">@entity.ShortDescription</p>
 
-        @* The record's own field data, whatever kind of record it is. Every category keeps its
-           facts in different fields; MetaRowsFor turns each into the same labeled rows, so a
-           world's environment and a house's motto read as one archive rather than nine formats. *@
+        @* The record's own field data, whatever kind of record it is. Every category keeps
+           its facts in different fields; MetaRowsFor turns each into the same labeled
+           rows, so a world's environment and a house's motto read as one archive, not
+           nine formats. *@
         @if (MetaRowsFor(entity) is { Count: > 0 } metaRows)
         {
             <dl class="entity-meta">
@@ -85,9 +86,10 @@ else if (entity is not null)
         }
     </div>
 
-    @* Who belongs to this house or order, gathered from the affiliation each person's own
-       record already declares. Sits beside the house's description rather than down among
-       the connections, because membership is part of what the house IS, not a link out. *@
+    @* Who belongs to this house or order, gathered from the affiliation each person's
+       own record already declares. Sits next to the house's description instead of
+       down with the connections, since membership is part of what the house IS, not
+       a link out. *@
     @if (members.Count > 0)
     {
         <div class="entity-card roster-card dossier-item" style="--i: 1">
@@ -106,8 +108,8 @@ else if (entity is not null)
         </div>
     }
 
-    @* Doors out of the record and into the site's larger tools, each already aimed at
-       this entity. Bloodlines only appears for people who actually stand in the chart. *@
+    @* Doors out of the record and into the site's bigger tools, each already aimed at
+       this entity. Bloodlines only shows for people who actually stand in the chart. *@
     <nav class="entity-explore dossier-item" style="--i: 4" aria-label="Explore this record further">
         <a class="explore-link" href="@($"/connections?from={entity.Id}")">
             <span class="explore-glyph" aria-hidden="true">&#8596;</span>Trace a connection from here
@@ -168,10 +170,10 @@ else
     private bool isGated;
     private bool revealed;
 
-    // A resolved record sends "back" to its own category page, so paging Index -> category
-    // -> record returns the reader where they started. Unresolved states (a typo with
-    // several matches, or nothing found) have no single category, so they keep the Archives
-    // fallback.
+    // A resolved record sends "back" to its own category page, so going Index ->
+    // category -> record returns you where you started. Unresolved states (a typo
+    // with several matches, or nothing found) have no single category, so they keep
+    // the Archives fallback.
     private string BackHref =>
         entity is not null && GraphLayoutService.CategorySlug(entity) is var slug and not "unknown"
             ? $"/category/{slug}"
@@ -195,8 +197,8 @@ else
     private List<DuneEntity> related = new();
     private bool hasAnyConnections;
 
-    // The display order of the "connected records" sections. Every entity category appears
-    // here, so a single relationship lookup can be fanned out into the right headings.
+    // The display order of the "connected records" sections. Every entity category
+    // appears here, so one relationship lookup can fan out into the right headings.
     private static readonly (string Title, Func<DuneEntity, bool> Matches)[] Sections =
     {
         ("Personas", e => e is Persona),
@@ -228,22 +230,24 @@ else
 
         isGated = !Spoiler.IsVisible(entity);
 
-        // If the URL used a name or a typo rather than the canonical ID, normalize the
-        // address bar so links and bookmarks always point at the real ID.
+        // If the URL used a name or a typo instead of the real ID, fix up the address
+        // bar so links and bookmarks always point at the canonical one.
         if (!string.Equals(entity.Id, Id, StringComparison.OrdinalIgnoreCase))
         {
             Nav.NavigateTo($"/entity/{entity.Id}", replace: true);
             return;
         }
 
-        // Every connection is filtered through the spoiler gate, so a related entity from a book
-        // the reader hasn't reached never surfaces as a link, a rivalry, or a graph node.
+        // Every connection runs through the spoiler gate, so a related entity from a
+        // book the reader hasn't reached never shows up as a link, a rivalry, or a
+        // graph node.
         rivals = entity is House house
             ? Registry.GetRivalHouses(house.Id).Where(Spoiler.IsVisible).ToList()
             : new List<House>();
 
-        // A house or order can now name the people who belong to it, which until now only ran
-        // the other way. Alphabetical, since a roster has no natural order of importance.
+        // A house or order can now name the people who belong to it, which used to
+        // only run the other way. Alphabetical, since a roster has no natural order
+        // of importance.
         members = entity is House or Organization
             ? Registry.GetAffiliates(entity.Name)
                 .Where(Spoiler.IsVisible)
@@ -261,9 +265,10 @@ else
         revealed = true;
     }
 
-    // What the given related entity is to the one being viewed ("Mother", "Betrayer of his
-    // House"), or null when the pair has no label or the label belongs to a book the reader
-    // hasn't reached. The connection itself still shows; only its meaning is held back.
+    // What the given related entity is to the one being viewed ("Mother", "Betrayer
+    // of his House"), or null when the pair has no label or the label belongs to a
+    // book the reader hasn't reached. The connection itself still shows; only its
+    // meaning is held back.
     private string? RoleFor(string otherId)
     {
         if (entity is null)
@@ -276,18 +281,21 @@ else
             : null;
     }
 
-    // One labeled fact from a record. Value carries a single string; Items carries a list
-    // field (a world's customs, a faith's texts), which renders as a list rather than prose.
+    // One labeled fact from a record. Value carries a single string; Items carries a
+    // list field (a world's customs, a faith's texts), which renders as a list
+    // instead of prose.
     private sealed record MetaRow(string Label, string? Value = null, IReadOnlyList<string>? Items = null);
 
-    // The per-category fields each record type carries, mapped to the labels a reader sees.
-    // Rows with nothing in them drop out, so a record never shows an empty line. Labels are
-    // reader-facing rather than field names: EnvironmentalData reads as "Environment".
+    // The per-category fields each record type carries, mapped to the labels a
+    // reader sees. Rows with nothing in them drop out, so a record never shows an
+    // empty line. Labels are for readers, not field names: EnvironmentalData shows
+    // as "Environment".
     private static IReadOnlyList<MetaRow> MetaRowsFor(DuneEntity entity)
     {
-        // Other names come first and apply to every kind of record, so a reader who arrived
-        // knowing one name learns the others before reading anything else. Joined into a
-        // single line rather than stacked, since these are short and belong together.
+        // Other names come first and apply to every kind of record, so someone who
+        // arrived knowing one name learns the others before reading anything else.
+        // Joined into a single line instead of stacked, since these are short and
+        // belong together.
         var aliasRow = entity.Aliases.Count > 0
             ? new[] { new MetaRow("Also Known As", string.Join(", ", entity.Aliases)) }
             : Array.Empty<MetaRow>();
@@ -355,18 +363,20 @@ else
             .ToList();
     }
 
-    // Whether a value says anything a reader did not already know from its absence. The
-    // archive's usual way of recording a gap explains itself ("None; purely an ecological
-    // scavenger", "Unknown (beyond the Scattering)"), and those are kept: the absence is the
-    // fact. A bare "Not widely recorded" is the one form that adds nothing, and it sits on
-    // both the sigil and the motto of most minor houses, where the repetition reads as a
-    // template artifact rather than an archival note. Matched exactly, so a qualified version
-    // that does carry information ("Not widely recorded outside Grumman") still shows.
+    // Whether a value says anything you wouldn't already know from its absence. The
+    // archive's usual way of recording a gap explains itself ("None; purely an
+    // ecological scavenger", "Unknown (beyond the Scattering)"), and those stay: the
+    // absence is the fact. A bare "Not widely recorded" is the one form that adds
+    // nothing, and it sat on both the sigil and the motto of most minor houses, where
+    // the repetition read like a template artifact. Matched exactly, so a qualified
+    // version that does carry information ("Not widely recorded outside Grumman")
+    // still shows.
     private static bool HasFact(string? value) =>
         !string.IsNullOrWhiteSpace(value)
         && !string.Equals(value.Trim(), "Not widely recorded", StringComparison.OrdinalIgnoreCase);
 
-    // Reader-facing description of the tier a gated entry belongs to, used in the spoiler notice.
+    // The reader-facing name of the book a gated entry draws on, for the spoiler
+    // notice.
     private static string BookName(SpoilerTier tier) => tier switch
     {
         SpoilerTier.DuneMessiah => "Dune Messiah",

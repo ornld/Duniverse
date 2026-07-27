@@ -30,11 +30,12 @@
         <svg class="universe-graph @(hoveredNodeId is null ? null : "has-hover")" viewBox="0 0 1600 1200" xmlns="http://www.w3.org/2000/svg"
              role="img" aria-label="Every visible record in the archive, connected as one graph">
             <g class="universe-world">
-                @* The birth of the universe: every node carries a delay proportional to its
-                   distance from the canvas center, so creation blooms outward as a wave; a
-                   thread appears only after the later of its two stars exists. The @key wraps
-                   an inner group (never .universe-world itself, whose element the pan module
-                   holds), so a reading-progress change births the new universe from scratch. *@
+                @* The birth of the universe: every node carries a delay based on its distance
+                   from the canvas center, so creation blooms outward as a wave, and a
+                   thread only appears after the later of its two stars exists. The
+                   @key wraps an inner group (never .universe-world itself, whose
+                   element the pan module holds), so a reading-progress change births
+                   the new universe from scratch. *@
                 <g @key="birthEpoch">
                 <g class="graph-edges">
                     @foreach (var edge in graph.Edges)
@@ -56,8 +57,9 @@
                            @onclick="() => GoTo(node.Id)"
                            @onmouseover="() => hoveredNodeId = node.Id"
                            @onmouseout="() => hoveredNodeId = null">
-                            @* The invisible circle is the hit target: without it, the gap
-                               between the dot and its label is dead space that eats clicks. *@
+                            @* The invisible circle is the hit target. Without it, the gap
+                               between the dot and its label is dead space that eats
+                               clicks. *@
                             <circle class="hit" r="17" />
                             <circle r="9" />
                             <text y="24">@Truncate(node.Name)</text>
@@ -92,8 +94,9 @@
     private const double Width = 1600;
     private const double Height = 1200;
 
-    // An entity page can hand off a record via /universe?focus={id}. The reader lands with
-    // that star already selected and the camera gliding to it once the graph is attached.
+    // An entity page can hand off a record via /universe?focus={id}. You land with
+    // that star already selected and the camera gliding to it once the graph
+    // attaches.
     [Parameter, SupplyParameterFromQuery(Name = "focus")]
     public string? FocusId { get; set; }
 
@@ -131,8 +134,9 @@
     {
         Rebuild();
 
-        // A handed-off record selects its star, so the picker shows the chip and the camera
-        // knows where to fly once the graph attaches. A sealed or missing id is ignored.
+        // A handed-off record selects its star, so the picker shows the chip and the
+        // camera knows where to fly once the graph attaches. A sealed or missing id
+        // just gets ignored.
         if (FocusId is not null && nodesById.ContainsKey(FocusId)
             && Registry.GetEntity(FocusId) is { } entity && Spoiler.IsVisible(entity))
         {
@@ -140,11 +144,12 @@
         }
     }
 
-    // The whole visible archive. Hidden entities are excluded before the simulation runs, so
-    // they neither appear nor bend the shape of what does. The layout is deterministic for a
-    // given visible set, so the cache settles it once per set and hands back a copy on every
-    // later visit; the simulation only runs on the first sight of a reading progress. Building
-    // the graph stays cheap and has to happen anyway, because its ordered node ids are the key.
+    // The whole visible archive. Hidden entities get excluded before the simulation
+    // runs, so they neither appear nor bend the shape of what does. The layout is
+    // deterministic for a given visible set, so the cache settles it once per set and
+    // hands back a copy on every later visit; the simulation only runs the first time
+    // a reading progress shows up. Building the graph stays cheap and has to happen
+    // anyway, since its ordered node ids are the key.
     private void Rebuild()
     {
         var fresh = LayoutService.BuildFullGraph(Registry, Spoiler.IsVisible);
@@ -179,8 +184,9 @@
                 || string.Equals(edge.TargetId, hoveredNodeId, StringComparison.OrdinalIgnoreCase));
     }
 
-    // The hovered star and its direct neighbors keep full presence while the rest of
-    // the universe recedes; a star counts as near itself so it never fades under the cursor.
+    // The hovered star and its direct neighbors keep full presence as the rest of the
+    // universe fades back. A star counts as near itself so it never fades under the
+    // cursor.
     private bool IsNearHovered(GraphNode node)
     {
         return hoveredNodeId is not null
@@ -214,8 +220,9 @@
         {
             await JS.InvokeVoidAsync("duneUniverse.attach", container);
 
-            // A record handed in through ?focus= glides into view the same way the find
-            // picker does, once the canvas is attached and can accept a camera move.
+            // A record handed in through ?focus= glides into view the same way the
+            // find picker does, once the canvas is attached and can take a camera
+            // move.
             if (found is not null && nodesById.TryGetValue(found.Id, out var target))
             {
                 await JS.InvokeVoidAsync("duneUniverse.focusOn", target.X, target.Y, 2.6);
@@ -244,8 +251,8 @@
         }
     }
 
-    // A change in reading progress can add stars to the universe or take them away;
-    // rebuild from scratch and bring the camera home so the new whole is in frame.
+    // A change in reading progress can add stars to the universe or take them away.
+    // Rebuild from scratch and bring the camera home so the new whole is in frame.
     private void OnSpoilerChanged()
     {
         if (found is not null && !Spoiler.IsVisible(found))

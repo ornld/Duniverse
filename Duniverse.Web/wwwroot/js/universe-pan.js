@@ -1,15 +1,14 @@
-// Camera for the whole-Duniverse graph. Gestures and the fly-to move one <g> by its
-// CSS transform, so travel never round-trips through Blazor: the page renders a static
-// constellation once and this module is the only thing that moves it. Same pattern as
-// nav-sand.js: a small self-contained enhancement Blazor invokes after render.
+// The camera for the whole-Duniverse graph. Dragging and zooming just move one <g>
+// with a CSS transform, so none of it goes back through Blazor: the page draws the
+// constellation once and this file is the only thing that moves it. Same idea as
+// nav-sand.js, a small add-on Blazor calls after render.
 //
-// Gestures: drag to pan (mouse or touch), wheel to zoom around the cursor, two-finger
-// pinch to zoom around the pinch center, and the +/-/reset buttons the card provides
-// (matched by their data-uni-zoom attribute). A drag is not a click: once the pointer
-// moves past a small threshold, the click that would fire on release is swallowed in
-// the capture phase, so panning across a node never opens its record. focusOn() glides
-// the camera to a point (the find picker uses it); the glide is skipped for readers
-// who ask the OS for reduced motion.
+// Drag to pan (mouse or touch), scroll to zoom on the cursor, pinch to zoom on the
+// pinch center, plus the +/-/reset buttons on the card (found by their data-uni-zoom
+// attribute). A drag shouldn't count as a click: once the pointer moves past a small
+// threshold, the click that would fire on release gets swallowed, so panning across
+// a star never opens its record. focusOn() glides the camera to a point (the find
+// picker uses it) and skips the glide for anyone with reduced motion on.
 window.duneUniverse = (function () {
     let svg = null;
     let world = null;
@@ -24,14 +23,15 @@ window.duneUniverse = (function () {
         if (!world) {
             return;
         }
-        // Keep at least part of the constellation in frame, with a little slack.
+        // Don't let the constellation get dragged fully out of frame.
         tx = Math.min(200, Math.max(vb.width * (1 - scale) - 200, tx));
         ty = Math.min(200, Math.max(vb.height * (1 - scale) - 200, ty));
         world.style.transition = animated && !reducedMotion() ? "transform 0.6s ease" : "none";
         world.style.transform = "translate(" + tx + "px, " + ty + "px) scale(" + scale + ")";
     }
 
-    // Client pixels -> viewBox units, so zoom can hold the point under the cursor still.
+    // Converts screen pixels to viewBox units, so zooming can hold the point under
+    // the cursor still.
     function toView(clientX, clientY) {
         const r = svg.getBoundingClientRect();
         return [
@@ -66,7 +66,8 @@ window.duneUniverse = (function () {
             zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.0015));
         }, { passive: false });
 
-        // One tracked pointer pans; two pinch. The mid/dist pair covers both uniformly.
+        // One finger pans, two pinch. Tracking the midpoint and spread handles both
+        // the same way.
         const pointers = new Map();
         let moved = false;
         let downAt = null;
@@ -113,21 +114,23 @@ window.duneUniverse = (function () {
                 lastDist = d;
             }
             if (lastMid) {
-                // Distance from where the pointer went down, not per-move deltas: a click
-                // with a little hand jitter must still count as a click, and a pinch is
-                // always a gesture.
+                // Measured from where the pointer first went down, not move to move.
+                // A click with a bit of hand shake should still count as a click, and
+                // a pinch always counts as a gesture.
                 if (!moved && (pointers.size >= 2 || (downAt && Math.hypot(m[0] - downAt[0], m[1] - downAt[1]) > 6))) {
                     moved = true;
-                    // Capture only once a drag has truly begun, never on the initial press:
-                    // a captured pointer retargets its click to the capturing element, which
-                    // would rob the nodes of their clicks entirely. Mid-drag there is no
-                    // click worth keeping, and capture stops a fast drag from escaping the
-                    // SVG and stranding the pan.
+                    // Only capture the pointer once a real drag has started, never on
+                    // the press itself. Capturing on press redirects the click to the
+                    // SVG, and suddenly none of the stars can be clicked (learned that
+                    // one the hard way). Mid-drag there's no click worth keeping, and
+                    // capturing keeps a fast drag from slipping off the SVG and
+                    // stranding the pan.
                     for (const id of pointers.keys()) {
                         try {
                             svg.setPointerCapture(id);
                         } catch {
-                            // A pointer that cannot be captured still pans fine without it.
+                            // If a pointer can't be captured, panning still works
+                            // without it.
                         }
                     }
                 }
@@ -168,7 +171,7 @@ window.duneUniverse = (function () {
         });
     }
 
-    // Glides the camera until (x, y) in viewBox units sits centered at the given zoom.
+    // Glides the camera so the given viewBox point ends up centered at the given zoom.
     function focusOn(x, y, targetScale) {
         if (!svg) {
             return;

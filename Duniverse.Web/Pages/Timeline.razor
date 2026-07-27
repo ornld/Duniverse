@@ -14,8 +14,8 @@
         @{ string? currentEra = null; int cardIndex = 0; }
         @foreach (var evt in events)
         {
-            @* A new era opens a banded section header spanning the spine. Eras are computed
-               from the spoiler-filtered list, so an era whose events are all hidden never
+            @* A new era opens a banded section header spanning the spine. Eras come from
+               the spoiler-filtered list, so an era whose events are all hidden never
                shows an empty heading. *@
             @if (evt.Era is not null && evt.Era != currentEra)
             {
@@ -27,8 +27,8 @@
             cardIndex++;
             <div class="timeline-item @side">
                 @* The dot is a second door to the same record as its card, for the mouse
-                   only: hidden from assistive tech and skipped in the tab order, so the
-                   event is not announced or focused twice. *@
+                   only: hidden from assistive tech and skipped in the tab order, so
+                   the event isn't announced or focused twice. *@
                 <a class="timeline-dot" href="@($"/entity/{evt.Id}")" aria-hidden="true" tabindex="-1"></a>
                 <a class="timeline-card" href="@($"/entity/{evt.Id}")">
                     @if (!string.IsNullOrEmpty(evt.DateAG))
