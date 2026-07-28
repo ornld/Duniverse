@@ -152,7 +152,7 @@
     // anyway, since its ordered node ids are the key.
     private void Rebuild()
     {
-        var fresh = LayoutService.BuildFullGraph(Registry, Spoiler.IsVisible);
+        var fresh = LayoutService.BuildFullGraph(Registry, Spoiler.IsVisible, Spoiler.IsVisible);
         graph = LayoutCache.GetOrAdd(
             UniverseLayoutCache.KeyFor(fresh),
             fresh,

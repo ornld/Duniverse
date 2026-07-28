@@ -18,10 +18,13 @@ namespace Duniverse.Services
         /// <paramref name="toId"/>, both endpoints included, or null when no route exists.
         /// The optional <paramref name="include"/> predicate excludes entities from the walk
         /// entirely (the spoiler gate passes one), so a hidden entity can neither anchor a
-        /// route nor smuggle one through as an intermediate step.
+        /// route nor smuggle one through as an intermediate step. The optional
+        /// <paramref name="linkVisible"/> predicate does the same job one level down, for a
+        /// connection that is itself a later-book fact even though both entities it joins are
+        /// visible; without it a route could hop along an edge the reader should not know about.
         /// </summary>
         public IReadOnlyList<DuneEntity>? FindShortestPath(EntityRegistry registry, string fromId, string toId,
-            Func<DuneEntity, bool>? include = null)
+            Func<DuneEntity, bool>? include = null, Func<SpoilerTier, bool>? linkVisible = null)
         {
             var from = registry.GetEntity(fromId);
             var to = registry.GetEntity(toId);
@@ -52,7 +55,7 @@ namespace Duniverse.Services
             {
                 var current = queue.Dequeue();
 
-                foreach (var neighbor in registry.GetDirectlyRelated(current.Id))
+                foreach (var neighbor in registry.GetDirectlyRelated(current.Id, linkVisible))
                 {
                     if (!visited.Add(neighbor.Id))
                     {

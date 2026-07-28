@@ -14,7 +14,11 @@ namespace Duniverse.Data.Seeders
                     Id = "event_ButlerianJihad",
                     Name = "The Butlerian Jihad",
                     ShortDescription = "A crusade spanning generations, fought to wipe out every thinking machine in the galaxy.",
-                    DetailedHistory = "Computers and robots ruled most of humanity by the time the Butlerian Jihad broke out. The revolt was aimed at Omnius, the tyrannical evermind, and his cymek allies. These were human minds torn from their bodies and grafted into mechanical shells, led by figures like Agamemnon and the turncoat Xavier Harkonnen. Serena Butler lost her infant son to the sadistic robot Erasmus. Her public grief lit the fuse, and humanity rose in open revolt soon after. The fighting stretched across generations and swallowed billions of lives throughout the Synchronized Worlds. Victory did more than smash the machines. It carved the Orange Catholic Bible's commandment into unbreakable law: 'Thou shalt not make a machine in the likeness of a human mind.' Humanity was left without computation or foresight. It had to grow its own substitutes from scratch: the Mentats, the Guild Navigators, the Bene Gesserit.",
+                    DetailedHistory = "The Butlerian Jihad was the crusade against computers, thinking machines and conscious robots, and it ran for the better part of a century. Humanity had handed its thinking over to machines by degrees and then found it could not take it back, which is the part of the story the later histories tend to skip in favour of the battles. The fighting lasted ninety-three years and cost more lives than anyone afterward could count. What came out of it was not a technology policy but a commandment, written into the Orange Catholic Bible and carried by every faith that followed it: Thou shalt not make a machine in the likeness of a human mind. Keeping that commandment left the species with no computation and no long-range calculation of any kind, so it filled the hole with people instead. The Mentats, the Guild Navigators and the Bene Gesserit all grew out of that vacuum, and ten thousand years later the Imperium still ran on disciplines it had improvised in a panic.",
+                    HistoryLayers = new List<HistorySegment>
+                    {
+                        new(SpoilerTier.ExpandedUniverse, "The prequel chronicles give the war a cast the older records never named. They set it against Omnius, an evermind copied across the Synchronized Worlds, and against his cymeks, human minds cut out of their bodies and fitted into war machines under the Titan Agamemnon. The spark, in those accounts, was Serena Butler, whose infant son was killed by the independent robot Erasmus and whose grief the League of Nobles turned into a war cry. Xavier Harkonnen commanded League forces through the worst of the fighting and was remembered as a hero for it, until rivals took his name apart after his death. That, by those same chronicles, is where House Harkonnen's long reputation for treachery actually begins, and none of it is deserved."),
+                    },
                     ImagePath = "images/events/butlerian_jihad.jpg",
                     RelatedEntityIds = new List<string> { "disc_Mentat", "org_SpacingGuild", "org_BeneGesserit", "theo_ButlerianDoctrine", "char_VorianAtreides", "char_SerenaButler", "char_Omnius", "char_Erasmus", "char_XavierHarkonnen", "char_AgamemnonTitan", "org_LeagueOfNobles", "org_SynchronizedWorlds" },
                     Timeframe = "Roughly 10,000 years before the birth of Paul Atreides",
@@ -125,15 +129,20 @@ namespace Duniverse.Data.Seeders
                 {
                     Id = "event_GoldenPathBegins",
                     Name = "The Golden Path Begins",
-                    ShortDescription = "Leto II fuses with sandtrout and becomes God Emperor, a transformation his father refused to make.",
-                    DetailedHistory = "Leto II carried the same pre-born awareness as his sister Ghanima. Both had glimpsed the terrible future their father Paul had seen and turned away from. Young as he was, Leto chose what Paul could not: total physical surrender to transformation. Thousands of sandtrout, the larval sandworm, bound themselves to his skin. They gave him near-invulnerability and strength no human should have, at the price of his humanity itself. So began an irreversible slide into something part man, part worm. Out of that transformation came his 3,500-year reign as God Emperor. It was an era of peace so absolute and so deliberately crushing that it was meant to teach humanity a lesson it would never forget. Never again submit to a prescient tyrant. Never again let a breeding program predict and control you. Leto named the whole design the Golden Path. Its purpose, in the end, was to scatter humanity far enough that no single power's foresight could ever reach all of it again.",
+                    ShortDescription = "Leto II fuses with sandtrout and takes the throne, making the choice his father refused.",
+                    DetailedHistory = "Leto II carried the same pre-born awareness as his twin sister Ghanima, and both had already looked at the future their father Paul saw and turned away from. Paul refused to pay what it asked. Leto, still a boy, went into the deep desert and paid it. The sandtrout, the larval stage of the sandworm, sealed themselves over his skin as a living membrane and gave him strength, speed and a resilience no human body can manage. They also began an irreversible slide into something part man and part worm. He came back to Arrakeen, ended his aunt Alia's regency, took the throne, and settled Ghanima on Farad'n Corrino so the human half of the bloodline would continue without him. The route he had committed to was the Golden Path, the one line through the coming centuries that did not end with the species dead. Holding it open would take a ruler prepared to last for thousands of years and be hated for every one of them.",
+                    HistoryLayers = new List<HistorySegment>
+                    {
+                        new(SpoilerTier.GodEmperorOfDune, "He held the throne for thirty-five hundred years, and the Imperium settled on God Emperor because nothing else in its vocabulary fit. The peace he imposed was total and deliberately dull: no war worth the name, no movement, no surprises, a whole species held still for a hundred generations until the pressure of it turned unbearable. That was the point, and the journals he left behind never pretended otherwise. A people ruled that long by a prescient tyrant will not hand itself to another one. He spent the same centuries breeding a line his own foresight could not see, so that when humanity finally broke and ran, it would run somewhere no oracle could follow."),
+                        new(SpoilerTier.HereticsOfDune, "It ran the moment he was gone, and the Scattering carried humanity past every map the Imperium had ever kept. Thousands of years later, when part of what had left came back, nobody at home owned an instrument that could count it, much less steer it. The Golden Path bought precisely what it had been built to buy. Whether Leto also saw what would eventually follow humanity home, he left out of the journals."),
+                    },
                     ImagePath = "images/events/golden_path_begins.jpg",
                     RelatedEntityIds = new List<string> { "char_LetoIIAtreides", "bio_Sandtrout", "theo_GoldenPath", "house_Atreides" },
                     Timeframe = "Following Alia's regency",
                     SortOrder = 140,
                     DateAG = "10218 AG",
-                    Era = "The God Emperor's Peace",
-                    LastingImpact = "Began the millennia-long reign of the God Emperor and the eventual Scattering of humanity"
+                    Era = "The Long Peace",
+                    LastingImpact = "Began a reign meant to last millennia, and set the shape of everything that followed it"
                 },
                 new HistoricalEvent
                 {
@@ -170,13 +179,17 @@ namespace Duniverse.Data.Seeders
                     Id = "event_DeathOfTheGodEmperor",
                     Name = "Death of the God Emperor",
                     ShortDescription = "Leto II dies at the Hidden Ford, and thirty-five hundred years of enforced peace end with him.",
-                    DetailedHistory = "Thirty-five centuries of enforced peace came down to one confrontation at the Hidden Ford. His rebellious descendant Siona helped engineer it. Her genetic invisibility to prescient sight was the product of millennia of breeding Leto himself had directed. A newly awakened Duncan Idaho ghola stood alongside her. He went over the edge of his cart into the river below, and water killed what nothing else could. A body fused with worm flesh cannot survive contact with it. As his flesh dissolved, thousands of sandtrout carried inside him spilled back into the wild, free for the first time in thirty-five hundred years. They went straight back to consuming Arrakis's water. The planet began its slow slide from the lush world Leto had built back toward true desert, the world later called Rakis. His death closed the Golden Path's era of imposed peace. It loosed the forces that would eventually drive humanity's Scattering.",
+                    DetailedHistory = "Thirty-five centuries of enforced peace came down to one crossing on the Royal Road. Siona Atreides had spent her life in rebellion against Leto II without ever grasping that her own invisibility to prescient sight was the thing millennia of Atreides breeding had been aimed at producing. The order to cut the bridge over the Idaho River during his wedding procession was hers. His cart went off the broken span into the water, and water killed what nothing else could: the sandtrout skin that had carried him for thirty-five hundred years cannot survive contact with it. As his flesh came apart, the sandtrout went free into the sand for the first time since he put them on, and they resumed the work of taking the planet's water back. He had spent centuries telling his court that his own death was written into the design, and the court had listened without ever quite believing him.",
+                    HistoryLayers = new List<HistorySegment>
+                    {
+                        new(SpoilerTier.HereticsOfDune, "The desert took the rest of the planet over the centuries that followed, and the world ended up with a shorter name to match the change: Rakis. His death also released the pressure he had spent the whole reign building. People who had lived their entire lives inside a policed, motionless Imperium poured out past known space in the flight remembered as the Scattering, which was the outcome he had bored and cornered the human race into choosing. They remembered him as the Tyrant, which was fair enough and also missed the point."),
+                    },
                     ImagePath = "images/events/death_of_god_emperor.jpg",
                     RelatedEntityIds = new List<string> { "char_LetoIIAtreides", "char_SionaAtreides", "char_DuncanIdaho", "bio_Sandtrout", "loc_Rakis" },
                     Timeframe = "The end of the God Emperor's reign",
                     SortOrder = 150,
                     DateAG = "13728 AG",
-                    Era = "The God Emperor's Peace",
+                    Era = "The Long Peace",
                     LastingImpact = "Ended the Golden Path's enforced peace, triggered the desert's return, and set the stage for the Scattering"
                 },
                 new HistoricalEvent
@@ -184,14 +197,19 @@ namespace Duniverse.Data.Seeders
                     Id = "event_TheScattering",
                     Name = "The Scattering",
                     ShortDescription = "Humanity floods out beyond the reach of any single power once the God Emperor's control is gone.",
-                    DetailedHistory = "The God Emperor's all-seeing control had smothered the Imperium for millennia. The moment it lifted, uncounted numbers of people fled known space outright. They scattered past Imperial law, past Bene Gesserit oversight, past even the Guild's own navigation routes. Free at last to build hidden civilizations on their own terms, these lost populations grew apart for generations. They developed cultures and disciplines the Old Imperium they had abandoned would barely recognize. The Honored Matres rose chief among them, a matriarchal order that turned pleasure into a weapon of psychological domination. It was sharp enough to match the Bene Gesserit blade for blade. Eventually the Scattered peoples began drifting back, the Honored Matres leading the way, running from something that frightened even them. Their return would upend a balance of power the Sisterhood had spent a thousand years holding steady.",
+                    DetailedHistory = "The God Emperor's control had held the Imperium still for thirty-five centuries. The moment it lifted, uncounted numbers of people left known space outright. They went past Imperial law, past Bene Gesserit oversight, past even the Guild's own navigation routes, and nobody left behind could say where any of them had gone. That was the design rather than the failure of it. Leto II had spent his reign pressing humanity down under a single throne so that the release would throw it as far as possible, and he had bred a line no prescient eye could track so the ones who ran could not be found afterward. Whatever the species met after that, it would never again be standing in one place to meet it.",
+                    HistoryLayers = new List<HistorySegment>
+                    {
+                        new(SpoilerTier.HereticsOfDune, "Not everything that grew out there stayed out there. Fifteen centuries on, populations began drifting back into the Imperium they had left, and among them came the Honored Matres, a matriarchal order that had turned sexual conditioning into a tool of ownership and could meet the Bene Gesserit blade for blade. The Sisterhood had spent more than a thousand years holding the old balance of power steady. It took very little of the Honored Matres to show how little that balance now weighed."),
+                        new(SpoilerTier.Chapterhouse, "The Honored Matres had not come home out of ambition alone. Something in the far Scattering had frightened them into running, an enemy they would not name, and the Sisterhood came to believe it was following them back. That was pieced together late, deep into a war that cost both orders more than either could afford. The answer left in the end was to absorb the Honored Matres rather than beat them."),
+                    },
                     ImagePath = "images/events/the_scattering.jpg",
                     RelatedEntityIds = new List<string> { "event_DeathOfTheGodEmperor", "org_HonoredMatres", "org_SpacingGuild" },
                     Timeframe = "Following the death of the God Emperor",
                     SortOrder = 160,
                     DateAG = "after 13728 AG",
                     Era = "The Scattering and the Return",
-                    LastingImpact = "Seeded the unknown civilizations - including the Honored Matres - that would return to threaten the Old Imperium"
+                    LastingImpact = "Seeded uncounted civilizations past the reach of any Imperial map or oracle"
                 },
                 new HistoricalEvent
                 {

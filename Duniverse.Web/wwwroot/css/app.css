@@ -2271,8 +2271,10 @@ button.chip {
 
 /* The third break only wakes at phone widths. Five items can't share the last
    tablet row on a 375px screen, and the narrowest phones lack the room with the
-   gap squeezed to nothing. So below 600px, Terminology and Sayings take a row of
-   their own and the Mentat Trial sits next to the Index on a fourth. */
+   gap squeezed to nothing. So below 600px the Index drops to a row of its own and
+   the three rows above it each keep a tidy three tabs. The divider goes with it:
+   it earns its keep separating the Index from the tab beside it, but once the
+   Index stands alone that hairline is just a stray mark leading the row. */
 .nav-break-phone {
     display: none;
 }
@@ -2282,6 +2284,10 @@ button.chip {
         display: block;
         flex-basis: 100%;
         height: 0;
+    }
+
+    .nav-divider {
+        display: none;
     }
 }
 

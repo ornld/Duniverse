@@ -219,7 +219,7 @@
             return;
         }
 
-        path = PathFinder.FindShortestPath(Registry, from.Id, to.Id, Spoiler.IsVisible);
+        path = PathFinder.FindShortestPath(Registry, from.Id, to.Id, Spoiler.IsVisible, Spoiler.IsVisible);
         if (path is not null)
         {
             outcome = TraceOutcome.Found;

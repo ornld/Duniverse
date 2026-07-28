@@ -117,7 +117,7 @@ namespace Duniverse.Services
             bool sameCategory = GraphLayoutService.CategorySlug(guess) == GraphLayoutService.CategorySlug(answer);
 
             var path = _pathFinder.FindShortestPath(_registry, guess.Id, answer.Id,
-                entity => tierVisible(entity.SpoilerTier));
+                entity => tierVisible(entity.SpoilerTier), tierVisible);
 
             return new TrialGuessResult(correct, sameCategory, path is null ? null : path.Count - 1);
         }
@@ -232,7 +232,7 @@ namespace Duniverse.Services
         /// </summary>
         private string ConnectionClue(DuneEntity answer, Func<SpoilerTier, bool> tierVisible)
         {
-            var neighbors = _registry.GetDirectlyRelated(answer.Id)
+            var neighbors = _registry.GetDirectlyRelated(answer.Id, tierVisible)
                 .Where(neighbor => tierVisible(neighbor.SpoilerTier))
                 .OrderBy(neighbor => neighbor.Id, StringComparer.OrdinalIgnoreCase)
                 .ToList();

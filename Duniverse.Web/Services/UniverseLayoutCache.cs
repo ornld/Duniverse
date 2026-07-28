@@ -40,8 +40,17 @@ namespace Duniverse.Web.Services
 
         /// <summary>
         /// The cache key for a built but not yet laid-out graph: its node ids joined in the order
-        /// BuildFullGraph fixed them. A newline cannot occur inside an id, so the join stays
-        /// unambiguous and two different visible sets can never fold onto the same string.
+        /// BuildFullGraph fixed them, then its edges. A newline cannot occur inside an id, so the
+        /// join stays unambiguous and two different visible sets can never fold onto the same
+        /// string.
+        ///
+        /// The edges are in the key because they answer to the reader's progress on their own
+        /// now. Two people can both be visible while the connection between them is still a
+        /// later-book fact, so the same set of records can legitimately produce two different
+        /// webs. Keying on the records alone would let one of those webs stand in for the other,
+        /// which is the one mistake a spoiler site cannot make. It also happens to be the honest
+        /// key regardless: the simulation settles on the springs as much as on the nodes, so two
+        /// graphs with different edges were never going to land in the same place anyway.
         /// </summary>
         public static string KeyFor(EntityGraph graph)
         {
@@ -50,6 +59,16 @@ namespace Duniverse.Web.Services
             {
                 builder.Append(node.Id).Append('\n');
             }
+
+            // Ids cannot contain a null character either, so this parts the two lists in a way
+            // no combination of names could imitate.
+            builder.Append('\0');
+
+            foreach (var edge in graph.Edges)
+            {
+                builder.Append(edge.SourceId).Append('|').Append(edge.TargetId).Append('\n');
+            }
+
             return builder.ToString();
         }
 

@@ -26,11 +26,16 @@ namespace Duniverse.Data.Seeders
                     Id = "bio_Sandtrout",
                     Name = "Sandtrout",
                     ShortDescription = "The juvenile form of the sandworm, and the reason Arrakis stays a desert.",
-                    DetailedHistory = "Sandtrout are the sandworm's larval stage, vulnerable in a way the adult never is. One trait defines them completely: they swallow up every trace of free water they touch. Water kills a maturing sandworm outright. So sandtrout swarm toward any moisture that reaches the deep sand and seal it into vast underground reservoirs. This starves the surface of what ordinary plant life would need to take hold. That same trick of biology gave Leto II his path to becoming the God Emperor. He bound thousands of sandtrout to his own skin and gained a living armor, near-indestructible, that handed him strength and durability no human body could match. The price was his humanity. Centuries later his body was finally destroyed, and the sandtrout he had carried within him scattered back into the wild. The water-hoarding began again. Arrakis started its slow drift back toward the world once known as Rakis.",
+                    DetailedHistory = "Sandtrout are the sandworm's larval stage, soft and vulnerable in a way the adult never is. One habit defines them: they take in every trace of free water they touch and seal it away in reservoirs deep beneath the sand. Water is poison to a maturing worm, so the behavior is self-preservation rather than malice, but the effect on Arrakis is absolute. Nothing reaches the surface for ordinary plant life to live on, and the desert stays a desert. Pardot and Liet Kynes understood that greening the planet meant breaking this cycle first. The Fremen had found their own use for the creature long before any planetologist arrived: drowning one yields the bitter liquid their Reverend Mothers take as the Water of Life.",
+                    HistoryLayers = new List<HistorySegment>
+                    {
+                        new(SpoilerTier.ChildrenOfDune, "Leto II found the use nobody else had been willing to consider. He let thousands of them fasten onto his skin and stay there, and what he got for it was a living membrane no blade or projectile could reach through, strength past any human measure, and centuries where a lifetime should have been. What he gave up was the shape of a man, and every ordinary thing that came with it."),
+                        new(SpoilerTier.HereticsOfDune, "When his body finally came apart, the sandtrout he had carried scattered back into the sand and resumed hoarding water as though nothing had interrupted them. The desert closed over the gardens again, the worms came back with it, and the world took a new name."),
+                    },
                     ImagePath = "images/biology/sandtrout.jpg",
                     RelatedEntityIds = new List<string> { "bio_ShaiHulud", "loc_Arrakis", "char_LetoIIAtreides", "event_GoldenPathBegins" },
                     BiologicalClassification = "Larval stage of the sandworm (fauna)",
-                    DerivedProducts = "Consumes and locks away planetary water; source of the God Emperor's transformed skin"
+                    DerivedProducts = "Consumes and locks away planetary water; drowned to yield the Water of Life"
                 },
                 new FloraFauna
                 {

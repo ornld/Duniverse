@@ -88,7 +88,11 @@ namespace Duniverse.Data
                 ["char_DukePaulusAtreides"] = SpoilerTier.ExpandedUniverse, // the Old Duke is unnamed in Dune; the Paulus story is Prelude material
                 ["char_HelenaAtreides"] = SpoilerTier.ExpandedUniverse,     // Leto's mother, and her hand in the bullring, are Prelude material too
                 ["char_RhomburVernius"] = SpoilerTier.ExpandedUniverse,
-                ["char_ElroodIX"] = SpoilerTier.ExpandedUniverse,
+                // char_ElroodIX deliberately sits at the default instead of here. Dune names him
+                // as Shaddam's father, so hiding the man entirely kept a first-book reader from
+                // something their own appendix already told them. Everything that made him
+                // interesting, the decline and the poisoning, is Prelude material and now waits
+                // in an ExpandedUniverse layer on his record instead.
                 ["char_AbulurdHarkonnen"] = SpoilerTier.ExpandedUniverse,
                 ["org_LeagueOfNobles"] = SpoilerTier.ExpandedUniverse,
                 ["org_SynchronizedWorlds"] = SpoilerTier.ExpandedUniverse,

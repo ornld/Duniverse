@@ -58,7 +58,8 @@
 
     protected override void OnParametersSet()
     {
-        graph = LayoutService.BuildEgoGraph(Registry, CenterId, maxDepth: 2, include: Spoiler.IsVisible);
+        graph = LayoutService.BuildEgoGraph(Registry, CenterId, maxDepth: 2, include: Spoiler.IsVisible,
+            linkVisible: Spoiler.IsVisible);
         LayoutService.ApplyForceDirectedLayout(graph, Width, Height);
         nodesById = graph.Nodes.ToDictionary(n => n.Id, StringComparer.OrdinalIgnoreCase);
         neighborsById = BuildNeighbors(graph);

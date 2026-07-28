@@ -8,9 +8,9 @@
     <NavLink href="/timeline">Timeline</NavLink>
     @* Forced wrap points that wake at phone and tablet widths: the bar breaks into
        fixed rows instead of wrapping wherever the text runs out. Tablets get three
-       rows of three tabs with the Index closing the third. Phones can't fit that
-       third row, so a further break below 600px gives Terminology and Sayings a row
-       of their own and seats the Mentat Trial next to the Index on a fourth. *@
+       rows of three tabs with the Index closing the third. Phones can't fit the
+       Index on the end of that third row, so a further break below 600px sends it
+       down to a fourth row on its own, leaving three clean rows of three above it. *@
     <span class="nav-break" aria-hidden="true"></span>
     <NavLink href="/bloodlines">Bloodlines</NavLink>
     <NavLink href="/connections">Connections</NavLink>
@@ -18,12 +18,16 @@
     <span class="nav-break" aria-hidden="true"></span>
     <NavLink href="/terminology">Terminology</NavLink>
     <NavLink href="/sayings">Sayings</NavLink>
-    <span class="nav-break-phone" aria-hidden="true"></span>
     <NavLink href="/trial">Mentat Trial</NavLink>
+    <span class="nav-break-phone" aria-hidden="true"></span>
     <span class="nav-divider"></span>
     <div class="nav-index @(open ? "open" : "")" @onkeydown="OnKeyDown">
+        @* aria-expanded is spelled out as a string on purpose. Handing Blazor the bool
+           gets it treated like a checkbox's checked: false drops the attribute off the
+           button entirely and true writes it empty, so a screen reader never once hears
+           whether this panel is open. *@
         <button type="button" class="index-trigger @(IsCategoryPage ? "active" : "")"
-                aria-haspopup="true" aria-expanded="@open" @onclick="Toggle">
+                aria-haspopup="true" aria-expanded="@(open ? "true" : "false")" @onclick="Toggle">
             <span class="index-label">Index</span>
             <svg class="index-chevron" viewBox="0 0 16 16" aria-hidden="true">
                 <path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.5"

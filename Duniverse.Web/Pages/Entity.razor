@@ -68,6 +68,13 @@ else if (entity is not null)
             <p class="detailed-history">@entity.DetailedHistory</p>
         }
 
+        @* The rest of the story, as far as the reader has read. A record whose subject never
+           outlives its first book has no layers at all and this adds nothing. *@
+        @foreach (var layer in EntityRegistry.VisibleLayers(entity, Spoiler.IsVisible))
+        {
+            <p class="detailed-history">@layer.Text</p>
+        }
+
         @if (entity is Persona quotedPersona && quotedPersona.NotableQuotes.Count > 0)
         {
             <div class="entity-quotes">
@@ -231,8 +238,12 @@ else
         isGated = !Spoiler.IsVisible(entity);
 
         // If the URL used a name or a typo instead of the real ID, fix up the address
-        // bar so links and bookmarks always point at the canonical one.
-        if (!string.Equals(entity.Id, Id, StringComparison.OrdinalIgnoreCase))
+        // bar so links and bookmarks always point at the canonical one. A sealed entry
+        // is the one exception: its canonical ID spells out the very name this page is
+        // about to refuse to show, and the address bar keeps it in history, autocomplete,
+        // and anything the reader copies. The gate reads exactly the same at whatever
+        // address they arrived on, so it keeps the one they typed.
+        if (!isGated && !string.Equals(entity.Id, Id, StringComparison.OrdinalIgnoreCase))
         {
             Nav.NavigateTo($"/entity/{entity.Id}", replace: true);
             return;
@@ -257,7 +268,7 @@ else
                 .ToList()
             : new List<DuneEntity>();
 
-        related = Registry.GetDirectlyRelated(entity.Id).Where(Spoiler.IsVisible).ToList();
+        related = Registry.GetDirectlyRelated(entity.Id, Spoiler.IsVisible).Where(Spoiler.IsVisible).ToList();
         hasAnyConnections = related.Count > 0;
     }
 

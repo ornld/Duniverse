@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Duniverse.Models;
 
 namespace Duniverse.Services
@@ -19,6 +20,14 @@ namespace Duniverse.Services
         // Labeled relationships, keyed "viewedId|otherId" -> what the other entity is to the
         // viewed one. Each registered relationship writes two entries, one per direction.
         private readonly Dictionary<string, RelationshipLabel> _relationshipLabels = new Dictionary<string, RelationshipLabel>(StringComparer.OrdinalIgnoreCase);
+
+        // Connections this class invented, keyed the same way, holding the tier of the
+        // relationship that justified them. When no seeder joins a pair, the link exists purely
+        // because RelationshipMap named it, so the link carries the same spoiler weight the
+        // label does: hiding "Wife" from a reader who hasn't got there still leaves a bare line
+        // drawn between two people, which is the fact itself. Seeder-declared links never land
+        // here, because those stand on their own regardless of what any label says about them.
+        private readonly Dictionary<string, SpoilerTier> _inventedLinks = new Dictionary<string, SpoilerTier>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>The total number of registered entities.</summary>
         public int Count => _database.Count;
@@ -157,8 +166,15 @@ namespace Duniverse.Services
         /// of an entry is a weaker signal than a name, so it belongs in a list the reader
         /// chooses from, never in a redirect. Short queries are refused because two letters
         /// appear in almost every entry and would return the whole archive.
+        ///
+        /// The optional <paramref name="layerVisible"/> predicate keeps the search inside the
+        /// part of each entry the reader has actually earned. Without it, searching a phrase
+        /// that only appears in a held-back layer would find the record and hand back an excerpt
+        /// quoting the very sentence the layer exists to withhold, which would rebuild the leak
+        /// through the search box after the page had closed it.
         /// </summary>
-        public IEnumerable<DuneEntity> SearchByContent(string query)
+        public IEnumerable<DuneEntity> SearchByContent(string query,
+            Func<SpoilerTier, bool>? layerVisible = null)
         {
             var normalizedQuery = Normalize(query);
             if (normalizedQuery.Length < 3)
@@ -182,9 +198,42 @@ namespace Duniverse.Services
 
             return _database.Values.Where(entity =>
             {
-                var text = Normalize((entity.ShortDescription ?? string.Empty) + " " + (entity.DetailedHistory ?? string.Empty));
+                var text = Normalize(ReadableText(entity, layerVisible));
                 return terms.All(term => text.Contains(term, StringComparison.Ordinal));
             });
+        }
+
+        /// <summary>
+        /// Everything on a record the given reader is allowed to read: its summary, its opening
+        /// history, and only those later layers their progress has unlocked. Anything that reads
+        /// an entry's prose on a reader's behalf should go through here, so a layer held back on
+        /// the page cannot surface anywhere else.
+        /// </summary>
+        public static string ReadableText(DuneEntity entity, Func<SpoilerTier, bool>? layerVisible = null)
+        {
+            var builder = new StringBuilder();
+            builder.Append(entity.ShortDescription ?? string.Empty);
+            builder.Append(' ').Append(entity.DetailedHistory ?? string.Empty);
+
+            foreach (var layer in VisibleLayers(entity, layerVisible))
+            {
+                builder.Append(' ').Append(layer.Text);
+            }
+
+            return builder.ToString();
+        }
+
+        /// <summary>
+        /// The later chapters of an entry the reader has earned, in the order they were written.
+        /// A caller passing no predicate wants the whole story (the console app, anything with no
+        /// spoiler notion), which keeps this something callers opt into rather than switch off.
+        /// </summary>
+        public static IEnumerable<HistorySegment> VisibleLayers(DuneEntity entity,
+            Func<SpoilerTier, bool>? layerVisible = null)
+        {
+            return layerVisible is null
+                ? entity.HistoryLayers
+                : entity.HistoryLayers.Where(layer => layerVisible(layer.Tier));
         }
 
         /// <summary>
@@ -307,9 +356,10 @@ namespace Duniverse.Services
         /// at (forward). A link recorded on just one side of a relationship is enough for both
         /// sides to find each other.
         /// </summary>
-        public IEnumerable<T> GetRelatedEntities<T>(string relatedId) where T : DuneEntity
+        public IEnumerable<T> GetRelatedEntities<T>(string relatedId,
+            Func<SpoilerTier, bool>? linkVisible = null) where T : DuneEntity
         {
-            return GetDirectlyRelated(relatedId).OfType<T>();
+            return GetDirectlyRelated(relatedId, linkVisible).OfType<T>();
         }
 
         /// <summary>
@@ -318,7 +368,8 @@ namespace Duniverse.Services
         /// the relationship graph to walk the web of connections one hop at a time without
         /// needing to know in advance what categories it will find.
         /// </summary>
-        public IEnumerable<DuneEntity> GetDirectlyRelated(string id)
+        public IEnumerable<DuneEntity> GetDirectlyRelated(string id,
+            Func<SpoilerTier, bool>? linkVisible = null)
         {
             if (!_database.TryGetValue(id, out var source))
             {
@@ -327,9 +378,12 @@ namespace Duniverse.Services
 
             var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { id };
 
+            // The seen check runs before the tier check on purpose. A neighbor held back for
+            // spoilers is still marked seen, so the inbound pass below can't hand it back.
             foreach (var relatedId in source.RelatedEntityIds)
             {
-                if (_database.TryGetValue(relatedId, out var target) && seen.Add(target.Id))
+                if (_database.TryGetValue(relatedId, out var target) && seen.Add(target.Id)
+                    && !IsHeldBack(source.Id, target.Id, linkVisible))
                 {
                     yield return target;
                 }
@@ -339,12 +393,27 @@ namespace Duniverse.Services
             {
                 foreach (var referrerId in referrers)
                 {
-                    if (_database.TryGetValue(referrerId, out var referrer) && seen.Add(referrer.Id))
+                    if (_database.TryGetValue(referrerId, out var referrer) && seen.Add(referrer.Id)
+                        && !IsHeldBack(source.Id, referrer.Id, linkVisible))
                     {
                         yield return referrer;
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Whether a connection should stay out of sight: true only for a link this class
+        /// invented from a relationship whose book the caller says the reader has not reached.
+        /// Callers that pass no predicate (the console app, anything indifferent to spoilers)
+        /// always see everything, which keeps this a filter callers opt into rather than one
+        /// they have to remember to switch off.
+        /// </summary>
+        private bool IsHeldBack(string viewedId, string otherId, Func<SpoilerTier, bool>? linkVisible)
+        {
+            return linkVisible is not null
+                && _inventedLinks.TryGetValue($"{viewedId}|{otherId}", out var tier)
+                && !linkVisible(tier);
         }
 
         /// <summary>
@@ -374,6 +443,11 @@ namespace Duniverse.Services
                 if (!alreadyLinked)
                 {
                     from.RelatedEntityIds.Add(to.Id);
+
+                    // Remember that this one is ours, in both directions, so a reader who has
+                    // not reached the book it comes from never gets handed the bare edge.
+                    _inventedLinks[$"{from.Id}|{to.Id}"] = rel.Tier;
+                    _inventedLinks[$"{to.Id}|{from.Id}"] = rel.Tier;
 
                     if (!_inboundLinks.TryGetValue(to.Id, out var referrers))
                     {

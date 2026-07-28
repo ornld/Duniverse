@@ -24,7 +24,7 @@ namespace Duniverse.Services
         /// overwhelming the view with a dense, unreadable tangle.
         /// </summary>
         public EntityGraph BuildEgoGraph(EntityRegistry registry, string centerId, int maxDepth = 2,
-            Func<DuneEntity, bool>? include = null)
+            Func<DuneEntity, bool>? include = null, Func<SpoilerTier, bool>? linkVisible = null)
         {
             var graph = new EntityGraph();
 
@@ -46,7 +46,7 @@ namespace Duniverse.Services
 
                 foreach (var entity in frontier)
                 {
-                    foreach (var neighbor in registry.GetDirectlyRelated(entity.Id))
+                    foreach (var neighbor in registry.GetDirectlyRelated(entity.Id, linkVisible))
                     {
                         // Skip neighbors the caller wants hidden (the spoiler gate passes a
                         // predicate here), so they never become a node or leak through an edge.
@@ -100,8 +100,11 @@ namespace Duniverse.Services
         /// cleared to see; hidden entities never enter the simulation, which means the shape
         /// of the visible web leaks nothing about what is missing from it. Entities are
         /// walked in a deterministic order so the layout lands the same way on every visit.
+        /// The <paramref name="linkVisible"/> predicate covers the other case: two entities the
+        /// reader can see, joined by a connection that is itself a later-book fact.
         /// </summary>
-        public EntityGraph BuildFullGraph(EntityRegistry registry, Func<DuneEntity, bool>? include = null)
+        public EntityGraph BuildFullGraph(EntityRegistry registry, Func<DuneEntity, bool>? include = null,
+            Func<SpoilerTier, bool>? linkVisible = null)
         {
             var graph = new EntityGraph();
 
@@ -123,7 +126,7 @@ namespace Duniverse.Services
             var edgeKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (var entity in entities)
             {
-                foreach (var neighbor in registry.GetDirectlyRelated(entity.Id))
+                foreach (var neighbor in registry.GetDirectlyRelated(entity.Id, linkVisible))
                 {
                     if (!admitted.Contains(neighbor.Id))
                     {

@@ -36,9 +36,23 @@ namespace Duniverse.Models
         public string? ShortDescription { get; set; }
 
         /// <summary>
-        /// The detailed text revealed when the card is flipped over.
+        /// The detailed text revealed when the card is flipped over. This is the part of the
+        /// story that is safe as soon as the record itself is, so it holds nothing past the book
+        /// the record first appears in. Anything later belongs in <see cref="HistoryLayers"/>.
         /// </summary>
         public string? DetailedHistory { get; set; }
+
+        /// <summary>
+        /// The rest of the story, in reading order, each part waiting on the book that earns it.
+        /// Empty for the many records whose whole life fits in one novel, which is why this sits
+        /// beside <see cref="DetailedHistory"/> instead of replacing it: an entry only grows
+        /// layers when its subject actually outlives its first appearance.
+        ///
+        /// Kept in declaration order rather than sorted by tier, because the order a story is
+        /// told in is the writer's call and the Expanded Universe does not slot neatly onto the
+        /// end of the six-novel spine.
+        /// </summary>
+        public List<HistorySegment> HistoryLayers { get; set; } = new List<HistorySegment>();
 
         /// <summary>
         /// The local file path or URL to the image used on the card.
