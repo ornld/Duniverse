@@ -76,26 +76,30 @@ namespace Duniverse.Services
         }
 
         /// <summary>
-        /// Every Persona who names the given house or organization as their affiliation. The
-        /// archive records affiliation as free text and some figures serve two masters at once
-        /// ("House Vernius / House Atreides", "Honored Matres (later Bene Gesserit)"), so the
-        /// match is a substring rather than an equality and such a figure appears on both
-        /// rosters, which is the truthful answer. Callers apply their own spoiler filter.
+        /// Every Persona who belongs to the given house or organization, found by ID. A figure
+        /// who serves two masters carries two IDs and shows up on both rosters, which is the
+        /// truthful answer. Callers apply their own spoiler filter.
         ///
         /// This is the reverse of the link a Persona already shows: a member's record names
         /// their house, but the house's record had no way to name its members.
+        ///
+        /// Takes the ID and not the display name on purpose. Matching the name meant matching a
+        /// substring of free-text prose, which got it wrong in both directions: a member whose
+        /// affiliation read "House Corrino" never appeared on his own House Fenring roster, and
+        /// any Museum Fremen would have landed on the Fremen roster because one name contains
+        /// the other. An ID is exact and it is the same key the rest of the archive links by.
         /// </summary>
-        public IEnumerable<Persona> GetAffiliates(string organizationName)
+        public IEnumerable<Persona> GetAffiliates(string organizationId)
         {
-            if (string.IsNullOrWhiteSpace(organizationName))
+            if (string.IsNullOrWhiteSpace(organizationId))
             {
                 return Array.Empty<Persona>();
             }
 
             return _database.Values
                 .OfType<Persona>()
-                .Where(persona => !string.IsNullOrWhiteSpace(persona.Affiliation)
-                    && persona.Affiliation.Contains(organizationName, StringComparison.OrdinalIgnoreCase));
+                .Where(persona => persona.AffiliationIds
+                    .Contains(organizationId, StringComparer.OrdinalIgnoreCase));
         }
 
         /// <summary>

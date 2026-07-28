@@ -86,7 +86,7 @@ else if (entity is not null)
         }
     </div>
 
-    @* Who belongs to this house or order, gathered from the affiliation each person's
+    @* Who belongs to this house or order, gathered from the membership each person's
        own record already declares. Sits next to the house's description instead of
        down with the connections, since membership is part of what the house IS, not
        a link out. *@
@@ -246,10 +246,11 @@ else
             : new List<House>();
 
         // A house or order can now name the people who belong to it, which used to
-        // only run the other way. Alphabetical, since a roster has no natural order
-        // of importance.
+        // only run the other way. Looked up by ID, not by name: a display name is
+        // prose and matching on it put people on the wrong rosters. Alphabetical,
+        // since a roster has no natural order of importance.
         members = entity is House or Organization
-            ? Registry.GetAffiliates(entity.Name)
+            ? Registry.GetAffiliates(entity.Id)
                 .Where(Spoiler.IsVisible)
                 .OrderBy(person => person.Name, StringComparer.OrdinalIgnoreCase)
                 .Cast<DuneEntity>()

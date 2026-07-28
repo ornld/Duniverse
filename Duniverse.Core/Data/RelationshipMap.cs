@@ -118,8 +118,14 @@ namespace Duniverse.Data
             new("char_GilbertusAlbans", "disc_Mentat", "First of the Mentats", "The discipline he pioneered", SpoilerTier.ExpandedUniverse),
             new("char_DominicVernius", "char_RhomburVernius", "Father", "Son and heir in exile", SpoilerTier.ExpandedUniverse),
             new("char_DukePaulusAtreides", "char_DukeLetoAtreides", "Father", "Son thrust early into rule", SpoilerTier.ExpandedUniverse),
+            new("char_HelenaAtreides", "char_DukeLetoAtreides", "Mother he exiled", "Son who uncovered her betrayal", SpoilerTier.ExpandedUniverse),
+            new("char_DukePaulusAtreides", "char_HelenaAtreides", "Husband she let die", "Wife who knew of the plot", SpoilerTier.ExpandedUniverse),
             new("char_ShaddamIV", "char_ElroodIX", "Son who hastened his end", "Father and predecessor", SpoilerTier.ExpandedUniverse),
             new("char_HasimirFenring", "char_ElroodIX", "Poisoned him with chaumurky", "The Emperor he helped remove", SpoilerTier.ExpandedUniverse),
+
+            // ---- The Arrakis smugglers ----
+            new("char_EsmarTuek", "char_StabanTuek", "Father", "Son who took over the trade"),
+            new("char_StabanTuek", "char_GurneyHalleck", "Smuggler chief who took him in", "Raider who worked out of his camps"),
 
             // ---- Across the categories ----
             new("org_BeneGesserit", "char_PaulAtreides", "The order that bred him into being", "Kwisatz Haderach ahead of schedule"),

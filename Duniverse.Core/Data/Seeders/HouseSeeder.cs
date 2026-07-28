@@ -76,7 +76,7 @@ namespace Duniverse.Data.Seeders
                     ShortDescription = "A Great House whose fortune comes from miniaturized technology and inventive, borderline engineering.",
                     DetailedHistory = "House Richese stood as a perennial commercial and technological rival to Ix. Its fortune came from miniaturized devices, probes, and mechanisms. This clever engineering pushed right up against the boundaries the Butlerian Jihad had set against thinking machines, careful never to cross them outright. Ix specialized in large-scale industrial technology. Richese carved out a niche in delicate, precision instruments that nobles, Mentats, and spies across the Imperium all coveted. The rivalry between the two Houses ran on markets and patents as much as politics. Each side accused the other of lifting designs or undercutting prices in the lucrative gadget trade. Richese's fortunes rose and fell with the Imperium's appetite for its inventions. The House settled into life as a wealthy but politically secondary player next to the Great Houses that commanded real military muscle.",
                     ImagePath = "images/houses/richese.jpg",
-                    RelatedEntityIds = new List<string> { "loc_Ix", "theo_ButlerianDoctrine", "loc_Richese" },
+                    RelatedEntityIds = new List<string> { "loc_Ix", "theo_ButlerianDoctrine", "loc_Richese", "char_HelenaAtreides" },
                     Sigil = "Not widely recorded",
                     Motto = "Not widely recorded",
                     HistoricalRivalries = new List<string> { "house_Vernius" }
@@ -124,7 +124,7 @@ namespace Duniverse.Data.Seeders
                     ShortDescription = "A smuggling dynasty operating outside official Landsraad recognition, based on Arrakis.",
                     DetailedHistory = "House Tuek operated entirely outside official Landsraad recognition. It ran a smuggling dynasty on Arrakis from hidden bases scattered through the deep desert, well beyond the reach of Imperial authority or Harkonnen patrols. Esmar Tuek led the family for years, and his son Staban after him. The profits came from quietly trading illicitly harvested spice and ferrying it off-world without handing over the Emperor's or CHOAM's cut. Their networks and hidden shelters turned invaluable after the fall of House Atreides. Tuek smugglers sheltered fugitives like the loyal Atreides warmaster Gurney Halleck. They kept contacts and knowledge alive that would later serve Paul's cause. The Landsraad never acknowledged the Tueks as a true House. Their independence and mastery of the desert made them a quiet, essential power on Arrakis all the same.",
                     ImagePath = "images/houses/tuek.jpg",
-                    RelatedEntityIds = new List<string> { "loc_Arrakis", "char_GurneyHalleck" },
+                    RelatedEntityIds = new List<string> { "loc_Arrakis", "char_GurneyHalleck", "char_EsmarTuek", "char_StabanTuek" },
                     Sigil = "Not widely recorded",
                     Motto = "Not widely recorded",
                     HistoricalRivalries = new List<string>()

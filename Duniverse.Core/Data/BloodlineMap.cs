@@ -27,6 +27,7 @@ namespace Duniverse.Data
 
             // Generation 1: the elder generation of the classic era
             new("char_DukePaulusAtreides", 1, 0.12, "atreides"),
+            new("char_HelenaAtreides", 1, 0.26, "other"),   // Richese blood, standing here only as Leto's mother
             new("char_ElroodIX", 1, 0.50, "corrino"),
             new("char_AbulurdHarkonnen", 1, 0.66, "harkonnen"),
             new("char_BaronHarkonnen", 1, 0.80, "harkonnen"),
@@ -61,6 +62,7 @@ namespace Duniverse.Data
         // ---- Marriages, concubinages, and matches ----
         public static readonly IReadOnlyList<BloodlineUnion> Unions = new List<BloodlineUnion>
         {
+            new("char_DukePaulusAtreides", "char_HelenaAtreides", "Political match, coldly kept"),
             new("char_DukeLetoAtreides", "char_LadyJessica", "Concubine, never wed"),
             new("char_PaulAtreides", "char_Chani", "His Fremen concubine and true bond"),
             new("char_PaulAtreides", "char_PrincessIrulan", "Marriage in name alone", Dashed: true),
@@ -76,7 +78,7 @@ namespace Duniverse.Data
             new("char_BaronHarkonnen", "char_XavierHarkonnen", Label: "Ten millennia of Harkonnen descent", Dashed: true),
 
             // Into the classic era
-            new("char_DukeLetoAtreides", "char_DukePaulusAtreides"),
+            new("char_DukeLetoAtreides", "char_DukePaulusAtreides", "char_HelenaAtreides"),
             new("char_ShaddamIV", "char_ElroodIX"),
             new("char_GlossuRabban", "char_AbulurdHarkonnen"),
             new("char_FeydRautha", "char_AbulurdHarkonnen"),

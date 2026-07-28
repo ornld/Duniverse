@@ -20,6 +20,7 @@ namespace Duniverse.Data.Seeders
                     RelatedEntityIds = new List<string>(),
                     
                     Affiliation = "",
+                    AffiliationIds = new List<string>(),
                     Role = "",
                     NotableQuotes = new List<string>()
                 },
@@ -36,6 +37,8 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_LadyJessica", "char_DukeLetoAtreides", "char_Chani", "char_Stilgar", "char_GurneyHalleck", "char_ThufirHawat", "char_DuncanIdaho", "char_AliaAtreides", "char_PrincessIrulan", "char_FeydRautha", "char_HasimirFenring" },
                     Affiliation = "House Atreides",
+                    // Fremen as well: he was sworn into Sietch Tabr as Usul and ended up leading them.
+                    AffiliationIds = new List<string> { "house_Atreides", "org_Fremen" },
                     Role = "Emperor",
                     NotableQuotes = new List<string> { "Fear is the mind-killer. Fear is the little-death that brings total obliteration." }
                 },
@@ -48,6 +51,9 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_PaulAtreides", "char_DukeLetoAtreides", "char_AliaAtreides", "char_GaiusHelenMohiam", "char_FaradnCorrino" },
                     Affiliation = "Bene Gesserit",
+                    // The Sisterhood only. She ran the Atreides household as Leto's Lady, but she
+                    // was never of the House, and the roster says who belongs rather than who served.
+                    AffiliationIds = new List<string> { "org_BeneGesserit" },
                     Role = "Reverend Mother",
                     NotableQuotes = new List<string> { "I must not fear." }
                 },
@@ -60,6 +66,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_LadyJessica", "char_PaulAtreides", "char_ThufirHawat", "char_GurneyHalleck", "char_DuncanIdaho", "char_WellingtonYueh", "char_DukePaulusAtreides", "char_RhomburVernius" },
                     Affiliation = "House Atreides",
+                    AffiliationIds = new List<string> { "house_Atreides" },
                     Role = "Duke",
                     NotableQuotes = new List<string> { "A person needs new experiences. They jar something deep inside, allowing him to grow." }
                 },
@@ -73,6 +80,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_FeydRautha", "char_GlossuRabban", "char_PiterDeVries", "char_ShaddamIV", "char_AliaAtreides", "char_AbulurdHarkonnen" },
                     Affiliation = "House Harkonnen",
+                    AffiliationIds = new List<string> { "house_Harkonnen" },
                     Role = "Baron",
                     NotableQuotes = new List<string> { "Observe the plans within plans within plans." }
                 },
@@ -85,6 +93,9 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_PaulAtreides", "char_LietKynes", "char_LetoIIAtreides", "char_GhanimaAtreides", "char_Stilgar" },
                     Affiliation = "Fremen",
+                    // Fremen only. Being Paul's consort tied her to the Atreides, but it never
+                    // made her one of them, and the Imperium never let her hold the title either.
+                    AffiliationIds = new List<string> { "org_Fremen" },
                     Role = "Fedaykin",
                     NotableQuotes = new List<string> { "Tell me of your homeworld, Usul." }
                 },
@@ -97,6 +108,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_PaulAtreides", "char_Chani", "char_Otheym", "char_Korba", "char_GaiusHelenMohiam", "char_Edric" },
                     Affiliation = "Fremen",
+                    AffiliationIds = new List<string> { "org_Fremen" },
                     Role = "Naib",
                     NotableQuotes = new List<string> { "Siridar, I am a simple man. I know only the desert." }
                 },
@@ -109,6 +121,8 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_DukeLetoAtreides", "char_PaulAtreides", "char_LadyJessica", "char_Scytale", "char_MilesTeg", "char_DarwiOdrade", "char_Murbella", "char_SionaAtreides", "disc_GholaCultivation", "bio_Futar" },
                     Affiliation = "House Atreides",
+                    // He trained at Ginaz before he ever wore Atreides colors, and the school still claims him.
+                    AffiliationIds = new List<string> { "house_Atreides", "org_SwordmastersOfGinaz" },
                     Role = "Swordmaster",
                     NotableQuotes = new List<string>()
                 },
@@ -121,6 +135,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_DukeLetoAtreides", "char_PaulAtreides", "char_ThufirHawat" },
                     Affiliation = "House Atreides",
+                    AffiliationIds = new List<string> { "house_Atreides" },
                     Role = "Warmaster",
                     NotableQuotes = new List<string> { "Mood's a thing for cattle or making love or playing the baliset. It's not for fighting." }
                 },
@@ -133,6 +148,8 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_DukeLetoAtreides", "char_PaulAtreides", "char_PiterDeVries", "char_BaronHarkonnen" },
                     Affiliation = "House Atreides",
+                    // A Mentat School man, and the graduate the school itself points to.
+                    AffiliationIds = new List<string> { "house_Atreides", "org_MentatSchool" },
                     Role = "Mentat",
                     NotableQuotes = new List<string> { "A popular man arouses the jealousy of the powerful." }
                 },
@@ -145,6 +162,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_DukeLetoAtreides", "char_BaronHarkonnen", "char_PiterDeVries" },
                     Affiliation = "Suk School",
+                    AffiliationIds = new List<string> { "org_SukSchool" },
                     Role = "Physician",
                     NotableQuotes = new List<string> { "I am sorry, my Duke. But there is a thing I must do." }
                 },
@@ -157,6 +175,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_PaulAtreides", "char_LadyJessica", "char_BaronHarkonnen", "char_LetoIIAtreides", "char_GhanimaAtreides" },
                     Affiliation = "House Atreides",
+                    AffiliationIds = new List<string> { "house_Atreides" },
                     Role = "Regent",
                     NotableQuotes = new List<string> { "I am a messenger from Muad'Dib." }
                 },
@@ -169,6 +188,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_PrincessIrulan", "char_BaronHarkonnen", "char_PaulAtreides", "char_FaradnCorrino", "char_HasimirFenring", "char_ElroodIX" },
                     Affiliation = "House Corrino",
+                    AffiliationIds = new List<string> { "house_Corrino" },
                     Role = "Padishah Emperor",
                     NotableQuotes = new List<string>()
                 },
@@ -181,6 +201,8 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_ShaddamIV", "char_PaulAtreides", "char_GaiusHelenMohiam", "char_BronsoOfIx" },
                     Affiliation = "House Corrino",
+                    // Corrino by birth, Bene Gesserit by training. She answers to both.
+                    AffiliationIds = new List<string> { "house_Corrino", "org_BeneGesserit" },
                     Role = "Princess / Historian",
                     NotableQuotes = new List<string> { "A beginning is the time for taking the most delicate care that the balances are correct." }
                 },
@@ -193,6 +215,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_LadyJessica", "char_PaulAtreides", "char_Stilgar", "char_PrincessIrulan" },
                     Affiliation = "Bene Gesserit",
+                    AffiliationIds = new List<string> { "org_BeneGesserit" },
                     Role = "Truthsayer",
                     NotableQuotes = new List<string> { "You've proven you're human. Now we must see if you are more than human." }
                 },
@@ -205,6 +228,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_BaronHarkonnen", "char_GlossuRabban", "char_PaulAtreides", "char_MargotFenring" },
                     Affiliation = "House Harkonnen",
+                    AffiliationIds = new List<string> { "house_Harkonnen" },
                     Role = "Na-Baron",
                     NotableQuotes = new List<string>()
                 },
@@ -217,6 +241,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_BaronHarkonnen", "char_FeydRautha" },
                     Affiliation = "House Harkonnen",
+                    AffiliationIds = new List<string> { "house_Harkonnen" },
                     Role = "Count",
                     NotableQuotes = new List<string>()
                 },
@@ -229,6 +254,8 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_BaronHarkonnen", "char_WellingtonYueh", "char_DukeLetoAtreides", "char_ThufirHawat" },
                     Affiliation = "House Harkonnen",
+                    // No Mentat School for him. A twisted Mentat is Tleilaxu-made, which is rather the point.
+                    AffiliationIds = new List<string> { "house_Harkonnen" },
                     Role = "Twisted Mentat",
                     NotableQuotes = new List<string> { "It is by will alone I set my mind in motion." }
                 },
@@ -243,6 +270,8 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_Chani", "char_DukeLetoAtreides", "char_PaulAtreides", "char_PardotKynes" },
                     Affiliation = "Imperial Court / Fremen",
+                    // The Imperial Court half of his affiliation has no record here to point at.
+                    AffiliationIds = new List<string> { "org_Fremen" },
                     Role = "Planetologist",
                     NotableQuotes = new List<string> { "The highest function of ecology is understanding consequences." }
                 },
@@ -255,6 +284,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_DuncanIdaho", "char_PaulAtreides", "char_Edric", "disc_GholaCultivation" },
                     Affiliation = "Bene Tleilax",
+                    AffiliationIds = new List<string> { "org_BeneTleilax" },
                     Role = "Face Dancer",
                     NotableQuotes = new List<string>()
                 },
@@ -267,6 +297,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_GaiusHelenMohiam", "char_Scytale", "char_Stilgar" },
                     Affiliation = "Spacing Guild",
+                    AffiliationIds = new List<string> { "org_SpacingGuild" },
                     Role = "Steersman",
                     NotableQuotes = new List<string>()
                 },
@@ -279,6 +310,8 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_PaulAtreides", "char_Stilgar" },
                     Affiliation = "Qizarate",
+                    // A Fremen Fedaykin long before he was a priest, and he never stopped being one.
+                    AffiliationIds = new List<string> { "org_Qizarate", "org_Fremen" },
                     Role = "Panegyrist",
                     NotableQuotes = new List<string>()
                 },
@@ -291,6 +324,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_Stilgar", "char_PaulAtreides" },
                     Affiliation = "Fremen",
+                    AffiliationIds = new List<string> { "org_Fremen" },
                     Role = "Fedaykin",
                     NotableQuotes = new List<string>()
                 },
@@ -303,6 +337,8 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_PaulAtreides", "char_Chani", "char_GhanimaAtreides", "char_AliaAtreides", "char_MoneoAtreides", "char_SionaAtreides", "char_HwiNoree", "org_FishSpeakers" },
                     Affiliation = "House Atreides",
+                    // The Fish Speakers are his own corps, so he heads their roster.
+                    AffiliationIds = new List<string> { "house_Atreides", "org_FishSpeakers" },
                     Role = "God Emperor",
                     NotableQuotes = new List<string> { "I am a collection of obsolete memories." }
                 },
@@ -315,6 +351,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_LetoIIAtreides", "char_PaulAtreides", "char_Chani", "char_FaradnCorrino", "event_TigerAssassinationAttempt" },
                     Affiliation = "House Atreides",
+                    AffiliationIds = new List<string> { "house_Atreides" },
                     Role = "Princess",
                     NotableQuotes = new List<string>()
                 },
@@ -327,6 +364,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_ShaddamIV", "char_GhanimaAtreides", "char_LadyJessica", "char_LetoIIAtreides" },
                     Affiliation = "House Corrino",
+                    AffiliationIds = new List<string> { "house_Corrino" },
                     Role = "Prince",
                     NotableQuotes = new List<string>()
                 },
@@ -341,6 +379,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_PaulAtreides", "char_LetoIIAtreides", "char_GhanimaAtreides", "org_BeneTleilax" },
                     Affiliation = "Bene Tleilax",
+                    AffiliationIds = new List<string> { "org_BeneTleilax" },
                     Role = "Conditioned Ghola / Advisor",
                     NotableQuotes = new List<string> { "A little knowledge, properly injected, can be more paralyzing than a shock to the reflex ganglia." }
                 },
@@ -353,6 +392,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_ShaddamIV", "char_FaradnCorrino", "char_Tyekanik", "char_Javid", "bio_LazaTiger", "event_TigerAssassinationAttempt" },
                     Affiliation = "House Corrino",
+                    AffiliationIds = new List<string> { "house_Corrino" },
                     Role = "Princess / Conspirator",
                     NotableQuotes = new List<string>()
                 },
@@ -365,6 +405,8 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_WensiciaCorrino", "char_FaradnCorrino", "org_Sardaukar" },
                     Affiliation = "House Corrino",
+                    // A Sardaukar Bashar as much as a Corrino man.
+                    AffiliationIds = new List<string> { "house_Corrino", "org_Sardaukar" },
                     Role = "Bashar",
                     NotableQuotes = new List<string>()
                 },
@@ -377,6 +419,8 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_AliaAtreides", "char_WensiciaCorrino", "org_Fremen" },
                     Affiliation = "Fremen (secretly House Corrino)",
+                    // Both at once, which is the whole of what makes him dangerous.
+                    AffiliationIds = new List<string> { "org_Fremen", "house_Corrino" },
                     Role = "Naib / Conspirator",
                     NotableQuotes = new List<string>()
                 },
@@ -391,6 +435,8 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_LetoIIAtreides", "char_SionaAtreides", "org_FishSpeakers" },
                     Affiliation = "House Atreides",
+                    // Ran the Fish Speakers day to day as Leto II's majordomo.
+                    AffiliationIds = new List<string> { "house_Atreides", "org_FishSpeakers" },
                     Role = "Majordomo",
                     NotableQuotes = new List<string> { "The worm is God's mind, and it needs the freedom to wander in the wilderness." }
                 },
@@ -403,6 +449,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_MoneoAtreides", "char_LetoIIAtreides", "char_DuncanIdaho", "theo_GoldenPath" },
                     Affiliation = "House Atreides",
+                    AffiliationIds = new List<string> { "house_Atreides" },
                     Role = "Rebel Leader",
                     NotableQuotes = new List<string>()
                 },
@@ -415,6 +462,8 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_LetoIIAtreides", "house_Vernius", "event_DeathOfTheGodEmperor" },
                     Affiliation = "Ix",
+                    // Ix has no record of its own, and House Vernius is the Ixian one she already links to.
+                    AffiliationIds = new List<string> { "house_Vernius" },
                     Role = "Ambassador / Companion",
                     NotableQuotes = new List<string>()
                 },
@@ -429,6 +478,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_DarwiOdrade", "char_DuncanIdaho", "org_BeneGesserit", "org_HonoredMatres", "char_Schwangyu" },
                     Affiliation = "Bene Gesserit",
+                    AffiliationIds = new List<string> { "org_BeneGesserit" },
                     Role = "Bashar",
                     NotableQuotes = new List<string>()
                 },
@@ -441,6 +491,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_MilesTeg", "char_Taraza", "char_Murbella", "org_BeneGesserit", "org_HonoredMatres" },
                     Affiliation = "Bene Gesserit",
+                    AffiliationIds = new List<string> { "org_BeneGesserit" },
                     Role = "Mother Superior",
                     NotableQuotes = new List<string>()
                 },
@@ -453,6 +504,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "bio_ShaiHulud", "loc_Rakis", "theo_CultOfShaiHulud", "org_BeneGesserit" },
                     Affiliation = "Bene Gesserit",
+                    AffiliationIds = new List<string> { "org_BeneGesserit" },
                     Role = "Worm-Rider / Prophet",
                     NotableQuotes = new List<string>()
                 },
@@ -465,6 +517,8 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_DarwiOdrade", "char_DuncanIdaho", "org_HonoredMatres", "org_BeneGesserit", "disc_HonoredMatreImprinting" },
                     Affiliation = "Honored Matres (later Bene Gesserit)",
+                    // She ends up leading both orders, so both name her.
+                    AffiliationIds = new List<string> { "org_HonoredMatres", "org_BeneGesserit" },
                     Role = "Mother Superior",
                     NotableQuotes = new List<string>()
                 },
@@ -477,6 +531,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "org_BeneGesserit", "char_MilesTeg", "char_DarwiOdrade" },
                     Affiliation = "Bene Gesserit",
+                    AffiliationIds = new List<string> { "org_BeneGesserit" },
                     Role = "Mother Superior",
                     NotableQuotes = new List<string>()
                 },
@@ -489,6 +544,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "org_BeneTleilax", "theo_TleilaxuFaith", "char_MilesTeg" },
                     Affiliation = "Bene Tleilax",
+                    AffiliationIds = new List<string> { "org_BeneTleilax" },
                     Role = "Tleilaxu Master",
                     NotableQuotes = new List<string>()
                 },
@@ -503,6 +559,8 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_ShaddamIV", "char_MargotFenring", "char_PaulAtreides", "house_Fenring", "org_BeneGesserit" },
                     Affiliation = "House Corrino",
+                    // His own House first, then the Corrino throne he spent a lifetime serving.
+                    AffiliationIds = new List<string> { "house_Fenring", "house_Corrino" },
                     Role = "Count / Imperial Confidant",
                     NotableQuotes = new List<string> { "He is one of us, Mohiam." }
                 },
@@ -515,6 +573,8 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_HasimirFenring", "char_FeydRautha", "org_BeneGesserit", "house_Fenring" },
                     Affiliation = "Bene Gesserit",
+                    // A Reverend Mother in her own right and the Lady of House Fenring.
+                    AffiliationIds = new List<string> { "org_BeneGesserit", "house_Fenring" },
                     Role = "Reverend Mother",
                     NotableQuotes = new List<string>()
                 },
@@ -529,6 +589,8 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_AgamemnonTitan", "char_SerenaButler", "org_LeagueOfNobles", "house_Atreides" },
                     Affiliation = "League of Nobles",
+                    // The Atreides name starts with him, so the House roster starts there too.
+                    AffiliationIds = new List<string> { "org_LeagueOfNobles", "house_Atreides" },
                     Role = "Jihad Hero",
                     NotableQuotes = new List<string>()
                 },
@@ -541,6 +603,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_Erasmus", "char_Omnius", "char_VorianAtreides", "event_ButlerianJihad", "theo_ButlerianDoctrine" },
                     Affiliation = "League of Nobles",
+                    AffiliationIds = new List<string> { "org_LeagueOfNobles" },
                     Role = "Jihad Leader",
                     NotableQuotes = new List<string>()
                 },
@@ -553,6 +616,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "art_ShieldGenerator", "vehicle_Heighliner", "org_SpacingGuild", "org_BeneGesserit", "char_JosefVenport" },
                     Affiliation = "League of Nobles",
+                    AffiliationIds = new List<string> { "org_LeagueOfNobles" },
                     Role = "Inventor / Mystic",
                     NotableQuotes = new List<string>()
                 },
@@ -565,6 +629,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_Erasmus", "org_SynchronizedWorlds", "event_ButlerianJihad", "theo_ButlerianDoctrine" },
                     Affiliation = "Synchronized Worlds",
+                    AffiliationIds = new List<string> { "org_SynchronizedWorlds" },
                     Role = "Evermind",
                     NotableQuotes = new List<string>()
                 },
@@ -577,6 +642,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_Omnius", "char_SerenaButler", "org_SynchronizedWorlds", "event_ButlerianJihad" },
                     Affiliation = "Synchronized Worlds",
+                    AffiliationIds = new List<string> { "org_SynchronizedWorlds" },
                     Role = "Independent Robot",
                     NotableQuotes = new List<string>()
                 },
@@ -589,6 +655,8 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "house_Harkonnen", "org_LeagueOfNobles", "event_ButlerianJihad" },
                     Affiliation = "League of Nobles",
+                    // The Harkonnen line runs back to him, whatever his rivals later did to the name.
+                    AffiliationIds = new List<string> { "org_LeagueOfNobles", "house_Harkonnen" },
                     Role = "General",
                     NotableQuotes = new List<string>()
                 },
@@ -601,6 +669,8 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_VorianAtreides", "char_Omnius", "vehicle_CymekWalker", "event_ButlerianJihad" },
                     Affiliation = "Titans",
+                    // The Titans have no record of their own, and Omnius had him under his thumb by the end.
+                    AffiliationIds = new List<string> { "org_SynchronizedWorlds" },
                     Role = "Cymek Lord",
                     NotableQuotes = new List<string>()
                 },
@@ -615,7 +685,25 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_DukeLetoAtreides", "house_Atreides", "house_Harkonnen", "event_DeathOfDukePaulus" },
                     Affiliation = "House Atreides",
+                    AffiliationIds = new List<string> { "house_Atreides" },
                     Role = "Duke",
+                    NotableQuotes = new List<string>()
+                },
+                new Persona
+                {
+                    Id = "char_HelenaAtreides",
+                    Name = "Lady Helena Atreides",
+                    // Filed under the name she carried as Duchess, findable under the one she was born with.
+                    Aliases = new List<string> { "Helena Richese" },
+                    ShortDescription = "Wife to Duke Paulus and mother to Leto, exiled for her part in her husband's death.",
+                    DetailedHistory = "Helena married Duke Paulus Atreides to shore up what was left of her father's standing. Whatever the match secured on paper, it made a cold household. She was devout and rigid, contemptuous of how Paulus ruled Caladan and how he lived. He returned the feeling. Their son Leto grew up in the space between them. Paulus died in the bullring on a drugged Salusan bull, a killing Harkonnen agents arranged, and Helena had known it was coming and said nothing. Leto uncovered her part in it later and chose exile over execution, sending her to a religious retreat in Caladan's eastern reaches. The lesson stayed with him. Betrayal came from inside his own walls, from someone who owed him everything, and the Duke who later trusted Wellington Yueh had learned that at home first.",
+                    ImagePath = "",
+                    RelatedEntityIds = new List<string> { "char_DukePaulusAtreides", "char_DukeLetoAtreides", "house_Richese", "house_Atreides", "event_DeathOfDukePaulus", "loc_Caladan" },
+                    Affiliation = "House Richese (married into House Atreides, later exiled)",
+                    // Richese by blood, and Richese is the House that still claims her. Leto cast her
+                    // out over his father's death, so the Atreides roster is not hers to stand on.
+                    AffiliationIds = new List<string> { "house_Richese" },
+                    Role = "Duchess (exiled)",
                     NotableQuotes = new List<string>()
                 },
                 new Persona
@@ -627,6 +715,8 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_LietKynes", "loc_Arrakis", "org_Fremen" },
                     Affiliation = "Imperial Court / Fremen",
+                    // Same as his son: the Imperial Court half has no record here to point at.
+                    AffiliationIds = new List<string> { "org_Fremen" },
                     Role = "Planetologist",
                     NotableQuotes = new List<string>()
                 },
@@ -639,6 +729,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "house_Vernius", "loc_Ix", "char_RhomburVernius", "event_IxianCoup" },
                     Affiliation = "House Vernius",
+                    AffiliationIds = new List<string> { "house_Vernius" },
                     Role = "Earl (exiled)",
                     NotableQuotes = new List<string>()
                 },
@@ -651,6 +742,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_DominicVernius", "char_DukeLetoAtreides", "house_Vernius", "event_IxianCoup" },
                     Affiliation = "House Vernius / House Atreides",
+                    AffiliationIds = new List<string> { "house_Vernius", "house_Atreides" },
                     Role = "Prince (exiled)",
                     NotableQuotes = new List<string>()
                 },
@@ -663,6 +755,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_ShaddamIV", "char_HasimirFenring", "house_Corrino" },
                     Affiliation = "House Corrino",
+                    AffiliationIds = new List<string> { "house_Corrino" },
                     Role = "Padishah Emperor",
                     NotableQuotes = new List<string>()
                 },
@@ -675,6 +768,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_BaronHarkonnen", "house_Harkonnen", "loc_Lankiveil" },
                     Affiliation = "House Harkonnen",
+                    AffiliationIds = new List<string> { "house_Harkonnen" },
                     Role = "Exiled Patriarch",
                     NotableQuotes = new List<string>()
                 },
@@ -689,6 +783,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "org_BeneGesserit", "art_WaterOfLife", "event_ReverendMotherBreakthrough", "disc_BeneGesseritTraining" },
                     Affiliation = "Bene Gesserit",
+                    AffiliationIds = new List<string> { "org_BeneGesserit" },
                     Role = "Mother Superior (Founding)",
                     NotableQuotes = new List<string>()
                 },
@@ -701,6 +796,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "org_MentatSchool", "disc_Mentat", "char_Erasmus", "event_ButlerianJihad" },
                     Affiliation = "Mentat School",
+                    AffiliationIds = new List<string> { "org_MentatSchool" },
                     Role = "Founder / Headmaster",
                     NotableQuotes = new List<string>()
                 },
@@ -713,6 +809,8 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_NormaCenva", "org_SpacingGuild", "org_CHOAM", "bio_Melange" },
                     Affiliation = "Venport Holdings",
+                    // Venport Holdings has no record of its own, and the Guild is what it grew into.
+                    AffiliationIds = new List<string> { "org_SpacingGuild" },
                     Role = "Director",
                     NotableQuotes = new List<string>()
                 },
@@ -727,6 +825,7 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_MilesTeg", "char_DuncanIdaho", "org_BeneGesserit" },
                     Affiliation = "Bene Gesserit",
+                    AffiliationIds = new List<string> { "org_BeneGesserit" },
                     Role = "Proctor",
                     NotableQuotes = new List<string>()
                 },
@@ -739,7 +838,37 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_PaulAtreides", "char_PrincessIrulan", "theo_ChurchOfMuadDib", "org_Qizarate" },
                     Affiliation = "Ix",
+                    // Rhombur Vernius's son, so the Vernius roster is where he belongs.
+                    AffiliationIds = new List<string> { "house_Vernius" },
                     Role = "Dissident Historian",
+                    NotableQuotes = new List<string>()
+                },
+
+                // ---- The Arrakis smugglers (Dune) ----
+                new Persona
+                {
+                    Id = "char_StabanTuek",
+                    Name = "Staban Tuek",
+                    ShortDescription = "The smuggler chief who took Gurney Halleck in after House Atreides fell.",
+                    DetailedHistory = "Esmar Tuek built the operation. Staban inherited it, along with the hidden bases scattered through the deep desert and the bribes that kept Guild satellites pointed somewhere else. The trade ran on illicitly harvested spice, lifted off Arrakis without the Emperor's cut or CHOAM's. Every power on the planet knew it went on. Most took a share and said nothing. Gurney Halleck reached one of Staban's camps with a handful of surviving men after Arrakeen fell, and asked for work. Staban gave it to him. For roughly two years Gurney raided Harkonnen spice operations out of Tuek shelters, waging a private war against the House that had destroyed the one he served. The arrangement suited them both. Staban got a raider who understood Harkonnen methods from the inside. Gurney got a base, a crew, and a reason to keep going. It ended when Fremen fighters ambushed the band far out in the sand. Their commander turned out to be Paul Atreides, and Gurney found the boy he had trained grown, alive, and leading an army.",
+                    ImagePath = "",
+                    RelatedEntityIds = new List<string> { "char_EsmarTuek", "char_GurneyHalleck", "char_PaulAtreides", "house_Tuek", "loc_Arrakis", "bio_Melange" },
+                    Affiliation = "House Tuek",
+                    AffiliationIds = new List<string> { "house_Tuek" },
+                    Role = "Smuggler Chief",
+                    NotableQuotes = new List<string>()
+                },
+                new Persona
+                {
+                    Id = "char_EsmarTuek",
+                    Name = "Esmar Tuek",
+                    ShortDescription = "The smuggler who built the Tuek trade on Arrakis and passed it to his son.",
+                    DetailedHistory = "Esmar Tuek spent decades lifting spice off Arrakis without paying the Emperor or CHOAM a solari for the privilege. He grew the family trade from nothing into a network of shelters buried in the deep desert, far past the reach of Imperial inspectors and Harkonnen patrols. The work asked for more than nerve. It took bribes paid to the right Guild officials, enough that their satellites found nothing worth reporting. It took a reading of the sand sharp enough to keep a crew alive out where the worms ran. The Landsraad never recognized House Tuek as a House at all. Esmar appeared content with that. Recognition brought obligations, taxes, and scrutiny, none of it much use to a man in his line of work. He passed the operation to his son Staban, along with the contacts and the hiding places that would later shelter Gurney Halleck through two years of raiding. Nothing the Tueks built ever reached an official record. It shaped the balance of power on Arrakis all the same.",
+                    ImagePath = "",
+                    RelatedEntityIds = new List<string> { "char_StabanTuek", "house_Tuek", "loc_Arrakis", "bio_Melange" },
+                    Affiliation = "House Tuek",
+                    AffiliationIds = new List<string> { "house_Tuek" },
+                    Role = "Smuggler Chief",
                     NotableQuotes = new List<string>()
                 }
             };
