@@ -17,5 +17,6 @@ builder.Services.AddSingleton<UniverseLayoutCache>();
 builder.Services.AddSingleton<PathFinderService>();
 builder.Services.AddSingleton<MentatTrialService>();
 builder.Services.AddScoped<SpoilerSettings>();
+builder.Services.AddScoped<UnsealedRecords>();
 
 await builder.Build().RunAsync();

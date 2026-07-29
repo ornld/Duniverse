@@ -652,6 +652,79 @@ html {
         border-bottom-color: var(--dune-accent);
     }
 
+/* ---- Unsealing the Record ----
+   The one moment on this site that earns a motion. A passage the reader just unlocked opens
+   under a gold seal that parts from the middle, then settles in beneath it. Plays once ever,
+   per record, per layer: the ledger in UnsealedRecords is what keeps it from repeating, and
+   what keeps it off a first visit, where nothing has been unlocked at all.
+
+   The seal is two halves, each retreating toward its own outer edge, so the gap opens at the
+   centre and widens. One pseudo-element could only wipe in one direction, which reads as a
+   line being drawn rather than a seal being broken. */
+
+.layer-unsealing {
+    position: relative;
+    animation: layer-settle 0.72s ease-out 0.42s backwards;
+}
+
+    .layer-unsealing::before,
+    .layer-unsealing::after {
+        content: "";
+        position: absolute;
+        top: -0.85rem;
+        width: 50%;
+        height: 1px;
+        background: var(--dune-accent-bright);
+        animation: seal-part 0.85s ease-in-out forwards;
+    }
+
+    /* Origins sit at the OUTER ends so each half shrinks away from the middle. Put them at the
+       inner ends and the seal closes instead of opening. */
+    .layer-unsealing::before {
+        left: 0;
+        transform-origin: left center;
+    }
+
+    .layer-unsealing::after {
+        right: 0;
+        transform-origin: right center;
+    }
+
+@keyframes seal-part {
+    0% {
+        transform: scaleX(1);
+        opacity: 0.85;
+    }
+    100% {
+        transform: scaleX(0);
+        opacity: 0;
+    }
+}
+
+@keyframes layer-settle {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .layer-unsealing {
+        animation: none;
+    }
+
+        /* Removed rather than stilled. With the animation off, a seal left in place would sit
+           across the paragraph forever instead of opening once. */
+        .layer-unsealing::before,
+        .layer-unsealing::after {
+            display: none;
+        }
+}
+
 .edition-mark {
     margin: 1.15rem 0 -0.5rem;
     font-size: 0.72rem;

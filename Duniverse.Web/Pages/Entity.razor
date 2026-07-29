@@ -2,6 +2,7 @@
 @inject EntityRegistry Registry
 @inject NavigationManager Nav
 @inject SpoilerSettings Spoiler
+@inject UnsealedRecords Unsealed
 
 <PageTitle>@((entity is not null && isGated && !revealed) ? "Spoiler-protected entry" : (entity?.Name ?? "Not Found")) - Duniverse</PageTitle>
 
@@ -99,7 +100,7 @@ else if (entity is not null)
             {
                 <p class="edition-mark">@BookName(layer.Tier)</p>
             }
-            <p class="detailed-history">@layer.Text</p>
+            <p class="detailed-history @(newlyOpened.Contains(layer.Tier) ? "layer-unsealing" : "")">@layer.Text</p>
         }
 
         @if (entity is Persona quotedPersona && quotedPersona.NotableQuotes.Count > 0)
@@ -206,6 +207,12 @@ else
     private bool editionMarks;
 
     /// <summary>
+    /// The layers that opened since this reader last looked at this record, marked once and
+    /// then written down. Empty on a first visit: arriving somewhere is not unlocking it.
+    /// </summary>
+    private IReadOnlyList<SpoilerTier> newlyOpened = Array.Empty<SpoilerTier>();
+
+    /// <summary>
     /// Whether the archive offers to name the book behind each passage.
     ///
     /// This turns on the READER, never on the record, and that distinction is the whole point.
@@ -277,12 +284,41 @@ else
         ("Flora & Fauna", e => e is FloraFauna),
     };
 
+    /// <summary>
+    /// Works out what opened since the reader last looked at this record, then writes down
+    /// everything it is showing them now.
+    ///
+    /// Runs after OnParametersSet, which is what makes the order work: that method has already
+    /// resolved the record, so the visible layers are settled before they are compared against
+    /// the ledger. A gated record witnesses an empty set, which still seeds the entry, so the
+    /// day its tier finally opens the layers arrive marked rather than silently.
+    /// </summary>
+    protected override async Task OnParametersSetAsync()
+    {
+        if (entity is null)
+        {
+            return;
+        }
+
+        await Unsealed.LoadAsync();
+
+        var visible = EntityRegistry.VisibleLayers(entity, Spoiler.IsVisible)
+            .Select(layer => layer.Tier)
+            .ToList();
+
+        // Read before writing. Reversing these two lines would mark every layer as witnessed a
+        // moment before asking which of them were new, and nothing would ever be announced.
+        newlyOpened = Unsealed.NewlyOpened(entity.Id, visible);
+        await Unsealed.WitnessAsync(entity.Id, visible);
+    }
+
     protected override void OnParametersSet()
     {
         // A fresh entity address means the reveal choice starts over, and the edition marks
         // close with it: they are a study aid for one record, not a mode the site stays in.
         revealed = false;
         editionMarks = false;
+        newlyOpened = Array.Empty<SpoilerTier>();
 
         var result = Registry.Resolve(Id);
         entity = result.Entity;
