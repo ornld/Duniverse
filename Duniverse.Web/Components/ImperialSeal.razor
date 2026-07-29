@@ -1,0 +1,68 @@
+@inject SpoilerSettings Spoiler
+
+@*
+    How much archive is still shut, said out loud.
+
+    Spoiler protection has always worked as pure absence: records the reader has not reached
+    simply are not there, and nothing tells them the shelf is short. This gives the absence a
+    number, the way an Imperial archive would admit that a drawer holds sealed records without
+    admitting what is in them.
+
+    It never names anything. Only a count, and the next book that opens some of it, which is
+    the one piece of information that turns a locked drawer into a reason to keep reading.
+
+    Deliberately kept to whole categories and to the archive as a whole. The same line under a
+    small roster would be an invitation to guess: "one member of this House remains sealed"
+    narrows to a handful of people and hands over the fact that one of them matters later.
+*@
+
+@if (sealed_ > 0)
+{
+    <p class="imperial-seal">
+        @sealed_ @(sealed_ == 1 ? "record" : "records") @Scope remain under seal.
+        @if (nextBook is not null)
+        {
+            <span>The next opens with @nextBook.</span>
+        }
+    </p>
+}
+
+@code {
+    /// <summary>Every record this scope covers, before any spoiler filtering.</summary>
+    [Parameter]
+    public IEnumerable<DuneEntity> All { get; set; } = Array.Empty<DuneEntity>();
+
+    /// <summary>Reads into the sentence after the count, e.g. "in this drawer".</summary>
+    [Parameter]
+    public string Scope { get; set; } = "in the archive";
+
+    private int sealed_;
+    private string? nextBook;
+
+    protected override void OnParametersSet()
+    {
+        var hidden = All.Where(e => !Spoiler.IsVisible(e)).ToList();
+        sealed_ = hidden.Count;
+
+        // The nearest novel that would open something. Expanded Universe records are counted in
+        // the total but never named here: they are not further along the spine, they are a
+        // separate choice, and pointing a reader at the next book when the seal is really a
+        // toggle would just be wrong.
+        nextBook = hidden
+            .Select(e => e.SpoilerTier)
+            .Where(t => t != SpoilerTier.ExpandedUniverse)
+            .OrderBy(t => t)
+            .Select(BookName)
+            .FirstOrDefault();
+    }
+
+    private static string BookName(SpoilerTier tier) => tier switch
+    {
+        SpoilerTier.DuneMessiah => "Dune Messiah",
+        SpoilerTier.ChildrenOfDune => "Children of Dune",
+        SpoilerTier.GodEmperorOfDune => "God Emperor of Dune",
+        SpoilerTier.HereticsOfDune => "Heretics of Dune",
+        SpoilerTier.Chapterhouse => "Chapterhouse: Dune",
+        _ => "Dune",
+    };
+}

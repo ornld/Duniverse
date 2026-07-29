@@ -73,12 +73,17 @@
         <button class="surprise-btn" @onclick="RandomJump">Surprise me</button>
     </p>
 
-    <SpoilerControl OnChanged="RefilterCandidates" />
+    @* Keyed to the epoch so changing reading progress recounts the seals straight away, rather
+       than leaving a stale number sitting under the control that just changed it. *@
+    <SpoilerControl OnChanged="OnProgressChanged" />
+    <ImperialSeal All="everyRecord" Scope="in the archive" @key="sealEpoch" />
 </div>
 
 @code {
     private string query = "";
     private string lastQuery = "";
+    private List<DuneEntity> everyRecord = new();
+    private int sealEpoch;
     private bool notFound;
     private List<DuneEntity> rawCandidates = new();
     private List<DuneEntity> candidates = new();
@@ -101,6 +106,13 @@
         ("Shai-Hulud", "bio_ShaiHulud"),
         ("The Butlerian Jihad", "event_ButlerianJihad"),
     };
+
+    protected override void OnInitialized()
+    {
+        // The whole archive, unfiltered, so the seal line can say how much of it is still shut.
+        // Read once: the seed data never changes, only the reader's progress does.
+        everyRecord = Registry.GetAllEntities<DuneEntity>().ToList();
+    }
 
     private void HandleKeyUp(KeyboardEventArgs e)
     {
@@ -166,6 +178,15 @@
             .ToList();
 
         ApplySpoilerFilter();
+    }
+
+    // Changing reading progress moves two things at once: which results survive, and how much
+    // of the archive is still sealed. The epoch bump rebuilds the seal line so its number can
+    // never lag behind the control the reader just moved.
+    private void OnProgressChanged()
+    {
+        sealEpoch++;
+        RefilterCandidates();
     }
 
     // Re-apply the spoiler filter to the current results when the reader changes

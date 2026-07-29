@@ -602,6 +602,71 @@ html {
     border-left: 4px solid var(--dune-accent-bright);
 }
 
+/* ---- Under Imperial Seal ----
+   How much of a drawer is still shut. Reads as a footnote the archive is admitting rather
+   than a feature announcing itself, so it sits quiet: small, muted, one hairline above it. */
+
+.imperial-seal {
+    margin: 1.5rem 0 0;
+    padding-top: 0.85rem;
+    border-top: 1px solid var(--dune-border);
+    font-size: 0.82rem;
+    color: var(--dune-muted);
+    letter-spacing: 0.01em;
+}
+
+    .imperial-seal span {
+        /* The nudge toward the next book earns a little more light than the count itself. */
+        color: var(--dune-text);
+        opacity: 0.75;
+    }
+
+/* ---- The Unexpurgated View ----
+   Naming the book behind each passage. The mark is set as a caption above its paragraph in
+   letterspaced caps, the same register the site already uses for epigraph attributions, so a
+   record reading with marks on still reads as a record and not as a debug view. */
+
+.edition-note {
+    /* Wants real air above it. Sitting tight under the meta rows, in the same letterspaced
+       caps those labels use, it reads as another ROLE or AFFILIATION line rather than as
+       something you can press. */
+    margin: 1.5rem 0 0.4rem;
+}
+
+.edition-toggle {
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    font-size: 0.78rem;
+    color: var(--dune-muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-bottom: 1px dotted var(--dune-border);
+    transition: color 0.18s ease, border-color 0.18s ease;
+}
+
+    .edition-toggle:hover {
+        color: var(--dune-accent);
+        border-bottom-color: var(--dune-accent);
+    }
+
+.edition-mark {
+    margin: 1.15rem 0 -0.5rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--dune-accent);
+    opacity: 0.72;
+}
+
+    /* The first mark opens the history, so it does not need the gap the later ones use to
+       separate one passage from the one above it. */
+    .edition-mark:first-of-type {
+        margin-top: 0.25rem;
+    }
+
 /* ---- Terminology of the Imperium ---- */
 
 .letter-chips {

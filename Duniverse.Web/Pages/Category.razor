@@ -21,6 +21,8 @@
                 </a>
             }
         </div>
+
+        <ImperialSeal All="allInCategory" Scope="in this drawer" />
     </div>
 }
 else
@@ -36,6 +38,7 @@ else
     private string categoryTitle = "";
     private string heroStyle = "";
     private List<DuneEntity> items = new();
+    private List<DuneEntity> allInCategory = new();
 
     private static readonly Dictionary<string, string> CategoryBackgrounds = new()
     {
@@ -70,7 +73,10 @@ else
             _ => ("", Enumerable.Empty<DuneEntity>())
         };
 
-        items = found.Where(Spoiler.IsVisible).OrderBy(item => item.Name).ToList();
+        // Kept unfiltered as well as filtered: the seal line needs to know how many records the
+        // drawer actually holds, which is the one thing the filtered list can no longer say.
+        allInCategory = found.ToList();
+        items = allInCategory.Where(Spoiler.IsVisible).OrderBy(item => item.Name).ToList();
 
         heroStyle = CategoryBackgrounds.TryGetValue(slug, out var file)
             ? $"background-image: linear-gradient(rgba(23, 19, 16, 0.82), rgba(23, 19, 16, 0.88)), url('/images/categories/{file}');"

@@ -63,8 +63,26 @@ else if (entity is not null)
             </dl>
         }
 
+        @* Irulan wrote the official history and the correctives came later, which is the shape
+           of every record here: an opening that is safe the moment you can see the record at
+           all, and passages that only a further book earns. The mark names which book earned
+           each one. It shows only to a reader who has already earned every passage on this
+           record, so a label can never describe a paragraph they have not been given. *@
+        @if (ShowEditionMarks)
+        {
+            <p class="edition-note">
+                <button type="button" class="edition-toggle" @onclick="() => editionMarks = !editionMarks">
+                    @(editionMarks ? "Hide the editions" : "Show which book opens each part")
+                </button>
+            </p>
+        }
+
         @if (!string.IsNullOrEmpty(entity.DetailedHistory))
         {
+            @if (ShowEditionMarks && editionMarks)
+            {
+                <p class="edition-mark">@BookName(entity.SpoilerTier)</p>
+            }
             <p class="detailed-history">@entity.DetailedHistory</p>
         }
 
@@ -72,6 +90,10 @@ else if (entity is not null)
            outlives its first book has no layers at all and this adds nothing. *@
         @foreach (var layer in EntityRegistry.VisibleLayers(entity, Spoiler.IsVisible))
         {
+            @if (ShowEditionMarks && editionMarks)
+            {
+                <p class="edition-mark">@BookName(layer.Tier)</p>
+            }
             <p class="detailed-history">@layer.Text</p>
         }
 
@@ -176,6 +198,19 @@ else
     private DuneEntity? entity;
     private bool isGated;
     private bool revealed;
+    private bool editionMarks;
+
+    /// <summary>
+    /// Whether this record can offer to name the book behind each passage. Two conditions, and
+    /// the second is the one that matters: the record has to actually have later passages, and
+    /// the reader has to have earned every one of them. A reader who is missing a layer must
+    /// never be shown a label for it, since naming the book a withheld passage comes from is
+    /// its own small spoiler.
+    /// </summary>
+    private bool ShowEditionMarks =>
+        entity is not null
+        && entity.HistoryLayers.Count > 0
+        && entity.HistoryLayers.All(layer => Spoiler.IsVisible(layer.Tier));
 
     // A resolved record sends "back" to its own category page, so going Index ->
     // category -> record returns you where you started. Unresolved states (a typo
@@ -222,8 +257,10 @@ else
 
     protected override void OnParametersSet()
     {
-        // A fresh entity address means the reveal choice starts over.
+        // A fresh entity address means the reveal choice starts over, and the edition marks
+        // close with it: they are a study aid for one record, not a mode the site stays in.
         revealed = false;
+        editionMarks = false;
 
         var result = Registry.Resolve(Id);
         entity = result.Entity;
