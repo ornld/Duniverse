@@ -125,8 +125,12 @@ namespace Duniverse.Data.Seeders
                 {
                     Id = "loc_Ecaz",
                     Name = "Ecaz",
-                    ShortDescription = "A forested world famed for its woodcarvers and its long blood feud with House Moritani.",
-                    DetailedHistory = "Ecaz's master woodcarvers are famous across the Imperium. Their finished work fetches prices among the highest of any luxury good the Landsraad trades in. The planet's dense forests supply hardwoods rare enough to exist nowhere else in known space. That cultured, peaceable reputation sits right beside a much bloodier one. House Ecaz carried a generations-old feud with House Moritani of Grumman, a conflict worked out through formal duels of honor about as often as through open warfare. The feud eventually reached into House Atreides affairs during the years of Paul's children, pulling Ecaz's fortunes into currents far beyond its own borders. Grumman's threat never really went away. Ecaz endured regardless, one of the Landsraad's more diplomatically respected worlds. Its artistry stayed a genuine point of pride under constant danger.",
+                    ShortDescription = "A forested world famed across the Imperium for its woodcarvers and its rare hardwoods.",
+                    DetailedHistory = "Ecaz's master woodcarvers are famous across the Imperium, and their finished work fetches prices among the highest of any luxury good the Landsraad trades in. The planet's dense forests supply hardwoods rare enough to exist nowhere else in known space, elacca among them, which reaches far more courts than anything else the world sends out. A planet whose whole worth grows slowly and cannot be moved is a particular kind of prize, and Ecaz has spent its history being wanted by people it would rather not have interested in it. Its artistry stayed a genuine point of pride throughout, which is the sort of thing that reads as charming from a distance and as stubbornness up close.",
+                    HistoryLayers = new List<HistorySegment>
+                    {
+                        new(SpoilerTier.ExpandedUniverse, "The prequel chronicles set the world against a neighbour. In those accounts the ruling House carried a generations-old feud with House Moritani of Grumman, worked out through formal duels of honour about as often as through open warfare, and it eventually pulled Ecaz's fortunes into currents far beyond its own borders. Grumman's threat never really went away. A world that cannot be picked up and carried has to outlast the people who want it, and Ecaz did."),
+                    },
                     ImagePath = "images/worlds/ecaz.jpg",
                     RelatedEntityIds = new List<string> { "house_Ecaz", "house_Moritani", "bio_ElaccaWood" },
                     EnvironmentalData = "Dense forests providing rare hardwoods prized throughout the Landsraad.",

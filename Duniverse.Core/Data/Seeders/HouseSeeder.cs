@@ -55,8 +55,12 @@ namespace Duniverse.Data.Seeders
                 {
                     Id = "house_Ecaz",
                     Name = "House Ecaz",
-                    ShortDescription = "A Great House celebrated for its master woodcarvers. A long, bitter feud with House Moritani slowly wore it down.",
-                    DetailedHistory = "House Ecaz earned its name throughout the Imperium through artistry, not arms. Its master woodcarvers produced work prized across the Landsraad as the mark of refined taste. That peaceful reputation sat oddly alongside the House's generations-long feud with House Moritani of Grumman. The blood rivalry grew from old slights neither side could let go, and it turned brutally violent more than once. Matters grew far more dangerous during the reign of Paul Atreides' children. The conflict escalated and drew the Atreides themselves into Ecaz's affairs. Marriage alliances were brokered in hopes of finally securing peace. Grumman's threat never really let up, yet House Ecaz endured. It remained one of the Imperium's more cultured and diplomatically respected Great Houses.",
+                    ShortDescription = "A Great House that earned its standing through artistry rather than arms.",
+                    DetailedHistory = "House Ecaz earned its name throughout the Imperium through artistry, not arms. Its master woodcarvers produced work prized across the Landsraad as the mark of refined taste, and the elacca wood its forests grow reaches courts that would trade for nothing else the House offers. That bought Ecaz a standing among the Great Houses its own strength could never have won, which is a rarer position than it sounds and a more precarious one. A House respected for what it makes rather than feared for what it can do keeps its seat only so long as the Landsraad's appetite for beauty holds, and only so long as nobody with more soldiers decides the forests are worth the trouble of taking. Ecaz held that seat for generations regardless, and stayed one of the more cultured and diplomatically respected names in the Imperium.",
+                    HistoryLayers = new List<HistorySegment>
+                    {
+                        new(SpoilerTier.ExpandedUniverse, "The prequel chronicles give the House its enemy. In those accounts Ecaz spent generations locked against House Moritani of Grumman in a feud grown out of slights neither side would put down, settled by formal duels of honour about as often as by open war. It reached into Atreides affairs more than once, and the marriage alliances brokered to end it mostly did not. Grumman's threat never really let up, which is the sort of thing a House built on woodcarving learns to live beside rather than answer."),
+                    },
                     ImagePath = "images/houses/ecaz.jpg",
                     RelatedEntityIds = new List<string> { "loc_Ecaz", "house_Moritani" },
                     Sigil = "A carved wooden emblem",
