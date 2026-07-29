@@ -71,8 +71,13 @@ else if (entity is not null)
         @if (ShowEditionMarks)
         {
             <p class="edition-note">
-                <button type="button" class="edition-toggle" @onclick="() => editionMarks = !editionMarks">
-                    @(editionMarks ? "Hide the editions" : "Show which book opens each part")
+                @* aria-pressed spelled out as a string for the same reason the Index trigger
+                   does it: handed a bool, Blazor drops the attribute when false and writes it
+                   empty when true, so the state never reaches a screen reader at all. *@
+                <button type="button" class="edition-toggle"
+                        aria-pressed="@(editionMarks ? "true" : "false")"
+                        @onclick="() => editionMarks = !editionMarks">
+                    @(editionMarks ? "Hide which book opens each part" : "Show which book opens each part")
                 </button>
             </p>
         }
@@ -201,16 +206,33 @@ else
     private bool editionMarks;
 
     /// <summary>
-    /// Whether this record can offer to name the book behind each passage. Two conditions, and
-    /// the second is the one that matters: the record has to actually have later passages, and
-    /// the reader has to have earned every one of them. A reader who is missing a layer must
-    /// never be shown a label for it, since naming the book a withheld passage comes from is
-    /// its own small spoiler.
+    /// Whether the archive offers to name the book behind each passage.
+    ///
+    /// This turns on the READER, never on the record, and that distinction is the whole point.
+    /// An earlier version asked whether this particular record's layers had all been earned,
+    /// which quietly made the button itself a spoiler: with the base and the layers rendered in
+    /// identical markup, a reader could count paragraphs, and a record showing two of them with
+    /// no button could only mean it held more in a book they had not reached. The button
+    /// appearing was worse still, since it confirmed a record was closed for the rest of the
+    /// saga. Chani with a button meant Chani never comes up again.
+    ///
+    /// Keyed to progress instead, it is present on every record or on none, so it says nothing
+    /// about any of them. A reader who has finished everything cannot be spoiled by a label
+    /// either, which is what makes the marks safe to print at all.
     /// </summary>
     private bool ShowEditionMarks =>
         entity is not null
-        && entity.HistoryLayers.Count > 0
-        && entity.HistoryLayers.All(layer => Spoiler.IsVisible(layer.Tier));
+        && !string.IsNullOrEmpty(entity.DetailedHistory)
+        && AtFullProgress;
+
+    /// <summary>
+    /// True once nothing in the archive is being held back from this reader, either because
+    /// they turned protection off or because they have read to the end of the spine and opted
+    /// into the Expanded Universe.
+    /// </summary>
+    private bool AtFullProgress =>
+        !Spoiler.Enabled
+        || (Spoiler.NovelProgress >= SpoilerTier.Chapterhouse && Spoiler.IncludeExpandedUniverse);
 
     // A resolved record sends "back" to its own category page, so going Index ->
     // category -> record returns you where you started. Unresolved states (a typo

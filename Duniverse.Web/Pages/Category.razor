@@ -6,7 +6,11 @@
 
 <a class="back-link" href="/">&larr; Home</a>
 
-@if (items.Count > 0)
+@* Branches on the unfiltered list on purpose. Asking whether any VISIBLE record survives
+   conflates two different answers: a slug that names nothing, and a real category the reader
+   has not read far enough to open. The second used to render "Unknown category", telling a
+   first-time reader that a whole shelf of the archive did not exist. *@
+@if (allInCategory.Count > 0)
 {
     <div class="hero category-hero category-@Slug.ToLowerInvariant()" style="@heroStyle">
         <h1>@categoryTitle</h1>
@@ -22,7 +26,7 @@
             }
         </div>
 
-        <ImperialSeal All="allInCategory" Scope="in this drawer" />
+        <ImperialSeal All="allInCategory" Scope="in this category" />
     </div>
 }
 else

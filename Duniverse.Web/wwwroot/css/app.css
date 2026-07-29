@@ -661,11 +661,13 @@ html {
     opacity: 0.72;
 }
 
-    /* The first mark opens the history, so it does not need the gap the later ones use to
-       separate one passage from the one above it. */
-    .edition-mark:first-of-type {
-        margin-top: 0.25rem;
-    }
+/* The first mark opens the history, so it does not need the gap the later ones use to
+   separate one passage from the one above it. Matched on adjacency rather than :first-of-type,
+   which could never fire: the toggle above it is a <p> too, so a mark is never the first <p>
+   among its siblings. */
+.edition-note + .edition-mark {
+    margin-top: 0.25rem;
+}
 
 /* ---- Terminology of the Imperium ---- */
 

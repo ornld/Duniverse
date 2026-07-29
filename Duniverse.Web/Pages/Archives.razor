@@ -197,6 +197,21 @@
     {
         if (!string.IsNullOrWhiteSpace(lastQuery))
         {
+            // The name resolve runs again too, not just the text search. A query that named a
+            // sealed record came back empty and said "no matching records found", and without
+            // this it kept saying it after the reader unlocked the very record they had asked
+            // for: the candidate list it re-filters is only ever built by HandleSearch, so it
+            // stayed empty forever. Resolved here rather than navigated, since a chip click
+            // should change what the page says, not throw the reader onto another one.
+            var resolved = Registry.Resolve(lastQuery);
+            rawCandidates = resolved.Entity is not null
+                ? new List<DuneEntity> { resolved.Entity }
+                : resolved.Candidates
+                    .OrderByDescending(entity => ExactlyNamed(entity, lastQuery))
+                    .ThenBy(entity => entity.Name.Length)
+                    .ThenBy(entity => entity.Name)
+                    .ToList();
+
             var alreadyNamed = new HashSet<string>(rawCandidates.Select(c => c.Id), StringComparer.OrdinalIgnoreCase);
             rawContentMatches = Registry.SearchByContent(lastQuery, Spoiler.IsVisible)
                 .Where(entity => !alreadyNamed.Contains(entity.Id))

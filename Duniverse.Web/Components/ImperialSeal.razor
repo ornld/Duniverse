@@ -8,21 +8,31 @@
     number, the way an Imperial archive would admit that a drawer holds sealed records without
     admitting what is in them.
 
-    It never names anything. Only a count, and the next book that opens some of it, which is
-    the one piece of information that turns a locked drawer into a reason to keep reading.
+    It never names anything. Only a count, the next book that opens some of it, and, when it
+    applies, how much sits outside the six novels entirely.
 
     Deliberately kept to whole categories and to the archive as a whole. The same line under a
     small roster would be an invitation to guess: "one member of this House remains sealed"
     narrows to a handful of people and hands over the fact that one of them matters later.
 *@
 
-@if (sealed_ > 0)
+@if (sealedCount > 0)
 {
-    <p class="imperial-seal">
-        @sealed_ @(sealed_ == 1 ? "record" : "records") @Scope remain under seal.
+    @* A status region so the count reaches a screen reader when the reader moves their
+       progress and the number changes under them. *@
+    @* The spaces before each clause are written out. Razor eats the whitespace sitting between
+       a closing brace and the next block, so without them the sentences run together. *@
+    <p class="imperial-seal" role="status" aria-live="polite">
+        @sealedCount @(sealedCount == 1 ? "record" : "records") @Scope
+        @(sealedCount == 1 ? "remains" : "remain") under seal.
         @if (nextBook is not null)
         {
-            <span>The next opens with @nextBook.</span>
+            @(" ")<span>@nextBook opens the next.</span>
+        }
+        @if (expandedOnly > 0)
+        {
+            @(" ")<span>@expandedOnly of @(sealedCount == expandedOnly ? "those" : "them")
+                @(expandedOnly == 1 ? "sits" : "sit") outside the six novels.</span>
         }
     </p>
 }
@@ -32,22 +42,25 @@
     [Parameter]
     public IEnumerable<DuneEntity> All { get; set; } = Array.Empty<DuneEntity>();
 
-    /// <summary>Reads into the sentence after the count, e.g. "in this drawer".</summary>
+    /// <summary>Reads into the sentence after the count, e.g. "in this category".</summary>
     [Parameter]
     public string Scope { get; set; } = "in the archive";
 
-    private int sealed_;
+    private int sealedCount;
+    private int expandedOnly;
     private string? nextBook;
 
     protected override void OnParametersSet()
     {
         var hidden = All.Where(e => !Spoiler.IsVisible(e)).ToList();
-        sealed_ = hidden.Count;
+        sealedCount = hidden.Count;
 
-        // The nearest novel that would open something. Expanded Universe records are counted in
-        // the total but never named here: they are not further along the spine, they are a
-        // separate choice, and pointing a reader at the next book when the seal is really a
-        // toggle would just be wrong.
+        // Counted separately because reading on will never open them. Lumping them into a total
+        // whose only follow-up names the next novel would promise more than finishing the saga
+        // delivers, and leave a reader who did finish it wondering what they got wrong.
+        expandedOnly = hidden.Count(e => e.SpoilerTier == SpoilerTier.ExpandedUniverse);
+
+        // The nearest novel along the spine that would actually open something.
         nextBook = hidden
             .Select(e => e.SpoilerTier)
             .Where(t => t != SpoilerTier.ExpandedUniverse)
