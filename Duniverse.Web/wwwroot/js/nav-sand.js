@@ -138,21 +138,22 @@ window.duneNav = {
 
         requestAnimationFrame(frame);
     },
-
-    // The boot storm. Same grains and the same gusting wind as sandSettle above, but it
-    // builds instead of drifting: the caller feeds it an intensity from 0 to 1 and the
-    // storm answers with more grains, harder wind and longer streaks. Boot progress is
-    // what drives it, so the weather IS the loading bar rather than decoration next to
-    // one.
+    // The boot storm. Handed a canvas, it takes control of it away from this thread entirely
+    // and hands it to a worker, which owns every frame from then on.
     //
-    // The choreography is not only for looks. The build-up runs while the runtime is
-    // decompressing on the main thread, and slow sparse sand is the one motion that
-    // survives being hitched: a dropped frame in a lazy drift reads as a lull in the
-    // wind. The dense part and the clear both happen after boot, when the thread is
-    // free and every frame is cheap.
+    // That is the whole design, and it exists because the first version did not work. Drawing
+    // here meant the storm froze whenever the page was busy, and during a boot the page is
+    // busy in the worst possible way: starting the Blazor runtime is synchronous main-thread
+    // work, and while it runs requestAnimationFrame does not fire at all. An animation whose
+    // job is to cover a wait cannot be stopped by that wait. Delta timing, batching and a
+    // grain budget all helped and none of them addressed it, because a blocked thread draws
+    // nothing however cheap the frame would have been.
     //
-    // Returns a handle. Every method on it is safe to call at any time, including after
-    // stop, because the page that owns this cannot afford to be careful.
+    // A worker with an OffscreenCanvas is immune: its frames reach the compositor without this
+    // thread being consulted. There is no main-thread fallback on purpose. Anywhere the
+    // handover is unavailable the boot screen simply stays as it was before any of this, which
+    // is a perfectly good loading screen, and keeping a second copy of the physics alive to
+    // stutter on old browsers would be worse than not running it.
     sandStorm: function (canvas) {
         const inert = {
             setIntensity: function () { },
@@ -160,246 +161,92 @@ window.duneNav = {
             stop: function () { }
         };
 
-        if (!canvas || !canvas.getContext || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        if (!canvas || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            return inert;
+        }
+        if (typeof Worker !== "function" || typeof canvas.transferControlToOffscreen !== "function") {
             return inert;
         }
 
-        const ctx = canvas.getContext("2d");
-        if (!ctx) {
-            return inert;
-        }
-
-        // Capped rather than taken as given. At full device ratio this canvas is five
-        // million pixels to clear and composite every frame, and the grains are hairlines:
-        // there is nothing in a 1px streak that a third pixel of precision improves. The
-        // cap costs no visible quality and buys back close to half the fill cost on a
-        // retina screen, which is exactly the budget the decoder is competing for.
+        // Capped rather than taken as given: the grains are hairlines, and there is nothing in
+        // a 1px streak a third pixel of precision improves. Costs no visible quality and saves
+        // close to half the fill on a retina screen.
         const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-        const w = canvas.width = window.innerWidth * dpr;
-        const h = canvas.height = window.innerHeight * dpr;
+        canvas.width = window.innerWidth * dpr;
+        canvas.height = window.innerHeight * dpr;
 
-        const palette = ["#f4c07c", "#e0a458", "#e0a458", "#c97f3d", "#a05c22", "#8a4a1a", "#ffdf9e"];
-
-        const maxGrains = Math.min(900, Math.round(window.innerWidth / 1.6));
-
-        // Grains are sorted into buckets that share a colour, a width and an opacity, so a
-        // frame can draw each bucket as one path instead of stroking every grain on its own.
-        // Measured on a desktop: 900 individual strokes cost 0.28ms a frame, 63 batched ones
-        // cost 0.07ms. Four times cheaper, but both are noise against a 16.7ms budget, so
-        // this is insurance for weak hardware rather than the reason the storm ever
-        // stuttered. That was the runtime decompressing on the same thread, which is what
-        // the delta timing and the budget below actually answer.
-        //
-        // The quantising is invisible: three widths and three opacities per colour still
-        // layers the same way to the eye.
-        const SIZE_TIERS = 3;
-        const ALPHA_TIERS = 3;
-        const bucketCount = palette.length * SIZE_TIERS * ALPHA_TIERS;
-        const bucketStyle = [];
-        for (let c = 0; c < palette.length; c++) {
-            for (let s = 0; s < SIZE_TIERS; s++) {
-                for (let a = 0; a < ALPHA_TIERS; a++) {
-                    bucketStyle[(c * SIZE_TIERS + s) * ALPHA_TIERS + a] = {
-                        color: palette[c],
-                        width: (0.5 + s * 0.45) * dpr,
-                        alpha: 0.24 + a * 0.26
-                    };
-                }
+        let worker;
+        let surface;
+        try {
+            worker = new Worker("js/storm-worker.js");
+            surface = canvas.transferControlToOffscreen();
+        } catch (e) {
+            if (worker) {
+                try { worker.terminate(); } catch (ignored) { }
             }
+            return inert;
         }
 
-        let intensity = 0;
-        let clearing = 0;
-        let running = true;
+        let pendingClear = null;
+        worker.onmessage = function (event) {
+            const data = event.data || {};
+            if ((data.type === "cleared" || data.type === "failed") && pendingClear) {
+                const done = pendingClear;
+                pendingClear = null;
+                done();
+            }
+        };
+        // A worker that dies must not leave the page waiting on a clear that will never land.
+        worker.onerror = function () {
+            if (pendingClear) {
+                const done = pendingClear;
+                pendingClear = null;
+                done();
+            }
+        };
 
-        function spawn(g) {
-            g.x = Math.random() * w;
-            g.y = Math.random() * h;
-            g.px = g.x;
-            g.py = g.y;
-            g.vy = (0.15 + Math.random() * 0.5) * dpr;
+        worker.postMessage({
+            type: "init",
+            canvas: surface,
+            dpr: dpr,
+            grains: Math.min(900, Math.round(window.innerWidth / 1.6))
+        }, [surface]);
 
-            const sizeTier = (Math.random() * SIZE_TIERS) | 0;
-            const alphaTier = (Math.random() * ALPHA_TIERS) | 0;
-            // The glint colour sits last in the palette and stays rare.
-            const colour = Math.random() < 0.05
-                ? palette.length - 1
-                : (Math.random() * (palette.length - 1)) | 0;
-            g.b = (colour * SIZE_TIERS + sizeTier) * ALPHA_TIERS + alphaTier;
-
-            // Light grains ride the wind harder, and the spread is what breaks the
-            // population out of travelling as one pack.
-            g.carry = (1.55 - sizeTier * 0.3) * (0.55 + Math.random() * 0.9);
-            return g;
-        }
-
-        const grains = [];
-        for (let i = 0; i < maxGrains; i++) {
-            grains.push(spawn({}));
-        }
-
-        // Which grains belong to which bucket, worked out once. Drawing walks these lists
-        // rather than scanning every grain per bucket, so a frame still touches each grain
-        // exactly twice: once to move it, once to draw it.
-        const members = [];
-        for (let b = 0; b < bucketCount; b++) {
-            members.push([]);
-        }
-        for (let i = 0; i < grains.length; i++) {
-            members[grains[i].b].push(i);
-        }
-
-        // Grain index doubles as the activity switch, so the count can rise and fall with
-        // the load. Shuffling first means any prefix of the array is a fair sample of every
-        // bucket, instead of the storm gaining colours in the order they were created.
-        for (let i = grains.length - 1; i > 0; i--) {
-            const j = (Math.random() * (i + 1)) | 0;
-            const t = grains[i]; grains[i] = grains[j]; grains[j] = t;
-        }
-        for (let b = 0; b < bucketCount; b++) {
-            members[b].length = 0;
-        }
-        for (let i = 0; i < grains.length; i++) {
-            members[grains[i].b].push(i);
-        }
-
-        let last = 0;
-        let frameCost = 16.7;
-        // Trimmed automatically when frames start running long, which during boot is
-        // exactly when the decoder has the thread. Recovers slowly once it lets go.
-        let budget = 1;
-
-        function frame(now) {
-            if (!running || !canvas.isConnected) {
+        let alive = true;
+        function send(message) {
+            if (!alive) {
                 return;
             }
-
-            if (!last) {
-                last = now;
+            try {
+                worker.postMessage(message);
+            } catch (e) {
+                alive = false;
             }
-            const raw = now - last;
-            last = now;
-
-            // Movement is measured in time, not in frames. Per-frame steps meant a stall
-            // did not merely drop frames, it slowed the whole storm down and sped it back
-            // up, and that wobble reads worse than the missing frames ever did. Clamped so
-            // a long stall stretches into a gust rather than teleporting the field, which
-            // the streaks render as motion blur for free: a bigger step simply draws a
-            // longer line.
-            const dt = Math.min(raw / 16.667, 4);
-
-            frameCost += (raw - frameCost) * 0.1;
-            if (frameCost > 24) {
-                budget = Math.max(0.45, budget - 0.02);
-            } else if (frameCost < 15) {
-                budget = Math.min(1, budget + 0.008);
-            }
-
-            const gust =
-                0.5 * Math.sin(now * 0.00055) +
-                0.3 * Math.sin(now * 0.0016 + 2.1) +
-                0.2 * Math.sin(now * 0.00037 + 4.4);
-
-            const shaped = intensity * intensity;
-            const base = 0.5 + shaped * 14 + clearing * 30;
-            const wind = base * (0.55 + 0.45 * (gust * 0.5 + 0.5)) * dpr;
-
-            const active = Math.max(24, Math.round(maxGrains * (0.12 + shaped * 0.88) * budget));
-
-            for (let i = 0; i < active; i++) {
-                const g = grains[i];
-                g.px = g.x;
-                g.py = g.y;
-                g.x += (wind * g.carry + (Math.random() - 0.5) * 0.4 * dpr) * dt;
-                g.y += (g.vy * (1 - clearing * 0.8) + (Math.random() - 0.5) * 0.25 * dpr) * dt;
-
-                if (g.x > w + 8 * dpr || g.y > h + 8 * dpr) {
-                    if (clearing > 0.35) {
-                        g.px = g.x;
-                        continue;
-                    }
-                    // Carried round rather than respawned. Putting every grain back just
-                    // off the upwind edge drags the whole population into a band there
-                    // within one crossing, however much their speeds vary, and the rest of
-                    // the screen empties. Wrapping preserves the spread the field already
-                    // has. px follows so the wrap frame does not draw one long streak
-                    // straight across the canvas.
-                    g.x -= w + 16 * dpr;
-                    g.y = Math.random() * h;
-                    g.px = g.x;
-                    g.py = g.y;
-                }
-            }
-
-            ctx.clearRect(0, 0, w, h);
-            ctx.lineCap = "round";
-
-            const stretch = 0.9 + shaped * 1.6 + clearing * 5;
-            const fade = 1 - clearing * 0.15;
-
-            for (let b = 0; b < bucketCount; b++) {
-                const list = members[b];
-                const style = bucketStyle[b];
-                let drew = false;
-
-                for (let k = 0; k < list.length; k++) {
-                    const i = list[k];
-                    if (i >= active) {
-                        continue;
-                    }
-                    const g = grains[i];
-                    if (g.px === g.x && g.py === g.y) {
-                        continue;
-                    }
-                    if (!drew) {
-                        ctx.beginPath();
-                        drew = true;
-                    }
-                    ctx.moveTo(g.px + (g.px - g.x) * stretch, g.py + (g.py - g.y) * stretch);
-                    ctx.lineTo(g.x, g.y);
-                }
-
-                if (drew) {
-                    ctx.strokeStyle = style.color;
-                    ctx.lineWidth = style.width;
-                    ctx.globalAlpha = style.alpha * fade;
-                    ctx.stroke();
-                }
-            }
-
-            ctx.globalAlpha = 1;
-            requestAnimationFrame(frame);
         }
-
-        requestAnimationFrame(frame);
 
         return {
             setIntensity: function (value) {
-                const n = Number(value);
-                intensity = Number.isFinite(n) ? Math.max(0, Math.min(1, n)) : intensity;
+                send({ type: "intensity", value: value });
             },
 
             clear: function (ms) {
-                const span = Math.max(120, ms || 800);
                 return new Promise(function (resolve) {
-                    const from = performance.now();
-                    (function step(now) {
-                        if (!running) {
-                            resolve();
-                            return;
-                        }
-                        clearing = Math.min(1, (now - from) / span);
-                        if (clearing >= 1) {
-                            resolve();
-                            return;
-                        }
-                        requestAnimationFrame(step);
-                    })(from);
+                    if (!alive) {
+                        resolve();
+                        return;
+                    }
+                    pendingClear = resolve;
+                    send({ type: "clear", ms: ms });
                 });
             },
 
             stop: function () {
-                running = false;
+                send({ type: "stop" });
+                alive = false;
+                // Given a moment to close itself first, so the last frame is not cut mid-draw.
+                setTimeout(function () {
+                    try { worker.terminate(); } catch (e) { }
+                }, 60);
             }
         };
     }
