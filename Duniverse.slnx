@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="Duniverse.Core/Duniverse.Core.csproj" />
   <Project Path="Duniverse.csproj" />
+  <Project Path="Duniverse.Prerender/Duniverse.Prerender.csproj" />
   <Project Path="Duniverse.Web/Duniverse.Web.csproj" />
 </Solution>

@@ -33,11 +33,22 @@ jobs:
       - name: Publish
         run: dotnet publish Duniverse.Web/Duniverse.Web.csproj -c Release -o release --nologo
 
+      # Runs before the prerenderer on purpose. 404.html is what Pages serves for a genuinely
+      # unknown address, so it has to be the plain shell: copy it after prerendering and every
+      # dead URL would answer with the home page's title and a canonical pointing at the front
+      # door. Routes the app really has get their own file in the next step instead.
       - name: Add .nojekyll, CNAME, and SPA fallback
         run: |
           touch release/wwwroot/.nojekyll
           echo 'www.duniverse.org' > release/wwwroot/CNAME
           cp release/wwwroot/index.html release/wwwroot/404.html
+
+      # Writes a real index.html for every route the app can serve, so Pages answers each one
+      # with a 200 instead of falling through to that 404. Has to run after publish, because it
+      # reads the published shell to pick up the fingerprinted boot script. It rewrites
+      # sitemap.xml from the same walk, so the sitemap cannot drift from what actually exists.
+      - name: Prerender routes
+        run: dotnet run --project Duniverse.Prerender/Duniverse.Prerender.csproj -c Release -- release/wwwroot
 
       - name: Setup Pages
         uses: actions/configure-pages@v6

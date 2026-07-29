@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Just the home page for now. The way this site deploys, every other route gets served
-     with a 404 status, so search engines can't index them no matter what this file claims.
-     Listing them would just fill Search Console with missing-page reports. Once those routes
-     get served as real files, they belong in here too.
+<!-- A placeholder, and the answer to the note that used to sit here. Every route other than
+     this one used to be served with a 404 status, so listing them would only have filled Search
+     Console with missing-page reports. They are real files now: the deploy runs
+     Duniverse.Prerender, which writes an index.html for every route and then rewrites this
+     sitemap from the same walk, so the list that ships can never drift from the pages that
+     actually exist. Sealed records are left out of it on purpose; their pages get written too,
+     but they carry a noindex so their names stay off the open web.
 
-     Google ignores changefreq and priority, so I left them out. It does read lastmod, which
-     is the date the page content last changed, not the date of the last deploy. -->
+     What is written here only matters if someone serves wwwroot straight from the repo without
+     running the deploy, which is why it still names the one page that is always real. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://www.duniverse.org/</loc>
-    <lastmod>2026-07-20</lastmod>
   </url>
 </urlset>
