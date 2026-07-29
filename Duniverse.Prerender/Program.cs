@@ -175,13 +175,16 @@ foreach (var entity in registry.GetAllEntities<DuneEntity>().OrderBy(e => e.Id, 
 static string Swap(string html, string find, string replacement) =>
     html.Contains(find) ? html.Replace(find, replacement) : html;
 
+// The empty container the app renders into, and the only thing here that gets rewritten. The
+// boot screen used to live inside it and had to be reconstructed around the content; it is a
+// sibling now, so this leaves it entirely alone and just fills the slot.
+//
 // Checked once rather than per page: if the published shell ever stops looking like this, the
 // run should stop with a message instead of quietly writing two hundred pages of nothing.
-var appOpen = template.IndexOf("<div id=\"app\">", StringComparison.Ordinal);
-var appEnd = template.IndexOf("<div id=\"blazor-error-ui\">", StringComparison.Ordinal);
-if (appOpen < 0 || appEnd <= appOpen)
+const string AppSlot = "<div id=\"app\"></div>";
+if (!template.Contains(AppSlot, StringComparison.Ordinal))
 {
-    Console.Error.WriteLine("index.html no longer has the expected #app container; nothing written");
+    Console.Error.WriteLine($"index.html no longer contains {AppSlot}; nothing written");
     return 1;
 }
 
@@ -227,28 +230,19 @@ foreach (var (route, title, description, body, index) in pages)
         indexable.Add(url);
     }
 
-    // The whole #app container is rebuilt: the boot screen stays exactly as it was designed, and
-    // the entry's own markup goes in underneath it. Nothing is hidden with display:none, which
-    // would read as cloaking and get the content discounted anyway. It does not need to be:
-    // .boot-screen is fixed, inset 0 and opaque, so it covers the entry while the runtime loads,
-    // and Blazor clears the container on its first render the way it always has. A visitor sees
-    // the same loading art. A crawler reads the page sitting under it.
-    // Located on this page's own copy, not on the template. The meta swaps above have already
-    // changed the length of the string, so an offset measured against the template would slice
-    // in the wrong place and take the boot script out with it.
-    var open = html.IndexOf("<div id=\"app\">", StringComparison.Ordinal);
-    var close = html.IndexOf("<div id=\"blazor-error-ui\">", StringComparison.Ordinal);
-
-    var shell = new StringBuilder();
-    shell.Append("<div id=\"app\">\n");
-    shell.Append("        <div class=\"boot-screen\">\n");
-    shell.Append("            <div class=\"boot-wordmark\">Duniverse</div>\n");
-    shell.Append("            <div class=\"boot-seam\"><div class=\"boot-seam-fill\"></div></div>\n");
-    shell.Append("            <p class=\"boot-line\">Opening the archives</p>\n");
-    shell.Append("        </div>\n");
-    shell.Append($"        <main class=\"prerendered-entry\">{body}</main>\n");
-    shell.Append("    </div>\n\n    ");
-    html = html[..open] + shell.ToString() + html[close..];
+    // The entry goes straight into the slot. Nothing is hidden with display:none, which would
+    // read as cloaking and get the content discounted anyway, and it does not need to be:
+    // .boot-screen is fixed, inset 0 and opaque, so it covers the entry while the runtime
+    // loads, and Blazor clears the container on its first render. A visitor sees the boot
+    // storm; a crawler reads the page sitting under it.
+    //
+    // Simple string swap now that the boot screen is a sibling rather than a child. It used to
+    // be an index slice around a reconstructed boot screen, which was both fiddly and a real
+    // bug once: the offsets were measured against the template while being applied to a copy
+    // the meta rewrites had already lengthened.
+    html = html.Replace(AppSlot,
+        $"<div id=\"app\"><main class=\"prerendered-entry\">{body}</main></div>",
+        StringComparison.Ordinal);
 
     var dir = route.Length == 0 ? root : Path.Combine(root, route.Replace('/', Path.DirectorySeparatorChar));
     Directory.CreateDirectory(dir);

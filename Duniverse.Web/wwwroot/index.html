@@ -68,11 +68,23 @@
 </head>
 
 <body>
-    <div id="app">
-        <!-- The loading screen. Blazor wipes everything inside #app the moment the app
-             renders. The gold seam is a real progress bar: its width tracks
-             --blazor-load-percentage, which the loader updates as the download comes in. -->
-        <div class="boot-screen">
+    <div id="app"></div>
+
+    <!-- The loading screen sits OUTSIDE #app on purpose, and that is a load-bearing choice.
+         Inside it, Blazor's first render wiped the whole container in a single frame, which
+         is why the old boot screen vanished rather than ended. Out here it outlives that
+         render, so the storm can break over a page that is already sitting behind it.
+
+         The cost is that nothing takes it down automatically any more. The script at the
+         foot of this file owns that, and if it ever fails to run, every visitor gets a blank
+         screen over a working site. It is written to come down on every path: on success, on
+         a boot that throws, and on a timer that does not care which happened.
+
+         The gold seam is still a real progress bar, its width tracking
+         --blazor-load-percentage, and the storm is driven from the same number. -->
+    <div class="boot-screen" id="boot-screen">
+        <canvas class="boot-sand" id="boot-sand" aria-hidden="true"></canvas>
+        <div class="boot-stage">
             <div class="boot-wordmark">Duniverse</div>
             <div class="boot-seam">
                 <div class="boot-seam-fill"></div>
@@ -209,6 +221,67 @@
             }
         }
 
+        // ---- The boot storm ------------------------------------------------------------
+        // Sand drifts across while the runtime downloads, thickens as the load lands, and
+        // breaks over the page once the app is up.
+        //
+        // It plays in full on a first visit and otherwise only while there is a real wait to
+        // cover. Ceremony on this site happens once and is remembered, the way the spoiler
+        // ritual asks once: a reader who came back should never be made to stand through
+        // weather for a page that is already cached and ready.
+        const STORM_KEY = 'duniverse.storm.v1';
+        const bootScreen = document.getElementById('boot-screen');
+        const bootBegan = performance.now();
+
+        let firstEver = true;
+        try {
+            firstEver = !localStorage.getItem(STORM_KEY);
+        } catch {
+            // Storage that will not answer is treated as a first visit. Erring toward the
+            // ceremony is the harmless direction; erring away from it hides the feature.
+        }
+
+        const wantsCalm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const inertStorm = {
+            setIntensity: function () { },
+            clear: function () { return Promise.resolve(); },
+            stop: function () { }
+        };
+        const storm = (!wantsCalm && window.duneNav && window.duneNav.sandStorm)
+            ? window.duneNav.sandStorm(document.getElementById('boot-sand'))
+            : inertStorm;
+
+        // Read from the same custom property the seam is drawn from, so the weather and the
+        // bar can never disagree about how far along the load actually is.
+        function loadFraction() {
+            const raw = getComputedStyle(document.documentElement)
+                .getPropertyValue('--blazor-load-percentage');
+            const n = parseFloat(raw);
+            return Number.isFinite(n) ? n / 100 : 0;
+        }
+
+        const stormPump = wantsCalm
+            ? 0
+            : setInterval(function () { storm.setIntensity(loadFraction()); }, 100);
+
+        let bootScreenDown = false;
+        function takeDownBootScreen() {
+            if (bootScreenDown) {
+                return;
+            }
+            bootScreenDown = true;
+            clearInterval(stormPump);
+            storm.stop();
+            if (bootScreen && bootScreen.parentNode) {
+                bootScreen.parentNode.removeChild(bootScreen);
+            }
+        }
+
+        // The guarantee. Whatever else happens above, the screen comes down. Twenty seconds
+        // is far longer than any real boot and far shorter than a visitor's patience with a
+        // page that never arrives.
+        setTimeout(takeDownBootScreen, 20000);
+
         const started = Blazor.start({
             loadBootResource: (type, name, defaultUri, integrity) => {
                 if (type === 'dotnetjs' || type === 'manifest' || type === 'configuration') {
@@ -244,6 +317,40 @@
                 })();
             }
         });
+
+        // The storm breaks and the screen lifts. Kept as its own chain so a failure here can
+        // never take the cache prune or the art warm-up down with it, and the other way round.
+        started.then(async function () {
+            try {
+                localStorage.setItem(STORM_KEY, '1');
+            } catch {
+                // A reader whose storage is closed sees the full storm every time. That is a
+                // worse outcome than remembering, and still a working site.
+            }
+
+            // A first visit is worth a moment even on a fast connection. A return visit is
+            // not, so the floor drops to nothing and the storm only ever covers a real wait.
+            const held = performance.now() - bootBegan;
+            const floor = (firstEver && !wantsCalm) ? 2000 : 0;
+            if (held < floor) {
+                await new Promise(function (r) { setTimeout(r, floor - held); });
+            }
+
+            storm.setIntensity(1);
+
+            // Raced rather than awaited. A backgrounded tab stops firing animation frames, so
+            // the clear would never resolve and the screen would sit over a site that had
+            // finished loading minutes ago.
+            await Promise.race([
+                storm.clear(firstEver ? 900 : 380),
+                new Promise(function (r) { setTimeout(r, 1600); })
+            ]);
+
+            if (bootScreen) {
+                bootScreen.classList.add('boot-lifting');
+            }
+            setTimeout(takeDownBootScreen, 420);
+        }).catch(takeDownBootScreen);
 
         // The stored bytes are only ever length-checked, so a cache entry that is wrong rather
         // than short is handed to the runtime and boot never finishes. A hard reload does not

@@ -51,15 +51,40 @@
 .boot-screen {
     position: fixed;
     inset: 0;
-    /* Sits above everything. Nothing app-rendered exists yet when this shows, but the
-       high ceiling costs nothing and keeps the screen whole if anything paints early. */
+    /* Sits above everything. The app renders underneath while this is still up, which is
+       the whole point: the storm clears onto a page that is already there. */
     z-index: 900;
+    display: grid;
+    place-items: center;
+    background: #171310;
+}
+
+/* The storm itself, behind the wordmark and filling the screen. Pointer events off so a
+   reader who arrives mid-load can already click through to whatever settled beneath. */
+.boot-sand {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+/* The text has to sit in its own stacking context, or the canvas paints over it. */
+.boot-stage {
+    position: relative;
+    z-index: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     gap: 1.15rem;
-    background: #171310;
+}
+
+/* The last beat: once the air has emptied, the screen itself lifts off the page rather
+   than being cut. Kept short, since by this point the reader is looking at the site. */
+.boot-lifting {
+    opacity: 0;
+    transition: opacity 0.4s ease-out;
+    pointer-events: none;
 }
 
 .boot-wordmark {
