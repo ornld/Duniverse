@@ -794,38 +794,65 @@ html {
     gap: 0.35rem;
 }
 
+/* The appendix, set as an appendix. This used to render as a stack of rounded boxes with
+   a gold bar down each one, which is a settings screen, not the back matter of a novel.
+   The page's own tagline says it means to be true to the appendix Herbert bound into the
+   back of Dune, so the entries now run the way that appendix runs: headword out in the
+   margin, definition flowing on the same line, nothing boxed. Dropping the boxes also
+   doubles how many terms fit a screen, which is why PageSize went 13 to 26. */
 .glossary {
     margin: 1.5rem 0 0;
-    display: grid;
-    gap: 1rem;
+    display: block;
     text-align: left;
 }
 
+/* Hanging indent. The headword sits out at the left edge and the wrapped lines tuck
+   under it, which is the whole reason a run of definitions stays scannable once you take
+   the boxes away. padding-left pushes the block over, the negative text-indent pulls the
+   first line back out. */
 .glossary-entry {
-    padding: 0.9rem 1.1rem;
-    background: rgba(36, 28, 22, 0.5);
-    border: 1px solid var(--dune-border);
-    border-left: 3px solid var(--dune-accent);
-    border-radius: 6px;
+    padding-left: 1.6rem;
+    text-indent: -1.6rem;
+    margin-bottom: 0.85rem;
+    line-height: 1.55;
 }
 
     .glossary-entry dt {
-        margin: 0 0 0.35rem;
-        font-weight: 700;
+        display: inline;
+        margin: 0;
         color: var(--dune-accent-bright);
-        letter-spacing: 0.02em;
+        font-size: 0.82rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+    }
+
+    /* The printed book puts a colon here. This draws a short rule instead, the same trick
+       the epigraph attribution uses for Herbert's dash, so the two registers match. It is
+       our house style, not the Chilton's. */
+    .glossary-entry dt::after {
+        content: "";
+        display: inline-block;
+        width: 1.4em;
+        height: 1px;
+        margin: 0 0.5em 0.28em 0.55em;
+        background: var(--dune-border);
+        vertical-align: middle;
     }
 
     .glossary-entry dd {
+        display: inline;
         margin: 0;
         color: var(--dune-text);
     }
 
+/* Now that this sits inside a run of prose instead of on its own row, it needs to hold
+   together as one unit and read a step quieter than the definition around it. */
 .glossary-see {
     display: inline-block;
-    margin-left: 0.5rem;
+    margin-left: 0.4rem;
     font-size: 0.85rem;
     white-space: nowrap;
+    text-indent: 0;
 }
 
 .glossary-pager {

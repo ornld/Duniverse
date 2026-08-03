@@ -66,7 +66,9 @@
 </div>
 
 @code {
-    private const int PageSize = 13;
+    // Doubled when the glossary lost its boxes: hanging definitions pack about twice as
+    // many terms into the same screen, and 13 left the page ending well short of the fold.
+    private const int PageSize = 26;
 
     private string filter = "";
     private char? selectedLetter;
