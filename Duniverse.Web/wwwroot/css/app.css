@@ -56,7 +56,7 @@
     z-index: 900;
     display: grid;
     place-items: center;
-    background: #171310;
+    background: #0f0d0c;
 }
 
 /* The storm itself, behind the wordmark and filling the screen. Pointer events off so a
@@ -158,13 +158,31 @@ code {
 }
 
 :root {
-    --dune-bg: #171310;
+    --dune-bg: #0f0d0c;
     --dune-panel: #241c16;
     --dune-border: #4a3a28;
     --dune-text: #f1e6d6;
     --dune-muted: #a89478;
+    /* Muted text that has to survive the lit top of a hero. The scrims put their warm end
+       right where the tagline sits, and plain --dune-muted fell to 4.4:1 over the busiest
+       category art, which is under the 4.5 line. This clears 5.3:1 on the worst of them and
+       still reads a step quieter than --dune-text. */
+    --dune-muted-lit: #b8a487;
     --dune-accent: #e0a458;
     --dune-accent-bright: #f4c07c;
+    /* The card wash, as three depths instead of one flat film. Every hero used to sit under a
+       single value held top to bottom, so seven different photographs all came out the same mud
+       and no card ever looked lit. These run warm at the top and cold at the foot, so a card
+       catches light on its top edge and sinks into the ground at its bottom, the way a glowglobe
+       tuned to yellow lights a sietch room from near the ceiling.
+
+       Three depths because the heroes already had three: 0.82/0.88 was the light end, 0.87/0.92
+       the middle, 0.90/0.94 the deep end where a graph needs quiet behind it. The bottom stop
+       stays neutral instead of leaning blue, since color on Arrakis comes off minerals, blooms
+       and stains, never out of the air. */
+    --scrim-soft: linear-gradient(rgba(45, 35, 25, 0.80), rgba(12, 11, 10, 0.93));
+    --scrim-mid: linear-gradient(rgba(38, 29, 21, 0.86), rgba(12, 11, 10, 0.95));
+    --scrim-deep: linear-gradient(rgba(34, 26, 19, 0.90), rgba(11, 10, 9, 0.96));
     /* The Ridulian grain: one 128px tile of sparse noise, generated offline and
        inlined so it costs no request. The tile carries its own faint alpha (little
        flecks at 2-7%, most pixels fully clear), so wherever it layers it looks like
@@ -447,7 +465,7 @@ html {
     }
 
 .tagline {
-    color: var(--dune-muted);
+    color: var(--dune-muted-lit);
     margin-bottom: 1.5rem;
 }
 
@@ -1218,21 +1236,21 @@ html {
 
 .entity-card.front {
     border-left: 4px solid var(--dune-accent);
-    background-image: var(--ridulian-grain), linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/entity-front-background.webp');
+    background-image: var(--ridulian-grain), var(--scrim-mid), url('/images/entity-front-background.webp');
     background-size: auto, cover, cover;
     background-position: 0 0, center, center;
     background-repeat: repeat, no-repeat, no-repeat;
 }
 
 .entity-card.back {
-    background-image: var(--ridulian-grain), linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/entity-back-background.webp');
+    background-image: var(--ridulian-grain), var(--scrim-mid), url('/images/entity-back-background.webp');
     background-size: auto, cover, cover;
     background-position: 0 0, center, center;
     background-repeat: repeat, no-repeat, no-repeat;
 }
 
 .entity-card.graph-card {
-    background-image: var(--ridulian-grain), linear-gradient(rgba(23, 19, 16, 0.9), rgba(23, 19, 16, 0.94)), url('/images/entity-graph-background.webp');
+    background-image: var(--ridulian-grain), var(--scrim-deep), url('/images/entity-graph-background.webp');
     background-size: auto, cover, cover;
     background-position: 0 0, center, center;
     background-repeat: repeat, no-repeat, no-repeat;
@@ -1422,34 +1440,34 @@ html {
    .entity-card.front carry over, so the entry text stays readable. Categories
    without their own art fall back to the shared front backdrop. */
 .entity-card.front.category-artifacts {
-    background-image: var(--ridulian-grain), linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/categories/artifacts.webp');
+    background-image: var(--ridulian-grain), var(--scrim-mid), url('/images/categories/artifacts.webp');
 }
 .entity-card.front.category-disciplines {
-    background-image: var(--ridulian-grain), linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/categories/disciplines.webp');
+    background-image: var(--ridulian-grain), var(--scrim-mid), url('/images/categories/disciplines.webp');
 }
 .entity-card.front.category-flora-fauna {
-    background-image: var(--ridulian-grain), linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/categories/flora-fauna.webp');
+    background-image: var(--ridulian-grain), var(--scrim-mid), url('/images/categories/flora-fauna.webp');
 }
 .entity-card.front.category-historical-events {
-    background-image: var(--ridulian-grain), linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/categories/historical-events.webp');
+    background-image: var(--ridulian-grain), var(--scrim-mid), url('/images/categories/historical-events.webp');
 }
 .entity-card.front.category-houses {
-    background-image: var(--ridulian-grain), linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/categories/houses.webp');
+    background-image: var(--ridulian-grain), var(--scrim-mid), url('/images/categories/houses.webp');
 }
 .entity-card.front.category-organizations {
-    background-image: var(--ridulian-grain), linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/categories/organizations.webp');
+    background-image: var(--ridulian-grain), var(--scrim-mid), url('/images/categories/organizations.webp');
 }
 /* Personas keep the neutral front backdrop on purpose: the category art is one
    literal figure, and the same face repeating behind every person works against
    each card. */
 .entity-card.front.category-theological-systems {
-    background-image: var(--ridulian-grain), linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/categories/theological-systems.webp');
+    background-image: var(--ridulian-grain), var(--scrim-mid), url('/images/categories/theological-systems.webp');
 }
 .entity-card.front.category-vehicles {
-    background-image: var(--ridulian-grain), linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/categories/vehicles.webp');
+    background-image: var(--ridulian-grain), var(--scrim-mid), url('/images/categories/vehicles.webp');
 }
 .entity-card.front.category-worlds {
-    background-image: var(--ridulian-grain), linear-gradient(rgba(23, 19, 16, 0.87), rgba(23, 19, 16, 0.92)), url('/images/categories/worlds.webp');
+    background-image: var(--ridulian-grain), var(--scrim-mid), url('/images/categories/worlds.webp');
 }
 
 .graph-hint {
@@ -1464,7 +1482,7 @@ html {
     position: relative;
     padding: 0.75rem;
     background-color: var(--dune-panel);
-    background-image: var(--ridulian-grain), linear-gradient(rgba(23, 19, 16, 0.92), rgba(23, 19, 16, 0.95)), url('/images/entity-graph-background.webp');
+    background-image: var(--ridulian-grain), var(--scrim-deep), url('/images/entity-graph-background.webp');
     background-size: auto, cover, cover;
     background-position: 0 0, center, center;
     background-repeat: repeat, no-repeat, no-repeat;
@@ -1927,7 +1945,7 @@ button.chip {
     margin: auto;
     padding: 2.25rem 2rem 1.75rem;
     background-color: var(--dune-panel);
-    background-image: linear-gradient(rgba(23, 19, 16, 0.88), rgba(23, 19, 16, 0.93)), url('/images/main-menu-background.webp');
+    background-image: var(--scrim-mid), url('/images/main-menu-background.webp');
     background-size: cover;
     background-position: center;
     border: 1px solid var(--dune-border);
