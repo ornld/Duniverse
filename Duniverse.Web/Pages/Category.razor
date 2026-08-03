@@ -83,7 +83,7 @@ else
         items = allInCategory.Where(Spoiler.IsVisible).OrderBy(item => item.Name).ToList();
 
         heroStyle = CategoryBackgrounds.TryGetValue(slug, out var file)
-            ? $"background-image: linear-gradient(rgba(23, 19, 16, 0.82), rgba(23, 19, 16, 0.88)), url('/images/categories/{file}');"
+            ? $"background-image: var(--scrim-soft), url('/images/categories/{file}');"
             : "";
     }
 }
