@@ -1045,7 +1045,12 @@ html {
     font-size: 0.8rem;
 }
 
-.lineage-atreides { color: #e0a458; }
+/* Atreides wears the archive's own spice gold, so it reads the token instead of a
+   copy. The lines below stay their own literals on purpose: Fremen and Companions
+   happen to share values with two category colors today, but a house is not a
+   drawer, and the category palette has to stay free to move without dragging the
+   bloodlines along with it. */
+.lineage-atreides { color: var(--dune-accent); }
 /* Lighter than the instinctive Harkonnen red: #c9413f failed reading contrast as the
    legend chip's text on the night ground, and the node rings follow the legend. */
 .lineage-harkonnen { color: #d75f5c; }
@@ -1122,7 +1127,7 @@ html {
         transition: transform var(--dur-open) ease, filter var(--dur-open) ease;
     }
 
-    .bloodline-node.ring-atreides circle { stroke: #e0a458; stroke-width: 3.5px; }
+    .bloodline-node.ring-atreides circle { stroke: var(--dune-accent); stroke-width: 3.5px; }
     .bloodline-node.ring-harkonnen circle { stroke: #d75f5c; stroke-width: 3.5px; }
     .bloodline-node.ring-corrino circle { stroke: #cfc0a8; stroke-width: 3.5px; }
     .bloodline-node.ring-fremen circle { stroke: #8fae5c; stroke-width: 3.5px; }
@@ -1567,7 +1572,8 @@ html {
 /* The site-wide category palette. Graph stars, the connection finder's chips and
    dots, and the tinted card edges below all read from --cat-color, so each
    category's color gets decided exactly once, right here. */
-.category-artifacts { --cat-color: #e0a458; }
+/* Artifacts are the spice: literally the accent, read from the token so it stays true. */
+.category-artifacts { --cat-color: var(--dune-accent); }
 .category-disciplines { --cat-color: #7fb3b0; }
 .category-flora-fauna { --cat-color: #8fae5c; }
 .category-historical-events { --cat-color: #c76b3f; }
