@@ -10,11 +10,15 @@
     color: red;
 }
 
+/* The one strip Blazor itself owns, shown only if the runtime falls over. It shipped
+   in template lightyellow, which made the site's worst moment its least themed one.
+   The reload link inside it picks up the site's own link gold on its own. */
 #blazor-error-ui {
-    color-scheme: light only;
-    background: lightyellow;
+    background: var(--dune-panel);
+    color: var(--dune-text);
+    border-top: 1px solid var(--dune-accent);
     bottom: 0;
-    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.4);
     box-sizing: border-box;
     display: none;
     left: 0;
@@ -815,7 +819,8 @@ html {
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--dune-accent);
-    opacity: 0.72;
+    /* Bright enough to clear reading contrast at this size, with margin to spare. */
+    opacity: 0.8;
 }
 
 /* The first mark opens the history, so it does not need the gap the later ones use to
@@ -997,7 +1002,9 @@ html {
 }
 
 .lineage-atreides { color: #e0a458; }
-.lineage-harkonnen { color: #c9413f; }
+/* Lighter than the instinctive Harkonnen red: #c9413f failed reading contrast as the
+   legend chip's text on the night ground, and the node rings follow the legend. */
+.lineage-harkonnen { color: #d75f5c; }
 .lineage-corrino { color: #cfc0a8; }
 .lineage-fremen { color: #8fae5c; }
 .lineage-other { color: #7fb3b0; }
@@ -1072,7 +1079,7 @@ html {
     }
 
     .bloodline-node.ring-atreides circle { stroke: #e0a458; stroke-width: 3.5px; }
-    .bloodline-node.ring-harkonnen circle { stroke: #c9413f; stroke-width: 3.5px; }
+    .bloodline-node.ring-harkonnen circle { stroke: #d75f5c; stroke-width: 3.5px; }
     .bloodline-node.ring-corrino circle { stroke: #cfc0a8; stroke-width: 3.5px; }
     .bloodline-node.ring-fremen circle { stroke: #8fae5c; stroke-width: 3.5px; }
     .bloodline-node.ring-other circle { stroke: #7fb3b0; stroke-width: 3.5px; }
@@ -2455,9 +2462,12 @@ button.chip {
         /* ---- Active tab: the Eyes of Ibad ----
            The one blue element on the whole site. The spice marks what you're
            looking at. Blue within blue, like the books describe the eyes: no single
-           flat color. The letters carry two blues (deep ink at the edges, brighter
+           flat color. The letters carry two blues (darker at the edges, brighter
            within) through a gradient clipped to the text, and the glow blooms from
-           drop-shadows so the gradient stays crisp inside the glyphs. Each shadow
+           drop-shadows so the gradient stays crisp inside the glyphs. Both blues
+           run a register brighter than the first pass: the old edge ink measured
+           under 2:1 against the bar, real smudge territory, so the pair moved up
+           together and the center went paler to keep the depth. Each shadow
            layer halves the opacity of the last and doubles its reach, so the bloom
            dissolves into the background instead of stopping at a hard line.
 
@@ -2473,7 +2483,7 @@ button.chip {
         .top-nav.tab-glow .index-trigger.active .index-label {
             background-image:
                 linear-gradient(100deg, rgba(126, 180, 255, 0) 40%, rgba(126, 180, 255, 0.5) 50%, rgba(126, 180, 255, 0) 60%),
-                linear-gradient(180deg, #1e4a9e 0%, #4a8fe8 52%, #1e4a9e 100%);
+                linear-gradient(180deg, #4a8fe8 0%, #84b8fa 52%, #4a8fe8 100%);
             background-size: 250% 100%, 100% 100%;
             background-position: 140% 0, 0 0;
             -webkit-background-clip: text;
