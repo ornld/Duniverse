@@ -1571,18 +1571,20 @@ html {
 
 /* The site-wide category palette. Graph stars, the connection finder's chips and
    dots, and the tinted card edges below all read from --cat-color, so each
-   category's color gets decided exactly once, right here. */
+   category's color gets decided exactly once, right here. The cooler drawers lean
+   warm on purpose, mineral versions of themselves, so every hue reads as something
+   the desert could yield without giving up telling ten drawers apart. */
 /* Artifacts are the spice: literally the accent, read from the token so it stays true. */
 .category-artifacts { --cat-color: var(--dune-accent); }
-.category-disciplines { --cat-color: #7fb3b0; }
+.category-disciplines { --cat-color: #8fb3a4; }
 .category-flora-fauna { --cat-color: #8fae5c; }
 .category-historical-events { --cat-color: #c76b3f; }
-.category-houses { --cat-color: #d4494f; }
-.category-organizations { --cat-color: #9b6dc4; }
-.category-personas { --cat-color: #f4c07c; }
-.category-theological-systems { --cat-color: #b98fd1; }
-.category-vehicles { --cat-color: #6f97b5; }
-.category-worlds { --cat-color: #d9a441; }
+.category-houses { --cat-color: #d75f5c; }
+.category-organizations { --cat-color: #a878b4; }
+.category-personas { --cat-color: #edc186; }
+.category-theological-systems { --cat-color: #c79cc4; }
+.category-vehicles { --cat-color: #85a0b5; }
+.category-worlds { --cat-color: #cf9838; }
 .category-unknown { --cat-color: var(--dune-muted); }
 
 /* A record's kind tints the top edge of its card, its browse page's hero, and the
