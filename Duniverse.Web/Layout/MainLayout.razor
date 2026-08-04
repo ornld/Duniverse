@@ -46,15 +46,16 @@
             <TwinMoons />
             <svg class="horizon-dunes" viewBox="0 0 1440 90" preserveAspectRatio="none"
                  xmlns="http://www.w3.org/2000/svg" focusable="false">
-                @* Depth runs light to dark: the far crests catch the moonlight, and the
-                   near dune sits in its own shadow, matching the footer fill below. *@
-                <path fill="#2f251a" d="M0 46 C 90 34 200 28 340 36 C 470 43 560 56 720 50 C 850 45 930 32 1060 36 C 1180 40 1300 52 1440 44 L 1440 90 L 0 90 Z" />
-                <path fill="#292017" d="M0 64 C 130 68 250 52 420 55 C 590 58 680 70 850 66 C 1010 62 1120 48 1250 54 C 1340 58 1400 62 1440 64 L 1440 90 L 0 90 Z" />
-                <path fill="#241c16" d="M0 76 C 150 68 320 62 540 70 C 720 76 830 83 1020 79 C 1190 75 1320 68 1440 74 L 1440 90 L 0 90 Z" />
+                @* The crests carry classes instead of baked-in fills, so their colors
+                   live in app.css with everything else and the near crest can read
+                   the panel tone straight from the theme. *@
+                <path class="crest-far" d="M0 46 C 90 34 200 28 340 36 C 470 43 560 56 720 50 C 850 45 930 32 1060 36 C 1180 40 1300 52 1440 44 L 1440 90 L 0 90 Z" />
+                <path class="crest-mid" d="M0 64 C 130 68 250 52 420 55 C 590 58 680 70 850 66 C 1010 62 1120 48 1250 54 C 1340 58 1400 62 1440 64 L 1440 90 L 0 90 Z" />
+                <path class="crest-near" d="M0 76 C 150 68 320 62 540 70 C 720 76 830 83 1020 79 C 1190 75 1320 68 1440 74 L 1440 90 L 0 90 Z" />
                 @* Moonlight catching the nearest crest: the same curve, unclosed, as a
                    faint gold stroke. non-scaling-stroke keeps it hairline as the
                    stretched viewBox distorts everything else. *@
-                <path fill="none" stroke="rgba(224, 164, 88, 0.16)" stroke-width="1.2" vector-effect="non-scaling-stroke" d="M0 76 C 150 68 320 62 540 70 C 720 76 830 83 1020 79 C 1190 75 1320 68 1440 74" />
+                <path class="crest-light" stroke-width="1.2" vector-effect="non-scaling-stroke" d="M0 76 C 150 68 320 62 540 70 C 720 76 830 83 1020 79 C 1190 75 1320 68 1440 74" />
             </svg>
         </div>
         <div class="footer-content">
