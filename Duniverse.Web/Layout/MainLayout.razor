@@ -3,8 +3,18 @@
 @inject NavigationManager Nav
 
 <div class="page">
+    @* The running head. The wordmark used to sit alone at the far left with the rest of the
+       bar empty, which read as a template with the logo slot filled in. Now a drawn rule
+       crosses the gap to a register naming which part of the volume you are in, the way a
+       bound book prints one. It also gives location a second signal that isn't color, which
+       matters since the blue tab is the only thing saying it today. *@
     <header class="site-header">
         <a href="/" class="site-title">Duniverse</a>
+        <span class="head-rule" aria-hidden="true"></span>
+        @if (Register is string register)
+        {
+            <span class="head-register">@register</span>
+        }
     </header>
 
     <NavMenu />
@@ -71,6 +81,60 @@
     // Path only, stripped of query and hash: those refine a page in place (search
     // text, anchors), and re-mounting on them would replay the entrance mid-use.
     private string PageKey => $"{spoilerEpoch}:{Nav.ToBaseRelativePath(Nav.Uri).Split('?', '#')[0]}";
+
+    // Which part of the volume the reader is in, printed at the right of the running head.
+    // Real appendix titles wherever Herbert supplied one, our own wording in his register
+    // where he didn't. Cased normally here and uppercased in CSS, so the strings stay
+    // readable and the presentation stays in the stylesheet.
+    //
+    // Home returns null on purpose: a bound book prints no running head on its title page,
+    // and the wordmark is already doing that job there. The rule still crosses the bar.
+    private string? Register
+    {
+        get
+        {
+            var path = "/" + Nav.ToBaseRelativePath(Nav.Uri).Split('?', '#')[0].TrimEnd('/');
+
+            // Two of the ten drawers have a real appendix standing behind them. Appendix I is
+            // the sandtrout-to-plankton-to-worm-to-spice chain plus the desert life Kynes
+            // catalogues, which is most of Flora & Fauna. Appendix II is the Orange Catholic
+            // Bible, the Zensunni migration and the Butlerian commandment, which is the older
+            // half of Theological Systems. The looser of the two is Appendix II, since the
+            // later-book faiths in that drawer postdate it. The other eight drawers take the
+            // house label rather than an invented appendix number.
+            if (path.StartsWith("/category/", StringComparison.OrdinalIgnoreCase))
+            {
+                return path["/category/".Length..].ToLowerInvariant() switch
+                {
+                    "flora-fauna" => "Appendix I: The Ecology of Dune",
+                    "theological-systems" => "Appendix II: The Religion of Dune",
+                    _ => "The Catalogue",
+                };
+            }
+
+            if (path.StartsWith("/entity/", StringComparison.OrdinalIgnoreCase))
+            {
+                return "The Record";
+            }
+
+            return path switch
+            {
+                "/" => null,
+                "/about" => "On Dune and Its Author",
+                "/archives" => "The Concordance",
+                "/timeline" => "Chronology of the Imperium",
+                // Herbert subtitles Appendix IV "Selected Excerpts of the Lives of the Great
+                // Houses", which is exactly what the chart below it is.
+                "/bloodlines" => "Appendix IV: The Almanak en-Ashraf",
+                "/connections" => "Cross-References",
+                "/universe" => "The Whole Record",
+                "/terminology" => "Terminology of the Imperium",
+                "/sayings" => "The Epigraphs",
+                "/trial" => "The Mentat Trial",
+                _ => "No Such Record",
+            };
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {

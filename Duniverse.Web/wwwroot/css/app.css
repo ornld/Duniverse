@@ -280,12 +280,14 @@ html {
     min-height: 100vh;
 }
 
+/* No border-bottom on purpose. The head rule below already draws a line across the bar,
+   and a border under it would put two parallel lines across the top of every page. The
+   rule carries the separation now, and it tapers where a border can't. */
 .site-header {
     display: flex;
     align-items: baseline;
-    gap: 0.75rem;
+    gap: 1rem;
     padding: 1rem 2rem;
-    border-bottom: 1px solid var(--dune-border);
 }
 
 .site-title {
@@ -293,6 +295,45 @@ html {
     letter-spacing: 0.04em;
     text-decoration: none;
     color: var(--dune-accent-bright);
+}
+
+/* Crosses whatever gap the wordmark and the register leave between them, so the bar reads
+   as one drawn line instead of two things marooned at opposite ends. Fades at both ends so
+   it never runs hard into the type. Same drawn-rule language as the epigraph attribution
+   and the glossary leaders. */
+.head-rule {
+    flex: 1;
+    height: 1px;
+    align-self: center;
+    margin-top: 2px;
+    background: linear-gradient(to right,
+        transparent 0%,
+        var(--dune-border) 14%,
+        var(--dune-border) 86%,
+        transparent 100%);
+}
+
+.head-register {
+    color: var(--dune-muted);
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+/* The longest register (Appendix IV) plus the wordmark needs about 495px of bar before the
+   two collide, so the band stands down below 620px and the header goes back to the plain
+   border it had. Without this the register runs off the right edge on a phone and drags a
+   sideways scroll onto every page. */
+@media (max-width: 620px) {
+    .site-header {
+        border-bottom: 1px solid var(--dune-border);
+    }
+
+    .head-rule,
+    .head-register {
+        display: none;
+    }
 }
 
 .site-body {
