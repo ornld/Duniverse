@@ -800,25 +800,43 @@ html {
    back of Dune, so the entries now run the way that appendix runs: headword out in the
    margin, definition flowing on the same line, nothing boxed. Dropping the boxes also
    doubles how many terms fit a screen, which is why PageSize went 13 to 26. */
+/* The ledger. Definitions used to start wherever their headword happened to end, so every
+   line opened at a different spot and the page read as ragged. One grid now owns the whole
+   list, so every headword shares a single column and every definition opens at the same
+   edge, all the way down the page.
+
+   The column is a fixed width, NOT fit-content. Letting it size to its contents lined every
+   page up beautifully on its own but moved the edge between pages (measured 132px to 227px
+   across the nine), and it slid on every keystroke in the filter as the result set changed.
+   An edge that walks around while you type is the same complaint in a new costume.
+
+   15rem is the ceiling because letterspaced caps run about a quarter wider than a character
+   count suggests: "Sorceresses of Rossak" measures 203px, not the ~150 you would guess, and
+   the leader needs its own minimum after that. It clamps down on narrow screens so the
+   definitions never get starved, which can wrap a long term onto two lines. That is fine.
+   The leader still ends where every other leader ends. */
 .glossary {
     margin: 1.5rem 0 0;
-    display: block;
+    display: grid;
+    grid-template-columns: clamp(8rem, 24vw, 15rem) 1fr;
+    column-gap: 1.1rem;
+    row-gap: 0.85rem;
+    align-items: baseline;
     text-align: left;
-}
-
-/* Hanging indent. The headword sits out at the left edge and the wrapped lines tuck
-   under it, which is the whole reason a run of definitions stays scannable once you take
-   the boxes away. padding-left pushes the block over, the negative text-indent pulls the
-   first line back out. */
-.glossary-entry {
-    padding-left: 1.6rem;
-    text-indent: -1.6rem;
-    margin-bottom: 0.85rem;
     line-height: 1.55;
 }
 
+/* The wrapper only exists to pair a dt with its dd in the markup. Taking it out of the box
+   tree lets both sit directly in the grid above, which is what puts every row on the same
+   two columns. The dl/dt/dd semantics are untouched. */
+.glossary-entry {
+    display: contents;
+}
+
     .glossary-entry dt {
-        display: inline;
+        /* Flex so the rule below can stretch from the end of the term to the column edge. */
+        display: flex;
+        align-items: baseline;
         margin: 0;
         color: var(--dune-accent-bright);
         font-size: 0.82rem;
@@ -826,33 +844,53 @@ html {
         text-transform: uppercase;
     }
 
-    /* The printed book puts a colon here. This draws a short rule instead, the same trick
-       the epigraph attribution uses for Herbert's dash, so the two registers match. It is
-       our house style, not the Chilton's. */
+    /* The printed book puts a colon here. This draws a rule instead, the same trick the
+       epigraph attribution uses for Herbert's dash, and with the ledger column it grew
+       into a leader: it fills whatever gap the term leaves, so every rule ends at the
+       same edge and walks the eye across to the definition. Our house style, not the
+       Chilton's. */
     .glossary-entry dt::after {
         content: "";
-        display: inline-block;
-        width: 1.4em;
+        flex: 1;
+        min-width: 1.4em;
         height: 1px;
-        margin: 0 0.5em 0.28em 0.55em;
+        margin: 0 0 0.28em 0.55em;
         background: var(--dune-border);
-        vertical-align: middle;
     }
 
     .glossary-entry dd {
-        display: inline;
         margin: 0;
         color: var(--dune-text);
     }
 
-/* Now that this sits inside a run of prose instead of on its own row, it needs to hold
-   together as one unit and read a step quieter than the definition around it. */
+/* Trails the definition inline, a step quieter than the text around it. */
 .glossary-see {
     display: inline-block;
     margin-left: 0.4rem;
     font-size: 0.85rem;
     white-space: nowrap;
-    text-indent: 0;
+}
+
+/* Phones and small tablets: a headword column starves the definitions here, so the ledger
+   collapses to one column and each term sits above its own definition. Every line still
+   opens at the same edge, just the left one.
+
+   700px rather than the 600px the nav uses. Measured at 620 the two-column form gave
+   definitions 38 characters a line and wrapped 7 of 26 headwords, which reads worse than
+   stacking. At 701 they get 45 characters and only the single longest term wraps. */
+@media (max-width: 700px) {
+    .glossary {
+        grid-template-columns: 1fr;
+        row-gap: 0;
+    }
+
+        .glossary-entry dt {
+            margin-bottom: 0.2rem;
+        }
+
+        .glossary-entry dd {
+            margin-bottom: 0.85rem;
+        }
 }
 
 .glossary-pager {
