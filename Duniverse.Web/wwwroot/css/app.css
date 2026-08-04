@@ -199,6 +199,12 @@ code {
     /* The flat wash About reads under. An essay wants an even page, not a lit card,
        so this one holds a single tone top to bottom instead of running warm to cold. */
     --scrim-essay: linear-gradient(rgba(23, 19, 16, 0.82), rgba(23, 19, 16, 0.88));
+    /* Recipes that repeat. The spice border is the gradient running the rim of a
+       lifted card, and the plate shadow is the pressed-plate pair (a hairline of
+       light along the top edge, shade gathering low) the hero and the cards share.
+       Each is written once here so a tuning pass turns one dial, not three. */
+    --spice-border-gradient: linear-gradient(120deg, #8a4a2a, #e0a458 30%, #f4c07c 50%, #c76b3f 70%, #8a4a2a);
+    --plate-shadow: inset 0 1px 0 rgba(241, 230, 214, 0.05), inset 0 -14px 28px -20px rgba(0, 0, 0, 0.45);
     /* The Ridulian grain: one 128px tile of sparse noise, generated offline and
        inlined so it costs no request. The tile carries its own faint alpha (little
        flecks at 2-7%, most pixels fully clear), so wherever it layers it looks like
@@ -460,7 +466,7 @@ html {
     /* The pressed-plate look: a hairline of light along the top edge and a soft shade
        gathering low, so the border feels stamped instead of drawn. The entity cards
        use the same pair. */
-    box-shadow: inset 0 1px 0 rgba(241, 230, 214, 0.05), inset 0 -14px 28px -20px rgba(0, 0, 0, 0.45);
+    box-shadow: var(--plate-shadow);
 }
 
 /* Some of the source pictures have a frame baked into their pixels (vehicles.webp
@@ -1368,7 +1374,7 @@ html {
     border-radius: 8px;
     padding: 1.5rem;
     margin-bottom: 1.5rem;
-    box-shadow: inset 0 1px 0 rgba(241, 230, 214, 0.05), inset 0 -14px 28px -20px rgba(0, 0, 0, 0.45);
+    box-shadow: var(--plate-shadow);
 }
 
 .entity-card.front {
@@ -1625,7 +1631,7 @@ html {
     background-repeat: repeat, no-repeat, no-repeat;
     border: 1px solid var(--dune-border);
     border-radius: 8px;
-    box-shadow: inset 0 1px 0 rgba(241, 230, 214, 0.05), inset 0 -14px 28px -20px rgba(0, 0, 0, 0.45);
+    box-shadow: var(--plate-shadow);
 }
 
 .universe-graph {
@@ -2881,7 +2887,7 @@ button.chip {
         border-color: transparent;
         background:
             linear-gradient(135deg, rgba(var(--dune-accent-rgb), 0.32), rgba(199, 107, 63, 0.2)) padding-box,
-            linear-gradient(120deg, #8a4a2a, #e0a458 30%, #f4c07c 50%, #c76b3f 70%, #8a4a2a) border-box;
+            var(--spice-border-gradient) border-box;
         background-size: 100% 100%, 300% 300%;
         box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35), 0 0 16px rgba(var(--dune-accent-rgb), 0.35);
         animation: spice-shimmer 2.5s ease infinite;
@@ -3011,7 +3017,7 @@ button.chip {
         border-color: transparent;
         background:
             linear-gradient(rgba(36, 28, 22, 0.75), rgba(36, 28, 22, 0.75)) padding-box,
-            linear-gradient(120deg, #8a4a2a, #e0a458 30%, #f4c07c 50%, #c76b3f 70%, #8a4a2a) border-box;
+            var(--spice-border-gradient) border-box;
         background-size: 100% 100%, 300% 300%;
         box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35), 0 0 16px rgba(var(--dune-accent-rgb), 0.35);
         animation: spice-shimmer 2.5s ease infinite;
