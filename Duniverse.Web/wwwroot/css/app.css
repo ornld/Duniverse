@@ -1449,10 +1449,16 @@ html {
         box-shadow: 0 6px 18px -10px rgba(0, 0, 0, 0.6);
     }
 
-    .explore-glyph {
+    /* Was three characters off the character map. Now the drawn marks, sized to sit level
+       with the pill's own text.
+
+       Qualified by the pill on purpose. The base .mark rule lives further down the sheet,
+       so a bare .explore-glyph ties with it on specificity and loses on source order, and
+       the size set here would quietly do nothing. */
+    .explore-link .explore-glyph {
         color: var(--dune-accent);
-        font-size: 1rem;
-        line-height: 1;
+        width: 17px;
+        height: 17px;
     }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1586,6 +1592,56 @@ html {
 .category-vehicles { --cat-color: #85a0b5; }
 .category-worlds { --cat-color: #cf9838; }
 .category-unknown { --cat-color: var(--dune-muted); }
+
+/* ---- The drawn marks ----
+   One mark per drawer, plus three for the doors out of a record. The shapes live in
+   Components/Mark.razor; everything about how big they are and what color they take is
+   decided here, per surface, because a mark in the Index and a mark heading a drawer are
+   not doing the same job.
+
+   None of them carry a color of their own. They stroke with currentColor, so setting
+   `color` on the mark (or on anything above it) is the whole tinting story. */
+
+.mark {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    /* Never let a flex row squeeze a mark out of shape. */
+    flex: none;
+    vertical-align: middle;
+}
+
+/* In the Index, each mark wears its own drawer's color while the label stays in reading
+   text. The li carries the category class, so --cat-color is already in scope here. */
+.index-mark {
+    width: 16px;
+    height: 16px;
+    color: var(--cat-color, var(--dune-accent));
+}
+
+/* The legend on the whole-Duniverse page. This used to be a colored dot and nothing else,
+   which asked color alone to separate ten categories. The mark says which drawer it is
+   without needing the reader to distinguish teal from steel. */
+.legend-mark {
+    width: 15px;
+    height: 15px;
+}
+
+/* A drawer's own page: the mark sits beside the name at the one size on this site where
+   these are drawn big enough to actually read as objects. */
+.category-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+}
+
+.category-heading-mark {
+    width: 2rem;
+    height: 2rem;
+    color: var(--cat-color, var(--dune-accent));
+    /* Optically level with the cap height rather than the line box, which sits low. */
+    margin-top: -0.15rem;
+}
 
 /* A record's kind tints the top edge of its card, its browse page's hero, and the
    left edge of every tile inside, carrying the graphs' color language through the
@@ -2531,8 +2587,12 @@ button.chip {
            the cycle. Both are stripped under prefers-reduced-motion, leaving the
            static glow. */
 
-        .top-nav.tab-glow a.active,
-        .top-nav.tab-glow .index-trigger.active .index-label {
+        /* Direct children only, plus the two labels. Inside the Index panel the treatment
+           takes the label span rather than the whole link, so its bloom stops at the words
+           and leaves the drawer's mark in the drawer's own color. */
+        .top-nav.tab-glow > a.active,
+        .top-nav.tab-glow .index-trigger.active .index-label,
+        .top-nav.tab-glow .index-panel a.active .index-label {
             background-image:
                 linear-gradient(100deg, rgba(126, 180, 255, 0) 40%, rgba(126, 180, 255, 0.5) 50%, rgba(126, 180, 255, 0) 60%),
                 linear-gradient(180deg, #4a8fe8 0%, #84b8fa 52%, #4a8fe8 100%);
@@ -2591,8 +2651,9 @@ button.chip {
         }
 
         @media (prefers-reduced-motion: reduce) {
-            .top-nav.tab-glow a.active,
-            .top-nav.tab-glow .index-trigger.active .index-label {
+            .top-nav.tab-glow > a.active,
+            .top-nav.tab-glow .index-trigger.active .index-label,
+            .top-nav.tab-glow .index-panel a.active .index-label {
                 animation: none;
             }
         }
@@ -2727,7 +2788,9 @@ button.chip {
     top: calc(100% + 0.55rem);
     left: 50%;
     transform: translateX(-50%);
-    width: min(22rem, 92vw);
+    /* Two rem wider than it was, bought back for the marks: with an icon in front of it,
+       "Theological System" wrapped to a second line at the old width. */
+    width: min(24rem, 94vw);
     z-index: 41;
     background: rgba(36, 28, 22, 0.92);
     backdrop-filter: blur(6px);
@@ -2794,11 +2857,15 @@ button.chip {
     }
 }
 
+/* Flex rather than a centered block, so the mark and its label ride one row together and
+   the pair stays centered as a unit. */
 .top-nav .index-panel a {
-    display: block;
-    padding: 0.42rem 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    padding: 0.42rem 0.55rem;
     border-radius: 6px;
-    text-align: center;
     transition: color var(--dur-touch) ease, background var(--dur-touch) ease;
 }
 

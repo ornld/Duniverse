@@ -81,7 +81,7 @@
     <div class="universe-legend">
         @foreach (var entry in Legend)
         {
-            <span><span class="endpoint-dot connection-cat category-@entry.Slug"></span>@entry.Label</span>
+            <span><Mark Name="@entry.Slug" CssClass="@($"legend-mark connection-cat category-{entry.Slug}")" />@entry.Label</span>
         }
     </div>
 

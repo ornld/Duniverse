@@ -13,7 +13,12 @@
 @if (allInCategory.Count > 0)
 {
     <div class="hero category-hero category-@Slug.ToLowerInvariant()" style="@heroStyle">
-        <h1>@categoryTitle</h1>
+        @* The drawer's own mark stands beside its name, at the one size on the site where
+           these are drawn large enough to actually look at. *@
+        <div class="category-heading">
+            <Mark Name="@Slug.ToLowerInvariant()" CssClass="category-heading-mark" />
+            <h1>@categoryTitle</h1>
+        </div>
         <p class="tagline">@items.Count records. Select one to see its full entry and connections.</p>
 
         <div class="category-grid">

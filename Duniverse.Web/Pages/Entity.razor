@@ -147,15 +147,15 @@ else if (entity is not null)
        this entity. Bloodlines only shows for people who actually stand in the chart. *@
     <nav class="entity-explore dossier-item" style="--i: 4" aria-label="Explore this record further">
         <a class="explore-link" href="@($"/connections?from={entity.Id}")">
-            <span class="explore-glyph" aria-hidden="true">&#8596;</span>Trace a connection from here
+            <Mark Name="connections" CssClass="explore-glyph" />Trace a connection from here
         </a>
         <a class="explore-link" href="@($"/universe?focus={entity.Id}")">
-            <span class="explore-glyph" aria-hidden="true">&#9673;</span>See it in the whole Duniverse
+            <Mark Name="universe" CssClass="explore-glyph" />See it in the whole Duniverse
         </a>
         @if (InBloodline)
         {
             <a class="explore-link" href="@($"/bloodlines?focus={entity.Id}")">
-                <span class="explore-glyph" aria-hidden="true">&#9906;</span>View in the bloodlines
+                <Mark Name="bloodlines" CssClass="explore-glyph" />View in the bloodlines
             </a>
         }
     </nav>

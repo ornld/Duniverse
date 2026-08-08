@@ -1,0 +1,131 @@
+@* The archive's drawn marks: one for each of the ten drawers, plus the three that label
+   the doors out of a record.
+
+   Every mark is built the same way, and the sameness is the point: a 24 box, a hairline
+   stroke, round caps, no fills except where a dot is a node rather than a shape. Nothing
+   here sets a color. They all stroke with currentColor, so a mark takes the tint of
+   whatever it sits in: --cat-color in the legend and the drawer headings, the spice accent
+   in the pills on a record. That is what lets one file serve every surface.
+
+   Purely decorative. Every one is hidden from screen readers, because in every place these
+   appear the label is already sitting right beside them, and announcing "crysknife" before
+   the word Artifacts helps nobody. *@
+
+<svg class="mark @CssClass" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+     stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+     aria-hidden="true" focusable="false">
+    @switch (Name)
+    {
+        @* Ground from a single worm tooth, so the belly curves out one side and the spine
+           runs near straight down the other. A symmetrical blade read as a needle. *@
+        case "artifacts":
+            <path d="M14 2.4 C 9.6 6.2, 8.5 10.6, 9.5 14.4 L 14.2 14.4 C 14.5 10.2, 14.4 6.2, 14 2.4 Z" />
+            <path d="M7.6 15 L 16.4 15" />
+            <path d="M10.6 15.6 L 10.6 19.6" />
+            <path d="M13.4 15.6 L 13.4 19.6" />
+            <path d="M9.8 20.4 L 14.2 20.4" />
+            break;
+
+        @* A spiral for the trained mind turning inward. Plotted rather than drawn by hand,
+           which is the only way the coils come out evenly spaced. *@
+        case "disciplines":
+            <path d="M12.0 12.0 L12.02 11.87 L12.08 11.76 L12.17 11.66 L12.3 11.59 L12.45 11.55 L12.62 11.55 L12.8 11.59 L12.97 11.68 L13.14 11.82 L13.28 12.0 L13.39 12.22 L13.46 12.48 L13.48 12.76 L13.45 13.05 L13.36 13.36 L13.2 13.66 L12.99 13.94 L12.71 14.19 L12.38 14.4 L12.0 14.56 L11.58 14.66 L11.13 14.68 L10.66 14.63 L10.19 14.49 L9.74 14.26 L9.3 13.96 L8.92 13.57 L8.59 13.11 L8.33 12.58 L8.16 12.0 L8.08 11.38 L8.1 10.73 L8.23 10.08 L8.48 9.44 L8.83 8.83 L9.29 8.27 L9.85 7.78 L10.5 7.37 L11.22 7.06 L12.0 6.88 L12.82 6.81 L13.66 6.88 L14.5 7.09 L15.31 7.44 L16.08 7.92 L16.77 8.54 L17.37 9.27 L17.85 10.1 L18.2 11.02 L18.41 12.0 L18.45 13.02 L18.34 14.06 L18.05 15.08 L17.6 16.07 L16.98 16.98 L16.22 17.8 L15.32 18.51 L14.3 19.07 L13.18 19.47 L12.0 19.69 L10.78 19.72 L9.55 19.55 L8.34 19.19 L7.18 18.63" />
+            break;
+
+        @* Sandtrout leaf, with its vein. *@
+        case "flora-fauna":
+            <path d="M12 2.8 C 16.4 7.6, 18.4 11.4, 12 21.2 C 5.6 11.4, 7.6 7.6, 12 2.8 Z" />
+            <path d="M12 5.2 L 12 19" />
+            break;
+
+        @* An hourglass, for the things that already happened. *@
+        case "historical-events":
+            <path d="M6.8 3.2 L 17.2 3.2" />
+            <path d="M6.8 20.8 L 17.2 20.8" />
+            <path d="M8.6 3.2 L 8.6 6.4 C 8.6 9.4, 12 10.9, 12 12 C 12 13.1, 8.6 14.6, 8.6 17.6 L 8.6 20.8" />
+            <path d="M15.4 3.2 L 15.4 6.4 C 15.4 9.4, 12 10.9, 12 12 C 12 13.1, 15.4 14.6, 15.4 17.6 L 15.4 20.8" />
+            break;
+
+        @* A swallowtail pennant on its staff. *@
+        case "houses":
+            <path d="M6.2 2.6 L 6.2 21.4" />
+            <path d="M6.2 4.4 L 18.6 6.6 L 15.4 9.2 L 18.6 11.8 L 6.2 14 Z" />
+            break;
+
+        @* One ring with three seats set around it: powers held in balance. Three overlapping
+           circles, which is where this started, turned to porridge at tab size. *@
+        case "organizations":
+            <circle cx="12" cy="12" r="6.2" />
+            <circle cx="12" cy="5.8" r="2" fill="currentColor" stroke="none" />
+            <circle cx="6.63" cy="15.1" r="2" fill="currentColor" stroke="none" />
+            <circle cx="17.37" cy="15.1" r="2" fill="currentColor" stroke="none" />
+            break;
+
+        @* Head and shoulders. The plainest mark in the set, and the one that reads fastest. *@
+        case "personas":
+            <circle cx="12" cy="8" r="4.1" />
+            <path d="M4.4 20.8 C 5.4 16.4, 8.4 14.2, 12 14.2 C 15.6 14.2, 18.6 16.4, 19.6 20.8" />
+            break;
+
+        @* The book, opened, filling the frame. It had a crescent over it for a while, which
+           crowded the box and borrowed a meaning the moons already carry here. *@
+        case "theological-systems":
+            <path d="M12 7.4 C 9.5 5.5, 6 5.3, 3.2 6.5 L 3.2 17.5 C 6 16.3, 9.5 16.5, 12 18.4" />
+            <path d="M12 7.4 C 14.5 5.5, 18 5.3, 20.8 6.5 L 20.8 17.5 C 18 16.3, 14.5 16.5, 12 18.4" />
+            <path d="M12 7.4 L 12 18.4" />
+            break;
+
+        @* A thopter from above, hull running the full height with the wings swept off its
+           shoulders. Wings alone, meeting at a stem, read as a stemmed glass. *@
+        case "vehicles":
+            <path d="M12 2.6 C 13.3 5.6, 13.6 9.2, 13.4 13 C 13.2 16.6, 12.7 19.3, 12 21.4 C 11.3 19.3, 10.8 16.6, 10.6 13 C 10.4 9.2, 10.7 5.6, 12 2.6 Z" />
+            <path d="M10.8 8.4 C 8 7.2, 5.2 5.4, 3.2 3.4 C 4.6 6.5, 7 9.3, 10.5 11.2 Z" />
+            <path d="M13.2 8.4 C 16 7.2, 18.8 5.4, 20.8 3.4 C 19.4 6.5, 17 9.3, 13.5 11.2 Z" />
+            break;
+
+        @* A world crossed by its orbit. *@
+        case "worlds":
+            <circle cx="12" cy="12" r="6.6" />
+            <ellipse cx="12" cy="12" rx="10.4" ry="3.5" transform="rotate(-22 12 12)" />
+            break;
+
+        @* ---- the three doors out of a record ---- *@
+
+        @* Two records joined by a drawn rule, the same rule the epigraphs and the running
+           head use. *@
+        case "connections":
+            <circle cx="4.8" cy="12" r="2.1" fill="currentColor" stroke="none" />
+            <circle cx="19.2" cy="12" r="2.1" fill="currentColor" stroke="none" />
+            <path d="M7.4 12 L 16.6 12" />
+            break;
+
+        @* A constellation, which is what the whole archive looks like on that page. *@
+        case "universe":
+            <path d="M5 7.2 L 11.2 3.8 L 17.4 9 M11.2 3.8 L 8 16.4 M17.4 9 L 16.2 18.6 M8 16.4 L 16.2 18.6" />
+            <circle cx="5" cy="7.2" r="1.6" fill="currentColor" stroke="none" />
+            <circle cx="11.2" cy="3.8" r="1.6" fill="currentColor" stroke="none" />
+            <circle cx="17.4" cy="9" r="1.6" fill="currentColor" stroke="none" />
+            <circle cx="8" cy="16.4" r="1.6" fill="currentColor" stroke="none" />
+            <circle cx="16.2" cy="18.6" r="1.6" fill="currentColor" stroke="none" />
+            break;
+
+        @* A descent forking, borrowed straight from the shape of the bloodline chart. *@
+        case "bloodlines":
+            <circle cx="12" cy="4.2" r="1.9" fill="currentColor" stroke="none" />
+            <path d="M12 6.4 L 12 11 M6.4 11 L 17.6 11 M6.4 11 L 6.4 15.2 M17.6 11 L 17.6 15.2" />
+            <circle cx="6.4" cy="17.4" r="1.9" fill="currentColor" stroke="none" />
+            <circle cx="17.6" cy="17.4" r="1.9" fill="currentColor" stroke="none" />
+            break;
+    }
+</svg>
+
+@code {
+    // A drawer's slug ("flora-fauna") or one of the three doors ("connections", "universe",
+    // "bloodlines"). An unknown name draws an empty box rather than throwing: a missing mark
+    // should never be the thing that takes a page down.
+    [Parameter, EditorRequired] public string Name { get; set; } = string.Empty;
+
+    // Where the size comes from. Each surface sets its own, since a mark in the nav and a
+    // mark heading a drawer are not the same object.
+    [Parameter] public string? CssClass { get; set; }
+}

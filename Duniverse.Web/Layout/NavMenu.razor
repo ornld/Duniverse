@@ -41,16 +41,21 @@
                 <canvas class="index-sand" @ref="sandCanvas"></canvas>
                 <div class="index-seam"></div>
                 <ul>
-                    <li style="--i: 0"><NavLink href="/category/artifacts">Artifact</NavLink></li>
-                    <li style="--i: 1"><NavLink href="/category/disciplines">Discipline</NavLink></li>
-                    <li style="--i: 2"><NavLink href="/category/flora-fauna">Flora & Fauna</NavLink></li>
-                    <li style="--i: 3"><NavLink href="/category/historical-events">Historical Event</NavLink></li>
-                    <li style="--i: 4"><NavLink href="/category/houses">House</NavLink></li>
-                    <li style="--i: 5"><NavLink href="/category/organizations">Organization</NavLink></li>
-                    <li style="--i: 6"><NavLink href="/category/personas">Persona</NavLink></li>
-                    <li style="--i: 7"><NavLink href="/category/theological-systems">Theological System</NavLink></li>
-                    <li style="--i: 8"><NavLink href="/category/vehicles">Vehicle</NavLink></li>
-                    <li style="--i: 9"><NavLink href="/category/worlds">World</NavLink></li>
+                    @* Each drawer carries its own mark. They tint from --cat-color, so the
+                       panel is the one place on the site where all ten colors sit together. *@
+                    @* The label sits in its own span so the Eyes of Ibad treatment can take
+                       the words alone. Left on the whole link, its glow bloomed over the
+                       mark beside it and turned a drawer's own color blue. *@
+                    <li style="--i: 0" class="category-artifacts"><NavLink href="/category/artifacts"><Mark Name="artifacts" CssClass="index-mark" /><span class="index-label">Artifact</span></NavLink></li>
+                    <li style="--i: 1" class="category-disciplines"><NavLink href="/category/disciplines"><Mark Name="disciplines" CssClass="index-mark" /><span class="index-label">Discipline</span></NavLink></li>
+                    <li style="--i: 2" class="category-flora-fauna"><NavLink href="/category/flora-fauna"><Mark Name="flora-fauna" CssClass="index-mark" /><span class="index-label">Flora & Fauna</span></NavLink></li>
+                    <li style="--i: 3" class="category-historical-events"><NavLink href="/category/historical-events"><Mark Name="historical-events" CssClass="index-mark" /><span class="index-label">Historical Event</span></NavLink></li>
+                    <li style="--i: 4" class="category-houses"><NavLink href="/category/houses"><Mark Name="houses" CssClass="index-mark" /><span class="index-label">House</span></NavLink></li>
+                    <li style="--i: 5" class="category-organizations"><NavLink href="/category/organizations"><Mark Name="organizations" CssClass="index-mark" /><span class="index-label">Organization</span></NavLink></li>
+                    <li style="--i: 6" class="category-personas"><NavLink href="/category/personas"><Mark Name="personas" CssClass="index-mark" /><span class="index-label">Persona</span></NavLink></li>
+                    <li style="--i: 7" class="category-theological-systems"><NavLink href="/category/theological-systems"><Mark Name="theological-systems" CssClass="index-mark" /><span class="index-label">Theological System</span></NavLink></li>
+                    <li style="--i: 8" class="category-vehicles"><NavLink href="/category/vehicles"><Mark Name="vehicles" CssClass="index-mark" /><span class="index-label">Vehicle</span></NavLink></li>
+                    <li style="--i: 9" class="category-worlds"><NavLink href="/category/worlds"><Mark Name="worlds" CssClass="index-mark" /><span class="index-label">World</span></NavLink></li>
                 </ul>
             </div>
         }
