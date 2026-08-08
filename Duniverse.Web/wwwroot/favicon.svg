@@ -1,13 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
     <title>Duniverse</title>
-    <!-- Twin moons over a dune rising to the right. Drawn in a 16 box rather than shrunk
-         into one, so it is built at the size it actually has to survive. The horizon lies
-         low on the left where the moons hang and climbs across to the right, which gives
-         each half its own subject instead of a bar across the middle. -->
+    <!-- Twin moons over a dune. Drawn in a 16 box rather than shrunk into one, so it is
+         built at the size it actually has to survive.
+
+         The sand lies low on the left where the moons hang, climbs the long way across,
+         crests under the small moon, then drops off to the right. That last part is what
+         makes it a dune: running the slope straight into the corner instead read as a
+         diagonal line ruled across the icon. Long windward side, short slip face, which
+         is the shape sand actually takes. -->
     <rect width="16" height="16" rx="3" fill="#0f0d0c"/>
     <circle cx="4.6" cy="7.1" r="3" fill="#d9cdb6"/>
-    <circle cx="12.2" cy="4.1" r="1.6" fill="#b0a288"/>
-    <path d="M0 13.6 C 3.5 13.2, 8 12.2, 11.5 9.6 C 13.2 8.3, 14.6 7.6, 16 7.2 L 16 16 L 0 16 Z" fill="#4a3a28"/>
+    <circle cx="12.4" cy="3.8" r="1.6" fill="#b0a288"/>
+    <path d="M0 13.7 C 4 13.4, 7.6 12.9, 10.6 9.2 C 11.4 8.2, 12.4 7.6, 13.4 7.9 C 14.4 8.2, 15.2 9.2, 16 11 L 16 16 L 0 16 Z" fill="#4a3a28"/>
     <!-- Moonlight catching the crest, the same gold the footer horizon uses. -->
-    <path d="M0 13.6 C 3.5 13.2, 8 12.2, 11.5 9.6 C 13.2 8.3, 14.6 7.6, 16 7.2" fill="none" stroke="#e0a458" stroke-width="0.7"/>
+    <path d="M0 13.7 C 4 13.4, 7.6 12.9, 10.6 9.2 C 11.4 8.2, 12.4 7.6, 13.4 7.9 C 14.4 8.2, 15.2 9.2, 16 11" fill="none" stroke="#e0a458" stroke-width="0.7"/>
 </svg>
