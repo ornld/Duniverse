@@ -483,7 +483,7 @@ html {
     box-shadow: var(--plate-shadow);
 }
 
-/* Some of the source pictures have a frame baked into their pixels (vehicles.webp
+/* Some of the source pictures have a frame baked into their pixels (vehicles.avif
    a white border, worlds.webp a dark edge line). This repaints the background on a
    slightly oversized layer so those baked-in edges land outside the card and get
    clipped. The image files themselves stay untouched. */
@@ -1685,7 +1685,7 @@ html {
     background-image: var(--ridulian-grain), var(--scrim-mid), url('/images/categories/theological-systems.webp');
 }
 .entity-card.front.category-vehicles {
-    background-image: var(--ridulian-grain), var(--scrim-mid), url('/images/categories/vehicles.webp');
+    background-image: var(--ridulian-grain), var(--scrim-mid), url('/images/categories/vehicles.avif');
 }
 .entity-card.front.category-worlds {
     background-image: var(--ridulian-grain), var(--scrim-mid), url('/images/categories/worlds.webp');
