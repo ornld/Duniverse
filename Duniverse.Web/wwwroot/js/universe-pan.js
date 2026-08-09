@@ -50,9 +50,26 @@ window.duneUniverse = (function () {
         apply(false);
     }
 
+    // The nudge shown when someone scrolls over the graph expecting to zoom. Held for a
+    // moment, then faded, and re-armed only once the reader has stopped scrolling, so a
+    // long scroll down the page raises it once instead of flickering the whole way.
+    let hintEl = null;
+    let hintTimer = null;
+    function hintZoom() {
+        if (!hintEl) {
+            return;
+        }
+        hintEl.classList.add("is-showing");
+        clearTimeout(hintTimer);
+        hintTimer = setTimeout(function () {
+            hintEl.classList.remove("is-showing");
+        }, 1400);
+    }
+
     function attach(container) {
         svg = container.querySelector("svg.universe-graph");
         world = svg ? svg.querySelector(".universe-world") : null;
+        hintEl = container.querySelector(".universe-zoom-hint");
         if (!svg || !world) {
             return;
         }
@@ -61,7 +78,20 @@ window.duneUniverse = (function () {
         tx = 0;
         ty = 0;
 
+        // Scrolling over the graph used to zoom it and swallow the scroll, which meant a
+        // wheel or a trackpad could not get you past the constellation to the rest of the
+        // page. Now a plain scroll belongs to the page and only a deliberate zoom gesture
+        // reaches the camera, the way a map behaves.
+        //
+        // One test covers both gestures: a trackpad pinch arrives as a wheel event with
+        // ctrlKey already set by the browser, and holding ctrl (or cmd) while scrolling is
+        // the keyboard equivalent. Anyone who does neither gets a one-off hint, and the
+        // +/- buttons on the card zoom without any of this.
         svg.addEventListener("wheel", function (e) {
+            if (!e.ctrlKey && !e.metaKey) {
+                hintZoom();
+                return;
+            }
             e.preventDefault();
             zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.0015));
         }, { passive: false });

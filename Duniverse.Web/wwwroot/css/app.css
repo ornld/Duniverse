@@ -1697,6 +1697,53 @@ html {
     text-align: center;
 }
 
+/* ---- Graphs without a cursor ----
+   Node names are drawn but held at zero opacity until hover, which is a rule a touchscreen
+   can never satisfy: every graph became a field of unnamed colored dots on a phone. Where
+   there is no hover, the record web simply shows all its names. It carries a few dozen
+   nodes at most, so they fit.
+
+   The whole-Duniverse graph is left out of this on purpose. A hundred and twenty names at
+   once is not a map, it is a wall, so that page answers a press instead: the first press
+   names a star and lights its threads, the second opens it. */
+/* The node a reader has singled out, by cursor or by finger. Hover cannot carry this on
+   its own: a touchscreen never hovers, so without a class the name of the thing you just
+   pressed stays invisible. */
+.graph-node.is-active text {
+    opacity: 1;
+}
+
+/* The touch line hides by default, since a cursor is still the common case. */
+.graph-hint-touch {
+    display: none;
+}
+
+@media (hover: none) {
+    /* Names are drawn at a size that suits a graph filling a desktop card. On a phone the
+       whole web scales to under half, which takes an 11px name down to about five: too
+       small to read even before it collides with its neighbours. Since only the pressed
+       node shows a name here, there is nothing to collide with, and it can be set large
+       enough to actually read. */
+    .relationship-graph .graph-node.is-active text {
+        font-size: 26px;
+    }
+
+    .universe-graph .graph-node.is-active text {
+        font-size: 30px;
+    }
+
+    /* Swap the instruction for one that can actually be followed here. Scoped to the record
+       web's own wrapper: the whole-Duniverse page has a single hint that already speaks to
+       both kinds of reader, and a looser selector would delete it. */
+    .graph-wrapper .graph-hint:not(.graph-hint-touch) {
+        display: none;
+    }
+
+    .graph-hint-touch {
+        display: block;
+    }
+}
+
 /* ---- The whole Duniverse ---- */
 
 .universe-card {
@@ -1846,6 +1893,39 @@ html {
             border-color: var(--dune-accent);
             color: var(--dune-accent-bright);
         }
+
+/* The zoom nudge. Sits over the constellation, out of the way of the controls, and only
+   while it is being shown: it never intercepts a press, so it cannot become the thing
+   standing between a finger and a star. */
+.universe-zoom-hint {
+    position: absolute;
+    top: 1.1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    margin: 0;
+    padding: 0.35rem 0.9rem;
+    background: rgba(23, 19, 16, 0.88);
+    border: 1px solid var(--dune-border);
+    border-radius: 999px;
+    color: var(--dune-text);
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--dur-open) ease;
+}
+
+    .universe-zoom-hint.is-showing {
+        opacity: 1;
+    }
+
+@media (prefers-reduced-motion: reduce) {
+    .universe-zoom-hint {
+        transition: none;
+    }
+}
 
 .universe-legend {
     display: flex;

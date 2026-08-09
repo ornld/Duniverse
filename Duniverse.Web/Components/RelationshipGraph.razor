@@ -6,7 +6,12 @@
 @if (graph is not null && graph.Nodes.Count > 1)
 {
     <div class="graph-wrapper">
-        <svg class="relationship-graph @(hoveredNodeId is null ? null : "has-hover")" viewBox="0 0 @Width @Height" preserveAspectRatio="xMidYMid meet">
+        @* Described as one picture rather than a web of controls. Everything drawn here is
+           listed underneath in Related, as ordinary links a keyboard and a screen reader
+           already handle, so announcing the same records twice would only make the page
+           longer to get through. *@
+        <svg class="relationship-graph @(hoveredNodeId is null ? null : "has-hover")" viewBox="0 0 @Width @Height" preserveAspectRatio="xMidYMid meet"
+             role="img" aria-label="@($"A web of {graph.Nodes.Count - 1} records connected to this one. Each is listed with its relationship below.")">
             <g class="graph-edges">
                 @foreach (var edge in graph.Edges)
                 {
@@ -26,11 +31,12 @@
             <g class="graph-nodes">
                 @foreach (var node in graph.Nodes)
                 {
-                    <g class="graph-node category-@node.Category @(node.IsCenter ? "is-center" : "") @(IsNearHovered(node) ? "near-hovered" : "")"
+                    <g class="graph-node category-@node.Category @(node.IsCenter ? "is-center" : "") @(IsNearHovered(node) ? "near-hovered" : "") @(IsActive(node) ? "is-active" : null)"
                        transform="translate(@node.X.ToString(Inv), @node.Y.ToString(Inv))"
-                       @onclick="() => GoTo(node.Id)"
+                       @onpointerdown="e => RememberPointer(e)"
+                       @onclick="() => Activate(node.Id)"
                        @onmouseover="() => hoveredNodeId = node.Id"
-                       @onmouseout="() => hoveredNodeId = null">
+                       @onmouseout="() => OnMouseOut()">
                         <circle r="@(node.IsCenter ? 20 : 11)" />
                         <text y="@(node.IsCenter ? 34 : 24)">@Truncate(node.Name)</text>
                         <title>@NodeTip(node)</title>
@@ -38,7 +44,9 @@
                 }
             </g>
         </svg>
+        @* The old line said "hover", which is advice a touchscreen cannot take. *@
         <p class="graph-hint muted">Hover any node to light its connections. Click it to re-center the web on it.</p>
+        <p class="graph-hint muted graph-hint-touch">Tap a node to name it and light its connections. Tap it again to open its record.</p>
     </div>
 }
 
@@ -87,6 +95,49 @@
         return hoveredNodeId is not null
             && (string.Equals(node.Id, hoveredNodeId, StringComparison.OrdinalIgnoreCase)
                 || (neighborsById.TryGetValue(hoveredNodeId, out var near) && near.Contains(node.Id)));
+    }
+
+    // The one node singled out right now, as against the neighbourhood lit around it.
+    private bool IsActive(GraphNode node)
+        => string.Equals(node.Id, hoveredNodeId, StringComparison.OrdinalIgnoreCase);
+
+    // Which kind of pointer opened the current interaction. A touchscreen never hovers, so
+    // a press has to do the naming that a cursor does by arriving.
+    private bool lastPointerWasTouch;
+
+    // The node a finger has already named. Held apart from hoveredNodeId, which a passing
+    // mouse also sets: a cursor must never leave a node primed to open on the next press.
+    private string? revealedByTouch;
+
+    private void RememberPointer(PointerEventArgs e)
+    {
+        lastPointerWasTouch = e.PointerType is "touch" or "pen";
+    }
+
+    // A cursor leaving a node drops the highlight. A finger's stays: there is nowhere for
+    // touch to move away to, and the name has to outlast the press to be read at all.
+    private void OnMouseOut()
+    {
+        if (!lastPointerWasTouch)
+        {
+            hoveredNodeId = null;
+        }
+    }
+
+    // Mouse keeps one click. Touch takes two: the first names the node and lights what it
+    // touches, the second opens it. Showing every name at once was the other option and it
+    // does not survive a phone, where the whole web scales to under half and three dozen
+    // names land on top of each other.
+    private void Activate(string id)
+    {
+        if (lastPointerWasTouch && !string.Equals(revealedByTouch, id, StringComparison.OrdinalIgnoreCase))
+        {
+            revealedByTouch = id;
+            hoveredNodeId = id;
+            return;
+        }
+
+        GoTo(id);
     }
 
     private void GoTo(string id)

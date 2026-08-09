@@ -27,8 +27,17 @@
             <button type="button" data-uni-zoom="reset" title="Reset the view" aria-label="Reset the view">&#8634;</button>
         </div>
 
+        @* Raised when someone scrolls over the graph expecting it to zoom. aria-hidden and
+           never focusable: it answers a mouse gesture, and a reader who cannot make that
+           gesture has the buttons above instead. *@
+        <p class="universe-zoom-hint" aria-hidden="true">Hold ctrl and scroll to zoom</p>
+
+        @* role="img" with a real description, deliberately. The constellation is a second
+           view of records that Archives, the drawers and the find box above all reach in
+           plain markup, so a screen reader is told what this is and spared 122 unlabelled
+           dots it cannot do anything useful with. *@
         <svg class="universe-graph @(hoveredNodeId is null ? null : "has-hover")" viewBox="0 0 1600 1200" xmlns="http://www.w3.org/2000/svg"
-             role="img" aria-label="Every visible record in the archive, connected as one graph">
+             role="img" aria-label="@($"A constellation of {graph.Nodes.Count} records and {graph.Edges.Count} connections. Every record here can also be reached from the Archives, the category drawers, or the find box above.")">
             <g class="universe-world">
                 @* The birth of the universe: every node carries a delay based on its distance
                    from the canvas center, so creation blooms outward as a wave, and a
@@ -51,12 +60,13 @@
                 <g class="graph-nodes">
                     @foreach (var node in graph.Nodes)
                     {
-                        <g class="graph-node category-@node.Category @(node.Id == found?.Id ? "is-found" : null) @(IsNearHovered(node) ? "near-hovered" : null)"
+                        <g class="graph-node category-@node.Category @(node.Id == found?.Id ? "is-found" : null) @(IsNearHovered(node) ? "near-hovered" : null) @(IsActive(node) ? "is-active" : null)"
                            transform="translate(@node.X.ToString(Inv), @node.Y.ToString(Inv))"
                            style="--birth: @NodeBirthDelay(node)"
-                           @onclick="() => GoTo(node.Id)"
+                           @onpointerdown="e => RememberPointer(e)"
+                           @onclick="() => Activate(node.Id)"
                            @onmouseover="() => hoveredNodeId = node.Id"
-                           @onmouseout="() => hoveredNodeId = null">
+                           @onmouseout="() => OnMouseOut()">
                             @* The invisible circle is the hit target. Without it, the gap
                                between the dot and its label is dead space that eats
                                clicks. *@
@@ -72,10 +82,13 @@
         </svg>
     </div>
 
+    @* Two sentences rather than one, because the two kinds of reader do different things:
+       a mouse hovers then clicks, a finger presses once to name a star and again to open
+       it. The old line only described the mouse. *@
     <p class="graph-hint muted">
         @graph.Nodes.Count records and @graph.Edges.Count connections at your reading
-        progress. Drag to travel, zoom to read, hover any point to light its web,
-        click it to open its record.
+        progress. Drag to travel. Hover any point to light its web and click it to open
+        its record; on a touchscreen, press once to name a star and again to open it.
     </p>
 
     <div class="universe-legend">
@@ -262,6 +275,49 @@
 
         Rebuild();
         pendingReset = true;
+    }
+
+    // The one star singled out right now, as against the neighbourhood lit around it.
+    private bool IsActive(GraphNode node)
+        => string.Equals(node.Id, hoveredNodeId, StringComparison.OrdinalIgnoreCase);
+
+    // Which kind of pointer opened the current interaction. Touch has no hover, so a tap
+    // has to do the job hovering does on a mouse, and it cannot do both jobs at once.
+    private bool lastPointerWasTouch;
+
+    // The star a finger has already revealed. Kept apart from hoveredNodeId because that
+    // one is also set by a passing mouse, and a mouse must never leave a node in the
+    // "already named, next press opens it" state.
+    private string? revealedByTouch;
+
+    private void RememberPointer(PointerEventArgs e)
+    {
+        lastPointerWasTouch = e.PointerType is "touch" or "pen";
+    }
+
+    // A mouse leaving a node clears the highlight. A finger's stays put: there is nothing
+    // for touch to move away to, and the label has to survive long enough to be read.
+    private void OnMouseOut()
+    {
+        if (!lastPointerWasTouch)
+        {
+            hoveredNodeId = null;
+        }
+    }
+
+    // Mouse keeps its one-click behaviour. Touch gets two steps: the first press names the
+    // star and lights the threads it holds, the second on that same star opens the record.
+    // Without this a reader on a phone can only find out what a dot was by leaving the page.
+    private void Activate(string id)
+    {
+        if (lastPointerWasTouch && !string.Equals(revealedByTouch, id, StringComparison.OrdinalIgnoreCase))
+        {
+            revealedByTouch = id;
+            hoveredNodeId = id;
+            return;
+        }
+
+        GoTo(id);
     }
 
     private void GoTo(string id)
