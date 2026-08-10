@@ -1,0 +1,56 @@
+@inject EntityRegistry Registry
+@inject SpoilerSettings Spoiler
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+
+@* Open sand, for any address the archive can't answer. Two pages land here: a URL with no
+   page behind it, and a record id with no record behind it. They used to look nothing alike,
+   one a night desert and the other a bare card, even though they're the same dead end. The
+   canvas comes first so the copy and actions, painted later in DOM order, stay readable above
+   the drifting sand. *@
+<div class="hero lost-desert">
+    <canvas class="lost-sand" @ref="sandCanvas"></canvas>
+    <h1>@Heading</h1>
+    <p class="tagline">@ChildContent</p>
+    <div class="lost-actions">
+        <a class="chip" href="/archives">Search the Archives</a>
+        <a class="chip" href="/">Return home</a>
+        <button class="surprise-btn" @onclick="FollowGuide">Follow a Fremen guide</button>
+    </div>
+</div>
+
+@code {
+    private ElementReference sandCanvas;
+
+    /// <summary>
+    /// The line over the sand. Both callers say the same thing so far, which is the point:
+    /// a reader who hits one dead end and then the other should recognise the place.
+    /// </summary>
+    [Parameter]
+    public string Heading { get; set; } = "Lost in the deep desert";
+
+    /// <summary>
+    /// The sentences under the heading. This is where the two callers differ, since one
+    /// knows the bad address and the other knows the bad record id.
+    /// </summary>
+    [Parameter, EditorRequired]
+    public RenderFragment? ChildContent { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("duneNav.sandSettle", sandCanvas);
+        }
+    }
+
+    // A guide out of the erg: any record the reader is cleared to see.
+    private void FollowGuide()
+    {
+        var entity = Registry.GetRandomEntity(Spoiler.IsVisible);
+        if (entity is not null)
+        {
+            Nav.NavigateTo($"/entity/{entity.Id}");
+        }
+    }
+}

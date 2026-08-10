@@ -191,10 +191,12 @@ else if (candidates.Count > 0)
 }
 else
 {
-    <div class="entity-card front">
-        <h2>No record found for "@Id"</h2>
-        <p>Verify the ID or name and try again.</p>
-    </div>
+    @* Nothing matched, not even loosely. That's the same dead end the 404 covers, so it
+       gets the same desert instead of a bare card. *@
+    <LostDesert>
+        Nothing in the archive answers to "@Id". Check the spelling, or go looking for
+        the record by name.
+    </LostDesert>
 }
 
 @code {

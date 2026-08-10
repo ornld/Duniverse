@@ -1,46 +1,9 @@
 @page "/not-found"
 @layout MainLayout
-@inject EntityRegistry Registry
-@inject SpoilerSettings Spoiler
-@inject NavigationManager Nav
-@inject IJSRuntime JS
 
 <PageTitle>Page not found - Duniverse</PageTitle>
 
-<div class="hero lost-desert">
-    @* The canvas comes first so the copy and actions, painted later in DOM order,
-       stay readable above the drifting sand. *@
-    <canvas class="lost-sand" @ref="sandCanvas"></canvas>
-    <h1>Lost in the deep desert</h1>
-    <p class="tagline">
-        This path leads to open sand. The archive keeps no record at this address.
-        Check the link for a misprint, or let the wind carry you back.
-    </p>
-    <div class="lost-actions">
-        <a class="chip" href="/archives">Search the Archives</a>
-        <a class="chip" href="/">Return home</a>
-        <button class="surprise-btn" @onclick="FollowGuide">Follow a Fremen guide</button>
-    </div>
-</div>
-
-@code {
-    private ElementReference sandCanvas;
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await JS.InvokeVoidAsync("duneNav.sandSettle", sandCanvas);
-        }
-    }
-
-    // A guide out of the erg: any record the reader is cleared to see.
-    private void FollowGuide()
-    {
-        var entity = Registry.GetRandomEntity(Spoiler.IsVisible);
-        if (entity is not null)
-        {
-            Nav.NavigateTo($"/entity/{entity.Id}");
-        }
-    }
-}
+<LostDesert>
+    This path leads to open sand. The archive keeps no record at this address.
+    Check the link for a misprint, or let the wind carry you back.
+</LostDesert>

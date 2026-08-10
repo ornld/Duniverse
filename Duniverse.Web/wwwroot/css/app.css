@@ -1,15 +1,3 @@
-.valid.modified:not([type=checkbox]) {
-    outline: 1px solid #26b050;
-}
-
-.invalid {
-    outline: 1px solid red;
-}
-
-.validation-message {
-    color: red;
-}
-
 /* The one strip Blazor itself owns, shown only if the runtime falls over. It shipped
    in template lightyellow, which made the site's worst moment its least themed one.
    The reload link inside it picks up the site's own link gold on its own. */
@@ -33,16 +21,6 @@
         position: absolute;
         right: 0.75rem;
         top: 0.5rem;
-    }
-
-.blazor-error-boundary {
-    background: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTYiIGhlaWdodD0iNDkiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIG92ZXJmbG93PSJoaWRkZW4iPjxkZWZzPjxjbGlwUGF0aCBpZD0iY2xpcDAiPjxyZWN0IHg9IjIzNSIgeT0iNTEiIHdpZHRoPSI1NiIgaGVpZ2h0PSI0OSIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMCkiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0yMzUgLTUxKSI+PHBhdGggZD0iTTI2My41MDYgNTFDMjY0LjcxNyA1MSAyNjUuODEzIDUxLjQ4MzcgMjY2LjYwNiA1Mi4yNjU4TDI2Ny4wNTIgNTIuNzk4NyAyNjcuNTM5IDUzLjYyODMgMjkwLjE4NSA5Mi4xODMxIDI5MC41NDUgOTIuNzk1IDI5MC42NTYgOTIuOTk2QzI5MC44NzcgOTMuNTEzIDI5MSA5NC4wODE1IDI5MSA5NC42NzgyIDI5MSA5Ny4wNjUxIDI4OS4wMzggOTkgMjg2LjYxNyA5OUwyNDAuMzgzIDk5QzIzNy45NjMgOTkgMjM2IDk3LjA2NTEgMjM2IDk0LjY3ODIgMjM2IDk0LjM3OTkgMjM2LjAzMSA5NC4wODg2IDIzNi4wODkgOTMuODA3MkwyMzYuMzM4IDkzLjAxNjIgMjM2Ljg1OCA5Mi4xMzE0IDI1OS40NzMgNTMuNjI5NCAyNTkuOTYxIDUyLjc5ODUgMjYwLjQwNyA1Mi4yNjU4QzI2MS4yIDUxLjQ4MzcgMjYyLjI5NiA1MSAyNjMuNTA2IDUxWk0yNjMuNTg2IDY2LjAxODNDMjYwLjczNyA2Ni4wMTgzIDI1OS4zMTMgNjcuMTI0NSAyNTkuMzEzIDY5LjMzNyAyNTkuMzEzIDY5LjYxMDIgMjU5LjMzMiA2OS44NjA4IDI1OS4zNzEgNzAuMDg4N0wyNjEuNzk1IDg0LjAxNjEgMjY1LjM4IDg0LjAxNjEgMjY3LjgyMSA2OS43NDc1QzI2Ny44NiA2OS43MzA5IDI2Ny44NzkgNjkuNTg3NyAyNjcuODc5IDY5LjMxNzkgMjY3Ljg3OSA2Ny4xMTgyIDI2Ni40NDggNjYuMDE4MyAyNjMuNTg2IDY2LjAxODNaTTI2My41NzYgODYuMDU0N0MyNjEuMDQ5IDg2LjA1NDcgMjU5Ljc4NiA4Ny4zMDA1IDI1OS43ODYgODkuNzkyMSAyNTkuNzg2IDkyLjI4MzcgMjYxLjA0OSA5My41Mjk1IDI2My41NzYgOTMuNTI5NSAyNjYuMTE2IDkzLjUyOTUgMjY3LjM4NyA5Mi4yODM3IDI2Ny4zODcgODkuNzkyMSAyNjcuMzg3IDg3LjMwMDUgMjY2LjExNiA4Ni4wNTQ3IDI2My41NzYgODYuMDU0N1oiIGZpbGw9IiNGRkU1MDAiIGZpbGwtcnVsZT0iZXZlbm9kZCIvPjwvZz48L3N2Zz4=) no-repeat 1rem/1.8rem, #b32121;
-    padding: 1rem 1rem 1rem 3.7rem;
-    color: white;
-}
-
-    .blazor-error-boundary::after {
-        content: "An error has occurred."
     }
 
 /* ---- Boot screen ----
@@ -133,19 +111,6 @@
     }
 }
 
-code {
-    color: #c02d76;
-}
-
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-    color: var(--bs-secondary-color);
-    text-align: end;
-}
-
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-    text-align: start;
-}
-
 /* ---- Duniverse Archives theme ---- */
 
 /* Marcellus, by Brian J. Bonislawsky / Astigmatic (SIL Open Font License; the
@@ -165,6 +130,12 @@ code {
     --dune-bg: #0f0d0c;
     --dune-panel: #241c16;
     --dune-border: #4a3a28;
+    /* The border a thing you can type into wears while nobody's touching it. Plain
+       --dune-border sits at 1.5:1 against the panel it encloses, so an empty search
+       field read as a faint suggestion of a box rather than a box. This clears 3:1,
+       which is the line for a control's own outline, and stays well under the accent
+       so focus still lands as an obvious change and not a small one. */
+    --dune-border-strong: #806848;
     --dune-text: #f1e6d6;
     --dune-muted: #a89478;
     /* Muted text that has to survive the lit top of a hero. The scrims put their warm end
@@ -568,7 +539,7 @@ html {
         min-width: 0;
         padding: 0.6rem 0.8rem;
         background: var(--dune-panel);
-        border: 1px solid var(--dune-border);
+        border: 1px solid var(--dune-border-strong);
         border-radius: 4px;
         color: var(--dune-text);
         font-size: 1rem;
@@ -1985,7 +1956,7 @@ html {
     width: 100%;
     padding: 0.6rem 0.8rem;
     background: var(--dune-panel);
-    border: 1px solid var(--dune-border);
+    border: 1px solid var(--dune-border-strong);
     border-radius: 4px;
     color: var(--dune-text);
     font-size: 1rem;
@@ -3059,7 +3030,7 @@ button.chip {
             var(--spice-border-gradient) border-box;
         background-size: 100% 100%, 300% 300%;
         box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35), 0 0 16px rgba(var(--dune-accent-rgb), 0.35);
-        animation: spice-shimmer 2.5s ease infinite;
+        animation: spice-shimmer 1.4s ease-in-out;
     }
 
         .category-tile:hover strong {
@@ -3079,6 +3050,11 @@ button.chip {
         transition: color 0.3s ease;
     }
 
+/* One pass of light along the rim, out and back, and then it's done. This used to loop
+   forever, which meant a card you happened to leave the cursor on kept flickering for as
+   long as you sat there and pulled the eye away from whatever you were reading. Ending
+   where it started matters: the resting position is the same one the card holds with no
+   animation at all, so reduced motion and the settled state look identical. */
 @keyframes spice-shimmer {
     0% {
         background-position: 0 0, 0% 50%;
@@ -3189,7 +3165,7 @@ button.chip {
             var(--spice-border-gradient) border-box;
         background-size: 100% 100%, 300% 300%;
         box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35), 0 0 16px rgba(var(--dune-accent-rgb), 0.35);
-        animation: spice-shimmer 2.5s ease infinite;
+        animation: spice-shimmer 1.4s ease-in-out;
     }
 
     .timeline-card h3 {
@@ -3304,10 +3280,11 @@ button.chip {
     }
 }
 
-/* ---- Lost in the deep desert (404) ----
-   An address with no record behind it: open desert at night. A faint horizon glow
-   and the drifting sand set the scene, and the words stay sparse. The copy sits
-   above the canvas by DOM order alone; both carry the same stacking level. */
+/* ---- Lost in the deep desert ----
+   Any dead end, whether that's a URL with no page or a record id with no record:
+   open desert at night. A faint horizon glow and the drifting sand set the scene,
+   and the words stay sparse. The copy sits above the canvas by DOM order alone;
+   both carry the same stacking level. */
 
 .lost-desert {
     position: relative;
