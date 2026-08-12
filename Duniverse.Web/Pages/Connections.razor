@@ -146,10 +146,9 @@
     };
 
     // ---- Chain geometry ----
-    // Nodes sit on a gentle zigzag so the edge labels above the lines and the names
-    // below the circles never fight for the same pixels. The viewBox grows with the
-    // path length and the SVG carries a matching max-width, so short chains stay
-    // small instead of scaling up to fill the card.
+    // I zigzag the nodes so the labels above the lines and the names below the circles
+    // never collide. The viewBox grows with the path, matched by the SVG's max-width,
+    // so short chains don't scale up.
 
     private const double Spacing = 150;
     private const double Margin = 78;

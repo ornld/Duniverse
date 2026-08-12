@@ -1,10 +1,9 @@
 namespace Duniverse.Models
 {
     /// <summary>
-    /// A single point in a relationship graph: the entity it represents, plus the coordinates
-    /// a GraphLayoutService has settled it at. Coordinates are mutable because force-directed
-    /// layout is an iterative simulation - the node drifts toward its final position over
-    /// many small nudges rather than being placed once.
+    /// One point in a relationship graph: the entity plus wherever GraphLayoutService settled
+    /// it. The coordinates are mutable since force-directed layout is iterative, so a node
+    /// drifts into place over many small nudges instead of landing once.
     /// </summary>
     public class GraphNode
     {

@@ -22,9 +22,9 @@
     public IEnumerable<DuneEntity>? Items { get; set; }
 
     /// <summary>
-    /// Optional lookup that maps a related entity's id to what it is to the entity being
+    /// Optional lookup mapping a related entity's id to what it is to the entity being
     /// viewed ("Mother", "Betrayer of his House"). Null means no badge. The caller owns
-    /// spoiler filtering, so this component never needs to know about reading progress.
+    /// spoiler filtering, so this component never checks reading progress.
     /// </summary>
     [Parameter]
     public Func<string, string?>? RoleFor { get; set; }

@@ -6,16 +6,9 @@ using Duniverse.Services;
 namespace Duniverse.Data
 {
     /// <summary>
-    /// The single place that gives connections their meaning. RelatedEntityIds says two entries
-    /// touch; this map says how: mother and son, betrayer and betrayed, slayer and slain. Each
-    /// entry is one pair read in both directions (FromRole is what From is to To, ToRole the
-    /// reverse), and a pair not linked in any seeder becomes a real connection when registered,
-    /// so canon links can be introduced here without touching ten seeder files.
-    ///
-    /// One label per pair. Where a relationship changes across books (Alia and the Baron), the
-    /// label carries the tier of the fact it reveals, and the site hides the label (not the
-    /// connection) from readers who haven't gotten there. Like SpoilerTierMap, these are
-    /// canon-informed first-pass calls, grouped for review: correct anything freely.
+    /// The one place connections get their meaning. RelatedEntityIds says two entries touch, this
+    /// says how: mother and son, slayer and slain. A pair no seeder linked becomes a real
+    /// connection here, so I can add canon links in one file.
     /// </summary>
     public static class RelationshipMap
     {

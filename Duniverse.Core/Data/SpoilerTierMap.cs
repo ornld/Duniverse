@@ -6,15 +6,9 @@ using Duniverse.Services;
 namespace Duniverse.Data
 {
     /// <summary>
-    /// The single place that records which entities are spoilers, and how far a reader must have
-    /// read before it is safe to show them. Everything not listed here stays at the default
-    /// <see cref="SpoilerTier.Dune"/>, meaning it is never hidden.
-    ///
-    /// This is deliberately one flat, grouped list rather than a tag scattered across ten seeder
-    /// files, so the whole spoiler policy can be reviewed and adjusted in a single scan. Read it
-    /// as "who gets hidden until which book." The calls here are a canon-informed first pass and
-    /// are meant to be corrected freely: moving an entity between groups is the only edit needed
-    /// to change when the site reveals it.
+    /// The one place that records which entities are spoilers and how far a reader must be before
+    /// seeing them. Anything unlisted stays at <see cref="SpoilerTier.Dune"/> and never hides. I
+    /// keep it flat so the whole policy reads in one scan.
     /// </summary>
     public static class SpoilerTierMap
     {
@@ -88,11 +82,9 @@ namespace Duniverse.Data
                 ["char_DukePaulusAtreides"] = SpoilerTier.ExpandedUniverse, // the Old Duke is unnamed in Dune; the Paulus story is Prelude material
                 ["char_HelenaAtreides"] = SpoilerTier.ExpandedUniverse,     // Leto's mother, and her hand in the bullring, are Prelude material too
                 ["char_RhomburVernius"] = SpoilerTier.ExpandedUniverse,
-                // char_ElroodIX deliberately sits at the default instead of here. Dune names him
-                // as Shaddam's father, so hiding the man entirely kept a first-book reader from
-                // something their own appendix already told them. Everything that made him
-                // interesting, the decline and the poisoning, is Prelude material and now waits
-                // in an ExpandedUniverse layer on his record instead.
+                // char_ElroodIX sits at the default on purpose. Dune names him as Shaddam's
+                // father, so hiding him kept a first-book reader from what their own appendix
+                // already said. The decline and the poisoning wait in an ExpandedUniverse layer.
                 ["char_AbulurdHarkonnen"] = SpoilerTier.ExpandedUniverse,
                 ["org_LeagueOfNobles"] = SpoilerTier.ExpandedUniverse,
                 ["org_SynchronizedWorlds"] = SpoilerTier.ExpandedUniverse,
@@ -108,10 +100,9 @@ namespace Duniverse.Data
             };
 
         /// <summary>
-        /// Stamps each listed tier onto its entity in the registry. Call once, after every seeder
-        /// has been registered. In debug builds an id that matches no registered entity throws,
-        /// so a typo here fails loudly during development rather than silently leaving a spoiler
-        /// unprotected in production.
+        /// Stamps each listed tier onto its entity. Call once, after every seeder has registered.
+        /// In debug builds an unknown id throws, so a typo fails loudly here rather than quietly
+        /// leaving a spoiler unprotected in production.
         /// </summary>
         public static void Apply(EntityRegistry registry)
         {

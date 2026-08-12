@@ -1,14 +1,6 @@
-// The camera for the whole-Duniverse graph. Dragging and zooming just move one <g>
-// with a CSS transform, so none of it goes back through Blazor: the page draws the
-// constellation once and this file is the only thing that moves it. Same idea as
-// nav-sand.js, a small add-on Blazor calls after render.
-//
-// Drag to pan (mouse or touch), scroll to zoom on the cursor, pinch to zoom on the
-// pinch center, plus the +/-/reset buttons on the card (found by their data-uni-zoom
-// attribute). A drag shouldn't count as a click: once the pointer moves past a small
-// threshold, the click that would fire on release gets swallowed, so panning across
-// a star never opens its record. focusOn() glides the camera to a point (the find
-// picker uses it) and skips the glide for anyone with reduced motion on.
+// The camera for the whole-Duniverse graph. Blazor calls attach after render, like
+// nav-sand.js. I move one <g> with a CSS transform, so nothing goes back through
+// Blazor. A drag swallows its click, so panning never opens a star.
 window.duneUniverse = (function () {
     let svg = null;
     let world = null;
@@ -50,9 +42,9 @@ window.duneUniverse = (function () {
         apply(false);
     }
 
-    // The nudge shown when someone scrolls over the graph expecting to zoom. Held for a
-    // moment, then faded, and re-armed only once the reader has stopped scrolling, so a
-    // long scroll down the page raises it once instead of flickering the whole way.
+    // The nudge for someone who scrolls over the graph expecting to zoom. I re-arm it
+    // only after the scrolling stops, so a long scroll down the page raises it once
+    // instead of flickering the whole way.
     let hintEl = null;
     let hintTimer = null;
     function hintZoom() {
@@ -78,15 +70,9 @@ window.duneUniverse = (function () {
         tx = 0;
         ty = 0;
 
-        // Scrolling over the graph used to zoom it and swallow the scroll, which meant a
-        // wheel or a trackpad could not get you past the constellation to the rest of the
-        // page. Now a plain scroll belongs to the page and only a deliberate zoom gesture
-        // reaches the camera, the way a map behaves.
-        //
-        // One test covers both gestures: a trackpad pinch arrives as a wheel event with
-        // ctrlKey already set by the browser, and holding ctrl (or cmd) while scrolling is
-        // the keyboard equivalent. Anyone who does neither gets a one-off hint, and the
-        // +/- buttons on the card zoom without any of this.
+        // A plain scroll belongs to the page, so a trackpad can get past the constellation.
+        // A pinch already sets ctrlKey, so one test covers both. Anyone who can't pinch or
+        // hold a modifier still has the card's +/- buttons.
         svg.addEventListener("wheel", function (e) {
             if (!e.ctrlKey && !e.metaKey) {
                 hintZoom();
@@ -149,12 +135,9 @@ window.duneUniverse = (function () {
                 // a pinch always counts as a gesture.
                 if (!moved && (pointers.size >= 2 || (downAt && Math.hypot(m[0] - downAt[0], m[1] - downAt[1]) > 6))) {
                     moved = true;
-                    // Only capture the pointer once a real drag has started, never on
-                    // the press itself. Capturing on press redirects the click to the
-                    // SVG, and suddenly none of the stars can be clicked (learned that
-                    // one the hard way). Mid-drag there's no click worth keeping, and
-                    // capturing keeps a fast drag from slipping off the SVG and
-                    // stranding the pan.
+                    // I capture only once a real drag starts. Capturing on press redirects
+                    // the click to the SVG, so no star can be clicked. Mid-drag there's no
+                    // click worth keeping, and capture stops a fast pan slipping off the SVG.
                     for (const id of pointers.keys()) {
                         try {
                             svg.setPointerCapture(id);
@@ -202,6 +185,7 @@ window.duneUniverse = (function () {
     }
 
     // Glides the camera so the given viewBox point ends up centered at the given zoom.
+    // Anyone with reduced motion on gets the jump without the glide.
     function focusOn(x, y, targetScale) {
         if (!svg) {
             return;

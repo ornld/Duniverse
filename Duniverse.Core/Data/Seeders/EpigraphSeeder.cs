@@ -4,11 +4,10 @@ using Duniverse.Models;
 namespace Duniverse.Data.Seeders
 {
     /// <summary>
-    /// The Collected Sayings archive: chapter epigraphs and famous lines from across the saga,
-    /// credited to their in-universe sources. Quotations are stored verbatim, original
-    /// punctuation included, so wording should be corrected against the printed books rather
-    /// than restyled. The set leans toward Dune itself on purpose; that is where the most
-    /// quoted material lives, and it keeps the page friendly to new readers.
+    /// The Collected Sayings archive: chapter epigraphs and famous lines, credited to their
+    /// in-universe sources. Quotations are verbatim, so fix wording against the printed books
+    /// rather than restyling it. I leaned toward Dune, which keeps the page friendly to new
+    /// readers.
     /// </summary>
     public static class EpigraphSeeder
     {

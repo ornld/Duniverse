@@ -1,20 +1,6 @@
-// The boot storm, drawn on a worker thread.
-//
-// It used to run on the main thread and it stuttered, badly, about three quarters of the way
-// through a load. Nothing about the animation was wrong: starting the Blazor runtime is
-// synchronous main-thread work, and while it runs requestAnimationFrame does not fire at all.
-// Smoothing the motion cannot help with that. A frozen thread draws nothing, whatever the
-// maths says.
-//
-// So the storm was moved off that thread. An OffscreenCanvas is handed over here once, this
-// worker owns it, and its frames go to the compositor without the main thread being involved.
-// The page can block for as long as it likes now and the sand keeps blowing at full rate,
-// which is the entire point: the animation exists to cover that wait, so it cannot be the
-// thing the wait interrupts.
-//
-// The main thread still sends the load percentage across, but only as a target. Intensity is
-// eased toward it here, so a page too busy to post an update for half a second produces a
-// storm that keeps building smoothly rather than one that steps whenever news arrives.
+// The boot storm, drawn on a worker. Starting Blazor blocks the main thread and rAF dies
+// there, so this worker owns an OffscreenCanvas and draws through the freeze. Load percent
+// arrives as a target; I ease intensity toward it.
 
 let canvas = null;
 let ctx = null;
@@ -79,9 +65,9 @@ function build(grainCount) {
         const t = grains[i]; grains[i] = grains[j]; grains[j] = t;
     }
 
-    // Which grains sit in which bucket, worked out once, so a frame touches each grain twice:
-    // once to move it, once to draw it. Drawing per bucket means one path and one stroke for
-    // every colour, width and opacity combination rather than one per grain.
+    // I work out bucket membership once. A frame touches each grain twice, once to move and
+    // once to draw. Drawing per bucket gives one path and one stroke per colour, width and
+    // alpha combo, not one per grain.
     members = [];
     for (let b = 0; b < BUCKETS; b++) {
         members.push([]);
@@ -92,9 +78,8 @@ function build(grainCount) {
 }
 
 let last = 0;
-// Counted so the page can ask, from a console, whether this thread is still drawing while the
-// main one is blocked. That question is the entire reason the storm lives out here, and it is
-// not answerable by looking at the screen: a blocked page cannot screenshot itself.
+// Counted so I can ask from a console whether this thread is still drawing when the main one
+// is blocked. The screen cannot answer that: a blocked page cannot screenshot itself.
 let frames = 0;
 
 function frame(now) {
@@ -201,17 +186,9 @@ function frame(now) {
     schedule();
 }
 
-// Frames are driven by requestAnimationFrame where it works, and by a plain timer where it
-// does not, decided by watching rather than by feature detection.
-//
-// A worker's requestAnimationFrame exists here but is driven by the placeholder canvas's
-// rendering, so it simply never fires if that canvas is not being drawn: detached from the
-// document, fully hidden, whatever. Feature detection cannot tell the difference, because the
-// function is present either way and just stays silent. So the first frame is raced against a
-// timer, and if rAF has not delivered by then the loop switches to the timer for good.
-//
-// The timer is a perfectly good driver here. Movement is measured in elapsed time, so uneven
-// spacing costs nothing, and this thread has nothing else competing for it.
+// A worker's rAF is present but never fires if the placeholder canvas isn't being rendered,
+// and feature detection cannot tell. So I race the first frame against a timer and take the
+// timer for good if rAF stays quiet.
 let useTimer = false;
 let started = false;
 

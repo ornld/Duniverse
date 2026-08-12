@@ -33,10 +33,9 @@ else if (entity is not null)
         <h1>@entity.Name</h1>
         <p class="short-desc">@entity.ShortDescription</p>
 
-        @* The record's own field data, whatever kind of record it is. Every category keeps
-           its facts in different fields; MetaRowsFor turns each into the same labeled
-           rows, so a world's environment and a house's motto read as one archive, not
-           nine formats. *@
+        @* Every category stores its facts in different fields, so MetaRowsFor flattens all
+           of them into the same labeled rows. I want a world's environment and a house's
+           motto reading as one archive, not nine formats. *@
         @if (MetaRowsFor(entity) is { Count: > 0 } metaRows)
         {
             <dl class="entity-meta">
@@ -64,11 +63,9 @@ else if (entity is not null)
             </dl>
         }
 
-        @* Irulan wrote the official history and the correctives came later, which is the shape
-           of every record here: an opening that is safe the moment you can see the record at
-           all, and passages that only a further book earns. The mark names which book earned
-           each one. It shows only to a reader who has already earned every passage on this
-           record, so a label can never describe a paragraph they have not been given. *@
+        @* Every record opens safe, then adds passages a further book earns, like Irulan's
+           history and its correctives. I show the marks only once every passage is earned,
+           so a label can never describe a paragraph they haven't been given. *@
         @if (ShowEditionMarks)
         {
             <p class="edition-note">
@@ -121,10 +118,9 @@ else if (entity is not null)
         }
     </div>
 
-    @* Who belongs to this house or order, gathered from the membership each person's
-       own record already declares. Sits next to the house's description instead of
-       down with the connections, since membership is part of what the house IS, not
-       a link out. *@
+    @* Who belongs to this house or order, read off the membership each person's own
+       record declares. I keep it next to the description instead of down with the
+       connections, since membership is part of what the house is. *@
     @if (members.Count > 0)
     {
         <div class="entity-card roster-card dossier-item" style="--i: 1">
@@ -215,19 +211,10 @@ else
     private IReadOnlyList<SpoilerTier> newlyOpened = Array.Empty<SpoilerTier>();
 
     /// <summary>
-    /// Whether the archive offers to name the book behind each passage.
-    ///
-    /// This turns on the READER, never on the record, and that distinction is the whole point.
-    /// An earlier version asked whether this particular record's layers had all been earned,
-    /// which quietly made the button itself a spoiler: with the base and the layers rendered in
-    /// identical markup, a reader could count paragraphs, and a record showing two of them with
-    /// no button could only mean it held more in a book they had not reached. The button
-    /// appearing was worse still, since it confirmed a record was closed for the rest of the
-    /// saga. Chani with a button meant Chani never comes up again.
-    ///
-    /// Keyed to progress instead, it is present on every record or on none, so it says nothing
-    /// about any of them. A reader who has finished everything cannot be spoiled by a label
-    /// either, which is what makes the marks safe to print at all.
+    /// Whether I name the book behind each passage. Keyed to reader progress, never the
+    /// record: layers and base text share markup, so two paragraphs and no button would
+    /// mean a third they haven't reached. A button was worse: Chani carrying one meant
+    /// Chani never comes up again.
     /// </summary>
     private bool ShowEditionMarks =>
         entity is not null
@@ -243,10 +230,9 @@ else
         !Spoiler.Enabled
         || (Spoiler.NovelProgress >= SpoilerTier.Chapterhouse && Spoiler.IncludeExpandedUniverse);
 
-    // A resolved record sends "back" to its own category page, so going Index ->
-    // category -> record returns you where you started. Unresolved states (a typo
-    // with several matches, or nothing found) have no single category, so they keep
-    // the Archives fallback.
+    // A resolved record sends "back" to its own category page, so Index to category to
+    // record returns you where you started. A typo with several matches or nothing found
+    // has no single category, so those keep the Archives fallback.
     private string BackHref =>
         entity is not null && GraphLayoutService.CategorySlug(entity) is var slug and not "unknown"
             ? $"/category/{slug}"
@@ -287,13 +273,9 @@ else
     };
 
     /// <summary>
-    /// Works out what opened since the reader last looked at this record, then writes down
-    /// everything it is showing them now.
-    ///
-    /// Runs after OnParametersSet, which is what makes the order work: that method has already
-    /// resolved the record, so the visible layers are settled before they are compared against
-    /// the ledger. A gated record witnesses an empty set, which still seeds the entry, so the
-    /// day its tier finally opens the layers arrive marked rather than silently.
+    /// Works out what opened since this reader last looked here, then writes down what they
+    /// see now. Runs after OnParametersSet, so the record is resolved. A gated record seeds
+    /// an empty entry, so its layers arrive marked later.
     /// </summary>
     protected override async Task OnParametersSetAsync()
     {
@@ -334,12 +316,9 @@ else
 
         isGated = !Spoiler.IsVisible(entity);
 
-        // If the URL used a name or a typo instead of the real ID, fix up the address
-        // bar so links and bookmarks always point at the canonical one. A sealed entry
-        // is the one exception: its canonical ID spells out the very name this page is
-        // about to refuse to show, and the address bar keeps it in history, autocomplete,
-        // and anything the reader copies. The gate reads exactly the same at whatever
-        // address they arrived on, so it keeps the one they typed.
+        // A name or typo swaps to the canonical ID so links and bookmarks agree. Never on
+        // a sealed entry: that ID writes the refused name into history. Skipping costs
+        // nothing, since the gate reads the same at any address.
         if (!isGated && !string.Equals(entity.Id, Id, StringComparison.OrdinalIgnoreCase))
         {
             Nav.NavigateTo($"/entity/{entity.Id}", replace: true);
@@ -353,10 +332,9 @@ else
             ? Registry.GetRivalHouses(house.Id).Where(Spoiler.IsVisible).ToList()
             : new List<House>();
 
-        // A house or order can now name the people who belong to it, which used to
-        // only run the other way. Looked up by ID, not by name: a display name is
-        // prose and matching on it put people on the wrong rosters. Alphabetical,
-        // since a roster has no natural order of importance.
+        // A house or order can name its own people, not just the other way. I look them
+        // up by ID, not display name: matching on prose put people on the wrong rosters.
+        // Alphabetical, since a roster has no ranking.
         members = entity is House or Organization
             ? Registry.GetAffiliates(entity.Id)
                 .Where(Spoiler.IsVisible)
@@ -374,10 +352,9 @@ else
         revealed = true;
     }
 
-    // What the given related entity is to the one being viewed ("Mother", "Betrayer
-    // of his House"), or null when the pair has no label or the label belongs to a
-    // book the reader hasn't reached. The connection itself still shows; only its
-    // meaning is held back.
+    // What the related entity is to the one being viewed ("Mother", say), or null when
+    // there is no label or its book sits past the reader's progress. The connection
+    // still shows, only its meaning is held back.
     private string? RoleFor(string otherId)
     {
         if (entity is null)
@@ -472,14 +449,10 @@ else
             .ToList();
     }
 
-    // Whether a value says anything you wouldn't already know from its absence. The
-    // archive's usual way of recording a gap explains itself ("None; purely an
-    // ecological scavenger", "Unknown (beyond the Scattering)"), and those stay: the
-    // absence is the fact. A bare "Not widely recorded" is the one form that adds
-    // nothing, and it sat on both the sigil and the motto of most minor houses, where
-    // the repetition read like a template artifact. Matched exactly, so a qualified
-    // version that does carry information ("Not widely recorded outside Grumman")
-    // still shows.
+    // Whether a value says anything its absence wouldn't. Gaps that explain themselves
+    // stay: the absence is the fact. Bare "Not widely recorded" sat on most minor houses
+    // and said nothing. Matched exactly, so "Not widely recorded outside Grumman"
+    // survives.
     private static bool HasFact(string? value) =>
         !string.IsNullOrWhiteSpace(value)
         && !string.Equals(value.Trim(), "Not widely recorded", StringComparison.OrdinalIgnoreCase);

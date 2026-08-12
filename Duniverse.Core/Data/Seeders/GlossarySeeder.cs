@@ -4,9 +4,9 @@ using Duniverse.Models;
 namespace Duniverse.Data.Seeders
 {
     /// <summary>
-    /// The Terminology of the Imperium: a field dictionary in the spirit of the appendix Frank
-    /// Herbert bound into Dune. Entries are short on purpose. A term that deserves a full
-    /// record has one in the archive proper, and SeeEntityId points the reader there.
+    /// The Terminology of the Imperium, a field dictionary in the spirit of the appendix Frank
+    /// Herbert bound into Dune. Entries stay short on purpose. A term deserving a full record has
+    /// one, and SeeEntityId points there.
     /// </summary>
     public static class GlossarySeeder
     {

@@ -38,9 +38,9 @@
         </div>
     }
 
-    @* Records the query never names, but whose entry text mentions it. Kept visually
-       below the name matches, and always a list instead of a jump, since a phrase
-       found in a body of prose is a weaker claim than a name. *@
+    @* Records the query never names, but whose text mentions it. I keep these below
+       the name matches and always as a list, never a jump: a phrase buried in prose
+       is a weaker claim than a name. *@
     @if (contentMatches.Count > 0)
     {
         <div class="candidates text-matches">
@@ -147,24 +147,18 @@
 
         var result = Registry.Resolve(lastQuery);
 
-        // An exact ID or an unambiguous name still goes straight to the record, but only
-        // one the reader has read far enough to meet. Resolve matches on substrings and
-        // typos and knows nothing about spoilers, so a sealed record can easily come back
-        // as the single confident hit. Sending them there would print its full ID in the
-        // address bar, and the ID is the name, so the gate page would be redacting a title
-        // that the address bar, the history, and the autocomplete all spell out anyway.
-        // Falling through instead hands it to the filter below, which already drops it the
-        // same way it drops two or more sealed records that tie.
+        // Resolve ignores spoilers and matches substrings and typos, so a sealed record can
+        // land as the confident hit. I don't navigate there: the ID is the name, so the URL
+        // spells it out. The filter drops it instead.
         if (result.Entity is not null && Spoiler.IsVisible(result.Entity))
         {
             Nav.NavigateTo($"/entity/{result.Entity.Id}");
             return;
         }
 
-        // A record the query actually names outranks one that just contains it inside
-        // a longer title, so searching "Muad'Dib" leads with the man instead of the
-        // church built around him. Without this the order is whatever the databank
-        // happens to hand back.
+        // A record the query actually names beats one that just contains it in a longer
+        // title, so "Muad'Dib" leads with the man, not the church built around him.
+        // Without this I get whatever order the databank hands back.
         rawCandidates = result.Candidates
             .OrderByDescending(entity => ExactlyNamed(entity, lastQuery))
             .ThenBy(entity => entity.Name.Length)
@@ -189,20 +183,16 @@
         RefilterCandidates();
     }
 
-    // Re-apply the spoiler filter to the current results when the reader changes
-    // their reading progress without running a new search. The text search runs again rather
-    // than being re-filtered: progress decides how much of each entry is readable, so moving it
-    // changes what the words in the box can match, not just which records survive the gate.
+    // Reading progress moved without a new search. I rerun the text search rather than
+    // re-filter it: progress decides how much of each entry is readable, so it changes
+    // what the box can match, not just which records survive.
     private void RefilterCandidates()
     {
         if (!string.IsNullOrWhiteSpace(lastQuery))
         {
-            // The name resolve runs again too, not just the text search. A query that named a
-            // sealed record came back empty and said "no matching records found", and without
-            // this it kept saying it after the reader unlocked the very record they had asked
-            // for: the candidate list it re-filters is only ever built by HandleSearch, so it
-            // stayed empty forever. Resolved here rather than navigated, since a chip click
-            // should change what the page says, not throw the reader onto another one.
+            // The name resolve reruns too. Only HandleSearch builds that candidate list, so a
+            // query naming a sealed record kept saying "no matching records found" long after
+            // it unlocked. I resolve here, not navigate: a chip click shouldn't move anyone.
             var resolved = Registry.Resolve(lastQuery);
             rawCandidates = resolved.Entity is not null
                 ? new List<DuneEntity> { resolved.Entity }
@@ -227,10 +217,9 @@
 
         var ranked = rawContentMatches
             .Where(Spoiler.IsVisible)
-            // A phrase in the one-line summary answers the reader better than the same
-            // phrase buried deep in a history, and an entry that keeps coming back to
-            // the phrase is more about it than one that mentions it once. Name only
-            // breaks ties, so alphabetical order never outranks relevance.
+            // A phrase in the one-line summary answers better than the same phrase
+            // buried in a history, and an entry that keeps returning to it is more
+            // about it. Name only breaks ties, so alphabetical never outranks relevance.
             .OrderByDescending(entity => InSummary(entity, lastQuery))
             .ThenByDescending(entity => Mentions(entity, lastQuery))
             .ThenBy(entity => entity.Name)
@@ -246,9 +235,9 @@
             && contentMatches.Count == 0;
     }
 
-    // The phrase itself, then its words longest first. The words of a query are often
-    // scattered through an entry instead of sitting together, so anything reading the
-    // text for display or ranking falls back from the whole phrase to its parts.
+    // The phrase itself, then its words longest first. Query words scatter through an
+    // entry instead of sitting together, so display and ranking both fall back from the
+    // whole phrase to its parts.
     private static IEnumerable<string> Needles(string query)
     {
         var trimmed = query.Trim();
@@ -288,9 +277,9 @@
         return Needles(query).Any(needle => summary.Contains(needle, StringComparison.OrdinalIgnoreCase));
     }
 
-    // How often a record's text comes back to the strongest search word, as a rough
-    // measure of how much the entry is actually about it. Counts only the part of the entry
-    // this reader can see, so a held-back layer never pushes a record up the results.
+    // How often a record comes back to the strongest search word, a rough measure of what
+    // the entry is about. I count only what this reader can see, so a held-back layer
+    // never pushes a record up the results.
     private int Mentions(DuneEntity entity, string query)
     {
         var needle = Needles(query).LastOrDefault();
@@ -313,13 +302,13 @@
     }
 
     // The stretch of an entry around the reader's phrase, so a match explains itself
-    // instead of arriving as a bare name. Falls back to null when the phrase only
-    // matched after punctuation was stripped, in which case the summary shows instead.
+    // instead of arriving as a bare name. Returns null when the phrase only matched
+    // after punctuation was stripped, and the summary shows instead.
     private string? Snippet(DuneEntity entity, string query, int radius = 70)
     {
-        // The opening history, then each layer the reader has earned, then the summary. A layer
-        // still waiting on a book the reader has not finished is not among them, so an excerpt
-        // can never quote a sentence the record itself is holding back.
+        // Opening history, then each layer the reader has earned, then the summary. A layer
+        // still waiting on a book they haven't finished isn't in here, so an excerpt can
+        // never quote a sentence the record is holding back.
         var sources = new List<string?> { entity.DetailedHistory };
         sources.AddRange(EntityRegistry.VisibleLayers(entity, Spoiler.IsVisible).Select(layer => layer.Text));
         sources.Add(entity.ShortDescription);

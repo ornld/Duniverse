@@ -1,10 +1,9 @@
 @inject EntityRegistry Registry
 @inject SpoilerSettings Spoiler
 
-@* One endpoint of a connection trace: a search box that narrows to a picked record.
-   Once picked, the record shows as a colored chip with a clear button, and clearing
-   brings the input back. Suggestions run through the spoiler gate, so you can only
-   anchor a trace on records you're cleared to see. *@
+@* One end of a connection trace. Type to narrow, pick, and the record becomes a chip
+   you can clear back to the input. I run suggestions through the spoiler gate, so
+   nobody anchors on a record they haven't unlocked. *@
 
 <div class="endpoint-picker">
     <span class="endpoint-label">@Label</span>

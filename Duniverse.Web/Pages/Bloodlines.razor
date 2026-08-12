@@ -26,12 +26,10 @@
     {
         <div class="bloodline-wrapper">
             <svg class="bloodline-chart" viewBox="0 0 @W @((int)chartHeight)" preserveAspectRatio="xMidYMid meet">
-                @* Every element carries its generation's row index (--row), and the CSS
-                   staggers the entrance by it: a generation's people settle, their
-                   lines flow down, and the next generation follows. Solid lines
-                   actually draw themselves in (pathLength normalizes them for the
-                   dash trick); dashed lines fade in instead, since the trick would
-                   wreck their dash pattern. *@
+                @* Every element carries its generation's row index (--row), and I stagger
+                   the entrance by it in CSS. Solid lines draw themselves in, since
+                   pathLength normalizes them for the dash trick. Dashed ones fade
+                   instead: that trick wrecks their pattern. *@
                 <g class="bloodline-bands">
                     @foreach (var band in visibleBands)
                     {
@@ -156,10 +154,9 @@
         visibleUnions = new List<DrawnEdge>();
         visibleBands = new List<DrawnBand>();
 
-        // A person only appears when their entity is safe for the reader AND their
-        // presence in the chart is (Duncan belongs to a later book's marriage).
-        // Everyone hidden takes every touching line with them, so the chart never
-        // hints at what it holds back.
+        // I only draw a person when both the entity and their tier are unspoiled (Duncan
+        // belongs to a later book's marriage). Anyone hidden takes their lines with them,
+        // since a dangling union or descent gives the concealment away.
         var visibleNodes = BloodlineMap.Nodes
             .Select(node => (Node: node, Entity: Registry.GetEntity(node.EntityId)))
             .Where(pair => pair.Entity is not null

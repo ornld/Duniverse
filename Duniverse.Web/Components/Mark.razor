@@ -1,15 +1,6 @@
-@* The archive's drawn marks: one for each of the ten drawers, plus the three that label
-   the doors out of a record.
-
-   Every mark is built the same way, and the sameness is the point: a 24 box, a hairline
-   stroke, round caps, no fills except where a dot is a node rather than a shape. Nothing
-   here sets a color. They all stroke with currentColor, so a mark takes the tint of
-   whatever it sits in: --cat-color in the legend and the drawer headings, the spice accent
-   in the pills on a record. That is what lets one file serve every surface.
-
-   Purely decorative. Every one is hidden from screen readers, because in every place these
-   appear the label is already sitting right beside them, and announcing "crysknife" before
-   the word Artifacts helps nobody. *@
+@* I draw one mark per drawer, same 24 box and hairline stroke throughout. I skip fills
+   unless a dot stands for a node. They take whatever tint surrounds them. All aria-hidden,
+   since the label sits right beside them. *@
 
 <svg class="mark @CssClass" viewBox="0 0 24 24" fill="none" stroke="currentColor"
      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"

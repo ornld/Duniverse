@@ -1,11 +1,9 @@
 namespace Duniverse.Models
 {
     /// <summary>
-    /// One entry in the Collected Sayings archive: a short quotation from the saga, credited to
-    /// the in-universe work or speaker it comes from, the way Frank Herbert headed his chapters.
-    /// Work doubles as the grouping key on the sayings page, so every epigraph credited to the
-    /// same source gathers under one heading. Text is stored verbatim, original punctuation and
-    /// line breaks included; verse renders through pre-line whitespace.
+    /// One entry in the Collected Sayings archive, credited the way Frank Herbert headed his
+    /// chapters. Work doubles as the grouping key, so everything from one source gathers under a
+    /// heading. I store Text verbatim so verse renders through pre-line whitespace.
     /// </summary>
     public class Epigraph
     {

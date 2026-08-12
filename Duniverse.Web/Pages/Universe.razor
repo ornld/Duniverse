@@ -32,19 +32,16 @@
            gesture has the buttons above instead. *@
         <p class="universe-zoom-hint" aria-hidden="true">Hold ctrl and scroll to zoom</p>
 
-        @* role="img" with a real description, deliberately. The constellation is a second
-           view of records that Archives, the drawers and the find box above all reach in
-           plain markup, so a screen reader is told what this is and spared 122 unlabelled
-           dots it cannot do anything useful with. *@
+        @* role="img" with a real description, deliberately. Archives, the drawers and the
+           find box all reach these records in plain markup, so a screen reader gets told
+           what this is instead of 122 unlabelled dots it can't use. *@
         <svg class="universe-graph @(hoveredNodeId is null ? null : "has-hover")" viewBox="0 0 1600 1200" xmlns="http://www.w3.org/2000/svg"
              role="img" aria-label="@($"A constellation of {graph.Nodes.Count} records and {graph.Edges.Count} connections. Every record here can also be reached from the Archives, the category drawers, or the find box above.")">
             <g class="universe-world">
-                @* The birth of the universe: every node carries a delay based on its distance
-                   from the canvas center, so creation blooms outward as a wave, and a
-                   thread only appears after the later of its two stars exists. The
-                   @key wraps an inner group (never .universe-world itself, whose
-                   element the pan module holds), so a reading-progress change births
-                   the new universe from scratch. *@
+                @* The birth of the universe: each node's delay grows with its distance from
+                   the center, so creation blooms outward. The @key wraps an inner group,
+                   never .universe-world, whose element the pan module holds, so a progress
+                   change rebirths everything. *@
                 <g @key="birthEpoch">
                 <g class="graph-edges">
                     @foreach (var edge in graph.Edges)
@@ -157,12 +154,9 @@
         }
     }
 
-    // The whole visible archive. Hidden entities get excluded before the simulation
-    // runs, so they neither appear nor bend the shape of what does. The layout is
-    // deterministic for a given visible set, so the cache settles it once per set and
-    // hands back a copy on every later visit; the simulation only runs the first time
-    // a reading progress shows up. Building the graph stays cheap and has to happen
-    // anyway, since its ordered node ids are the key.
+    // Hidden entities drop out before the simulation, so they neither appear nor bend
+    // what does. Layout is deterministic per visible set, so the cache settles it once
+    // and hands back copies. The graph's ordered node ids are the key.
     private void Rebuild()
     {
         var fresh = LayoutService.BuildFullGraph(Registry, Spoiler.IsVisible, Spoiler.IsVisible);
@@ -305,9 +299,9 @@
         }
     }
 
-    // Mouse keeps its one-click behaviour. Touch gets two steps: the first press names the
-    // star and lights the threads it holds, the second on that same star opens the record.
-    // Without this a reader on a phone can only find out what a dot was by leaving the page.
+    // Mouse keeps its one click. Touch gets two: first press names the star and lights its
+    // threads, second press on the same star opens it. Without this, a phone reader learns
+    // what a dot was only by leaving.
     private void Activate(string id)
     {
         if (lastPointerWasTouch && !string.Equals(revealedByTouch, id, StringComparison.OrdinalIgnoreCase))

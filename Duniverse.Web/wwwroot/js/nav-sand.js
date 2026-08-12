@@ -1,14 +1,6 @@
-// The blowing sand in the Index dropdown and the first-visit ritual. I wanted sand,
-// not snow. Snow falls straight down; sand gets carried sideways in gusts. Grains blow
-// in from the upwind side, ride a shared wind that surges and dies (three sine waves
-// at different speeds, so the gusts never quite repeat), and slowly sink until they
-// settle and fade out. A moving grain draws as a streak along its path, a settled one
-// as a dot. Small grains catch the wind harder than heavy ones, and a rare brighter
-// glint stands in for the spice. Faded grains respawn upwind after a short pause, so
-// the effect keeps going as long as the panel stays open. The loop watches
-// canvas.isConnected and stops itself once Blazor removes the panel. The canvas is
-// sized for devicePixelRatio so grains stay sharp on retina screens, and the whole
-// thing skips itself for anyone with reduced motion turned on.
+// The blowing sand in the Index dropdown. I size the canvas by devicePixelRatio and scale
+// grain speed and size by it, so grains stay sharp on retina. The loop quits when Blazor
+// drops the panel. Reduced motion skips it.
 window.duneNav = {
     sandSettle: function (canvas) {
         if (!canvas || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -27,10 +19,9 @@ window.duneNav = {
         const palette = ["#f4c07c", "#e0a458", "#e0a458", "#c97f3d", "#a05c22", "#8a4a1a"];
 
         function spawn(grain, now, initial) {
-            // Grains come in two ways: over the top, or straight through the upwind
-            // edge at any height. Without the edge entries, the wind sweeps everything
-            // out the far side before it can sink and the bottom of the panel stays
-            // empty.
+            // Grains enter two ways: over the top, or through the upwind edge at any
+            // height. Without the edge entries the wind sweeps everything out the far
+            // side before it sinks, and the bottom of the panel stays empty.
             if (Math.random() < 0.55) {
                 grain.x = (Math.random() * 1.1 - 0.35) * w;
                 grain.y = -Math.random() * h * 0.5;
@@ -138,22 +129,9 @@ window.duneNav = {
 
         requestAnimationFrame(frame);
     },
-    // The boot storm. Handed a canvas, it takes control of it away from this thread entirely
-    // and hands it to a worker, which owns every frame from then on.
-    //
-    // That is the whole design, and it exists because the first version did not work. Drawing
-    // here meant the storm froze whenever the page was busy, and during a boot the page is
-    // busy in the worst possible way: starting the Blazor runtime is synchronous main-thread
-    // work, and while it runs requestAnimationFrame does not fire at all. An animation whose
-    // job is to cover a wait cannot be stopped by that wait. Delta timing, batching and a
-    // grain budget all helped and none of them addressed it, because a blocked thread draws
-    // nothing however cheap the frame would have been.
-    //
-    // A worker with an OffscreenCanvas is immune: its frames reach the compositor without this
-    // thread being consulted. There is no main-thread fallback on purpose. Anywhere the
-    // handover is unavailable the boot screen simply stays as it was before any of this, which
-    // is a perfectly good loading screen, and keeping a second copy of the physics alive to
-    // stutter on old browsers would be worse than not running it.
+    // The boot storm. I hand the canvas to a worker that owns every frame, since drawing here
+    // froze whenever Blazor's runtime blocked the thread. No main thread fallback on purpose:
+    // without the handover the boot screen stays plain.
     sandStorm: function (canvas) {
         const inert = {
             setIntensity: function () { },

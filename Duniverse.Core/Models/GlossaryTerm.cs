@@ -1,10 +1,9 @@
 namespace Duniverse.Models
 {
     /// <summary>
-    /// One entry in the site's Terminology of the Imperium, the field dictionary written in the
-    /// spirit of the appendix Frank Herbert bound into Dune. Deliberately lighter than a
-    /// DuneEntity: a term is a word worth defining, not a subject worth a full record. Terms
-    /// that do have a full record point at it through SeeEntityId.
+    /// One entry in Terminology of the Imperium, my take on the appendix Frank Herbert bound
+    /// into Dune. I kept it lighter than a DuneEntity: a term is a word worth defining, not a
+    /// subject worth a record.
     /// </summary>
     public class GlossaryTerm
     {

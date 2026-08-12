@@ -6,22 +6,18 @@ using Duniverse.Models;
 namespace Duniverse.Services
 {
     /// <summary>
-    /// Builds a local "ego graph" around one entity - itself plus its neighbors out to a given
-    /// number of hops - and arranges it with a force-directed (Fruchterman-Reingold style)
-    /// physics simulation: nodes repel each other like charged particles, edges pull their
-    /// endpoints together like springs, and the whole system is nudged toward a stable, readable
-    /// layout over a fixed number of iterations. No JavaScript charting library involved - just
-    /// coordinate math, run once per graph and handed to the SVG as plain X/Y numbers.
+    /// Builds a local "ego graph" around one entity, itself plus neighbors out to a few hops,
+    /// then arranges it with a force-directed simulation: nodes repel, edges pull like springs.
+    /// No charting library, just coordinate math handed to the SVG.
     /// </summary>
     public class GraphLayoutService
     {
         private const int MaxNodes = 36;
 
         /// <summary>
-        /// Walks outward from <paramref name="centerId"/> breadth-first, collecting every entity
-        /// within <paramref name="maxDepth"/> hops. Direct (1-hop) neighbors are always included;
-        /// if the deeper hops would push the graph past MaxNodes, they're trimmed rather than
-        /// overwhelming the view with a dense, unreadable tangle.
+        /// Walks outward from the center breadth-first, collecting every entity within maxDepth
+        /// hops. Direct neighbors always make it in. If the deeper hops would push past MaxNodes
+        /// I trim them, since a dense tangle reads as nothing at all.
         /// </summary>
         public EntityGraph BuildEgoGraph(EntityRegistry registry, string centerId, int maxDepth = 2,
             Func<DuneEntity, bool>? include = null, Func<SpoilerTier, bool>? linkVisible = null)
@@ -93,16 +89,12 @@ namespace Duniverse.Services
         }
 
         /// <summary>
-        /// Collects the whole visible archive into one graph: every entity the
-        /// <paramref name="include"/> predicate admits becomes a node, and every recorded
-        /// connection between two admitted entities becomes an edge. The spoiler gate passes
-        /// its predicate here, so a reader's graph is built purely from records they are
-        /// cleared to see; hidden entities never enter the simulation, which means the shape
-        /// of the visible web leaks nothing about what is missing from it. Entities are
-        /// walked in a deterministic order so the layout lands the same way on every visit.
-        /// The <paramref name="linkVisible"/> predicate covers the other case: two entities the
-        /// reader can see, joined by a connection that is itself a later-book fact.
+        /// The whole visible archive as one graph. Hidden entities never enter the simulation, so
+        /// the shape of the web leaks nothing about what's missing. I walk entities in a fixed
+        /// order so the layout lands the same every visit.
         /// </summary>
+        /// <param name="linkVisible">Covers the other case: two entities the reader can see,
+        /// joined by a connection that's itself a later reveal.</param>
         public EntityGraph BuildFullGraph(EntityRegistry registry, Func<DuneEntity, bool>? include = null,
             Func<SpoilerTier, bool>? linkVisible = null)
         {
@@ -148,21 +140,18 @@ namespace Duniverse.Services
         }
 
         /// <summary>
-        /// Runs the spring-embedder simulation in place, settling each node's X/Y into the
-        /// [0, width] x [0, height] viewport. Nodes start on a seeded circle (deterministic and
-        /// already roughly spaced out) rather than at random, so the simulation converges to a
-        /// similar layout each time instead of jittering between runs.
+        /// Runs the spring-embedder in place, settling each node's X/Y inside the viewport. Nodes
+        /// start on a seeded circle rather than at random, so the simulation converges the same
+        /// way each time instead of jittering between runs.
         /// </summary>
         /// <param name="gravity">Optional pull toward the canvas center, as a fraction of a
-        /// node's distance from it. Zero (the default) suits small ego graphs, whose pinned
-        /// center already anchors them. Large free-floating graphs need a little gravity to
-        /// keep loosely connected clusters from drifting apart.</param>
-        /// <param name="repulsionRange">How far a node's repulsion reaches. Infinite (the
-        /// default) matches classic Fruchterman-Reingold and suits small graphs. On large
-        /// graphs, unlimited range makes every node press on every other, and the summed
-        /// pressure pins the outer ring flat against the clamped borders; a range of two or
-        /// three ideal-distances keeps spacing local, the way d3-force's theta cutoff does,
-        /// and lets the cloud settle as a constellation instead of a box.</param>
+        /// node's distance from it. Zero suits small ego graphs, whose pinned center already
+        /// anchors them. Big free-floating graphs need some gravity or loose clusters drift
+        /// apart.</param>
+        /// <param name="repulsionRange">How far a node's repulsion reaches. Infinite (the default)
+        /// is classic Fruchterman-Reingold, fine on small graphs. On big ones it pins the outer
+        /// ring flat against the borders, so two or three ideal-distances keeps spacing
+        /// local.</param>
         public void ApplyForceDirectedLayout(EntityGraph graph, double width, double height, int iterations = 300,
             double gravity = 0, double repulsionRange = double.PositiveInfinity)
         {
@@ -285,9 +274,8 @@ namespace Duniverse.Services
         }
 
         /// <summary>
-        /// Maps an entity to the same category slug used by /category/{slug} routes, so graph
-        /// nodes can be color-coded consistently with the rest of the site and link straight
-        /// back into the matching browse page.
+        /// Maps an entity to the same slug my /category/{slug} routes use, so graph nodes
+        /// color-code with the rest of the site and link straight back into the browse page.
         /// </summary>
         public static string CategorySlug(DuneEntity entity) => entity switch
         {

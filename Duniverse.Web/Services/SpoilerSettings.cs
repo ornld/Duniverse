@@ -7,16 +7,13 @@ using Microsoft.JSInterop;
 namespace Duniverse.Web.Services
 {
     /// <summary>
-    /// Holds the reader's optional spoiler-protection preferences and decides whether a given
-    /// entity should currently be shown. The settings live in the browser's localStorage, so a
-    /// choice sticks across reloads and return visits.
-    ///
-    /// Protection is on by default: a first-time visitor starts at Dune, the first book, and
-    /// owns their settings from there. Anyone who has made a choice keeps it, since saved
-    /// preferences always win over the default; turning protection off entirely opens the whole
-    /// site. When it is on, an entity is shown only if the reader has read far enough along the
-    /// six-novel spine, or, for Expanded Universe entities, has opted into those as well.
+    /// I keep spoiler preferences in localStorage so a choice sticks between visits.
+    /// Protection starts on at Dune, and a saved choice always wins over that default.
     /// </summary>
+    /// <remarks>
+    /// Switch protection off and I open everything. Leave it on and an entity only shows
+    /// once the reader has read that far, or once they opt into Expanded Universe.
+    /// </remarks>
     public class SpoilerSettings
     {
         private const string StorageKey = "duniverse.spoiler.v1";

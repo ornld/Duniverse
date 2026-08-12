@@ -418,8 +418,8 @@ namespace Duniverse.Data.Seeders
                     DetailedHistory = "Bijaz was a Tleilaxu-made dwarf, small, quick with words, and built to be useful to whoever held him. He reached Paul Atreides by way of Otheym, an old Fedaykin dying in an Arrakeen slum, who handed the dwarf over as a living record: Bijaz was a distrans, and the names of the traitors inside Muad'Dib's own priesthood sat coded in his voice. The Tleilaxu had counted on the gift being accepted. Once he was inside the Keep he turned his songs and riddles on Hayt, the ghola of Duncan Idaho, and worked a compulsion in underneath the man's conditioning, built to turn him against Paul at the moment grief left him most open to it. Bijaz never pretended to be anything but a tool, and said so in rhymes to anyone who would listen. The compulsion held right up to the moment it was meant to work, and then the ghola's buried self surfaced instead. Bijaz tried the trigger words one last time in the room where the whole plot came apart, and Duncan Idaho killed him for it.",
                     ImagePath = "",
                     // The twins are deliberately not listed. Bijaz dies in the room where the
-                    // conspiracy against Paul comes apart, so he never meets them; the links only
-                    // existed to prop up a Children of Dune passage that turned out to be invented.
+                    // conspiracy comes apart, so he never meets them. Those links only propped up
+                    // a Children of Dune passage that turned out to be invented.
                     RelatedEntityIds = new List<string> { "char_PaulAtreides", "org_BeneTleilax" },
                     Affiliation = "Bene Tleilax",
                     AffiliationIds = new List<string> { "org_BeneTleilax" },
@@ -427,9 +427,9 @@ namespace Duniverse.Data.Seeders
                     // Hayt is the ghola in that plot, Scytale the Face Dancer, Bijaz the distrans,
                     // and the record's own text has called him a dwarf all along.
                     Role = "Tleilaxu Distrans",
-                    // Left empty on purpose. The line that used to sit here could not be traced to
-                    // anything Bijaz actually says, and a quotation nobody can source is worse than
-                    // no quotation. His scenes are few, so a real one is a short skim away.
+                    // Left empty on purpose. The line that sat here couldn't be traced to anything
+                    // Bijaz actually says, and a quotation nobody can source is worse than none.
+                    // His scenes are few, so a real one is a short skim away.
                     NotableQuotes = new List<string>()
                 },
                 new Persona
@@ -810,10 +810,9 @@ namespace Duniverse.Data.Seeders
                         new(SpoilerTier.ExpandedUniverse, "The prequel chronicles fill that absence with a long and unpleasant decline. In those accounts Elrood ruled decades past the point of sound judgment, growing erratic and suspicious enough that nobody in his own household could guess from one week to the next where they stood with him. His son ran out of patience and had him poisoned, with Hasimir Fenring's quiet and deniable help, managed carefully enough that no formal accusation ever landed anywhere near the throne. It bought Shaddam the seat years earlier than waiting would have, and installed an Emperor whose fear of House Atreides would eventually cost him the same seat. Imperial succession, on that telling, spared nobody, a father least of all."),
                     },
                     ImagePath = "",
-                    // Fenring is deliberately not listed. Nothing in Dune ties him to Elrood; the
-                    // only thing that does is the poisoning, which is Prelude material. Leaving him
-                    // out drops the pair to RelationshipMap alone, where the link carries its own
-                    // Expanded Universe tier and stays hidden until the reader asks for it.
+                    // Fenring is deliberately not listed. Nothing in Dune ties him to Elrood except
+                    // the poisoning, which is Prelude material. Leaving him out drops the pair to
+                    // RelationshipMap, where the link carries its own Expanded Universe tier.
                     RelatedEntityIds = new List<string> { "char_ShaddamIV", "house_Corrino" },
                     Affiliation = "House Corrino",
                     AffiliationIds = new List<string> { "house_Corrino" },

@@ -5,24 +5,22 @@ using Duniverse.Models;
 namespace Duniverse.Services
 {
     /// <summary>
-    /// Finds the shortest chain of relationships joining two entities - the "how is Duncan
-    /// Idaho connected to Shai-Hulud?" question. It walks the same web of links the
-    /// relationship graph draws (RelatedEntityIds in both directions, via
-    /// EntityRegistry.GetDirectlyRelated), breadth-first, so the first time the destination
-    /// turns up the route to it is guaranteed to use the fewest possible hops.
+    /// Finds the shortest chain of relationships joining two entities, the "how is Duncan Idaho
+    /// connected to Shai-Hulud?" question. It walks the same web the graph draws, breadth-first,
+    /// so the first route to turn up uses the fewest hops.
     /// </summary>
     public class PathFinderService
     {
         /// <summary>
-        /// Returns the entities along the shortest route from <paramref name="fromId"/> to
-        /// <paramref name="toId"/>, both endpoints included, or null when no route exists.
-        /// The optional <paramref name="include"/> predicate excludes entities from the walk
-        /// entirely (the spoiler gate passes one), so a hidden entity can neither anchor a
-        /// route nor smuggle one through as an intermediate step. The optional
-        /// <paramref name="linkVisible"/> predicate does the same job one level down, for a
-        /// connection that is itself a later-book fact even though both entities it joins are
-        /// visible; without it a route could hop along an edge the reader should not know about.
+        /// The entities along the shortest route from one id to the other, both endpoints
+        /// included, or null when there's no route.
         /// </summary>
+        /// <param name="include">Drops entities from the walk entirely. The spoiler gate passes
+        /// one, so a hidden record can't anchor a route or smuggle one through as a middle
+        /// step.</param>
+        /// <param name="linkVisible">Same job one level down, for a connection that's itself a
+        /// later reveal even when both entities show. Without it a route could hop along an edge
+        /// the reader shouldn't know about.</param>
         public IReadOnlyList<DuneEntity>? FindShortestPath(EntityRegistry registry, string fromId, string toId,
             Func<DuneEntity, bool>? include = null, Func<SpoilerTier, bool>? linkVisible = null)
         {

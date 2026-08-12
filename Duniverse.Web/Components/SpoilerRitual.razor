@@ -3,14 +3,9 @@
 @inject IJSRuntime JS
 @implements IDisposable
 
-@* The first-visit ritual. A brand-new reader gets one full-screen moment: mark the
-   last Dune novel you finished, and the archive seals everything past it before you
-   see a single record. The main menu and the About page are exempt on purpose, so the
-   site's first impression stays clean and a curious newcomer can read about the book
-   in peace. The ritual waits for the first step deeper in (any other route, clicked
-   or landed on directly). Any action here (a spine, the full archive, or skip) saves
-   a preference, so it only ever asks once. Returning readers with a saved choice
-   never see it at all. *@
+@* First visit only. The reader marks the last novel they finished and everything past
+   it seals. Main menu and About stay exempt, so a newcomer can read about the book in
+   peace. Every choice saves, so it asks once. *@
 
 @if (ShouldShow)
 {
@@ -57,9 +52,9 @@
 
     private bool ShouldShow => Spoiler.Loaded && !Spoiler.HasStoredChoice && !dismissed && !OnExemptPage;
 
-    // The main menu and the About page hold no records, so the ritual never covers
-    // them. It waits for the first step into the archive proper. Query strings and
-    // fragments get stripped before the check, so "/?utm=..." still counts as home.
+    // Main menu and About hold no records, so the ritual never covers them. It waits
+    // for the first step into the archive proper. I strip query strings and fragments
+    // first, so "/?utm=..." still counts as home.
     private bool OnExemptPage
     {
         get
@@ -94,10 +89,9 @@
         // the main menu and the ritual is due.
         Nav.LocationChanged += OnLocationChanged;
 
-        // Await the (idempotent) storage read directly instead of leaning on the
-        // layout's copy. A parent re-render doesn't reach this component when its
-        // parameters compare equal, so without this await the ritual would stay stuck
-        // on the render from before the settings finished loading, and never show up.
+        // I await the storage read here rather than lean on the layout's copy. It's
+        // idempotent. A parent re-render skips this component when parameters compare
+        // equal, so without the await the ritual stays stuck pre-load and never shows.
         await Spoiler.LoadAsync();
     }
 
@@ -113,12 +107,10 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        // The overlay only enters the DOM the first time a fresh reader leaves the
-        // main menu, so the sand and the focus grab can only start here, after the
-        // render that created it. Focus lands on the panel so Escape works right away
-        // and screen readers enter the dialog. Browser-back to the main menu unmounts
-        // the panel (which stops the sand loop too); "activated" resets so a return
-        // trip gets the full entrance again.
+        // The overlay only exists past the main menu, so I start sand and focus here.
+        // Panel focus hands Escape and screen readers the dialog. Browser-back
+        // unmounting stops the sand loop, so I skip teardown; activated resets for a
+        // replay.
         if (ShouldShow)
         {
             if (!activated)

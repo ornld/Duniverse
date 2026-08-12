@@ -18,15 +18,9 @@ namespace Duniverse.Models
         public required string Name { get; set; }
 
         /// <summary>
-        /// Other names this entity is known by in the saga, searchable alongside the display
-        /// name and shown on the record as "Also known as". Dune treats names as substance
-        /// rather than labels, so a reader who knows a figure only as Muad'Dib or the Maker
-        /// has to be able to find them by that name.
-        ///
-        /// Only names safe at the entity's own <see cref="SpoilerTier"/> belong here. An alias
-        /// that is itself a revelation would leak through search results and through the line
-        /// on the page, neither of which the spoiler gate inspects, so those are left out
-        /// entirely rather than half-protected.
+        /// Other names this entity goes by, searchable and shown as "Also known as". A reader
+        /// who only knows Muad'Dib still has to find him. I leave out any alias that's itself a
+        /// reveal, since search skips the spoiler gate.
         /// </summary>
         public List<string> Aliases { get; set; } = new List<string>();
 
@@ -36,21 +30,16 @@ namespace Duniverse.Models
         public string? ShortDescription { get; set; }
 
         /// <summary>
-        /// The detailed text revealed when the card is flipped over. This is the part of the
-        /// story that is safe as soon as the record itself is, so it holds nothing past the book
-        /// the record first appears in. Anything later belongs in <see cref="HistoryLayers"/>.
+        /// The text behind the card flip. It's safe the moment the record itself is, so I keep
+        /// nothing here past the book the record first appears in. Anything later goes in
+        /// <see cref="HistoryLayers"/>.
         /// </summary>
         public string? DetailedHistory { get; set; }
 
         /// <summary>
-        /// The rest of the story, in reading order, each part waiting on the book that earns it.
-        /// Empty for the many records whose whole life fits in one novel, which is why this sits
-        /// beside <see cref="DetailedHistory"/> instead of replacing it: an entry only grows
-        /// layers when its subject actually outlives its first appearance.
-        ///
-        /// Kept in declaration order rather than sorted by tier, because the order a story is
-        /// told in is the writer's call and the Expanded Universe does not slot neatly onto the
-        /// end of the six-novel spine.
+        /// The rest of the story, each part waiting on the book that earns it. Empty for records
+        /// whose whole life fits one novel. I keep declaration order, not tier order, since the
+        /// Expanded Universe doesn't slot onto the end.
         /// </summary>
         public List<HistorySegment> HistoryLayers { get; set; } = new List<HistorySegment>();
 
@@ -65,11 +54,9 @@ namespace Duniverse.Models
         public List<string> RelatedEntityIds { get; set; } = new List<string>();
 
         /// <summary>
-        /// The earliest work by which this entity is safe to encounter. Defaults to Dune, which
-        /// means no spoiler protection ever hides it. Entities first revealed in later novels or
-        /// in the Expanded Universe are raised above this default (see SpoilerTierMap in
-        /// Duniverse.Core/Data), so the site's optional spoiler gate can hold them back from a
-        /// reader who has not read that far yet.
+        /// The earliest book by which this entity is safe to meet. Defaults to Dune, so nothing
+        /// hides it. I raise anything first revealed later in SpoilerTierMap, and the gate holds
+        /// those back from a reader who hasn't gotten there.
         /// </summary>
         public SpoilerTier SpoilerTier { get; set; } = SpoilerTier.Dune;
 

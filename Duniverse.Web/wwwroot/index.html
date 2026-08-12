@@ -10,12 +10,10 @@
     <title>Duniverse, an unofficial Dune encyclopedia</title>
     <base href="/" />
 
-    <!-- The whole site renders client side. Anything that doesn't run scripts (crawlers, link
-         previews) only ever sees this file, so the site's description has to live right here
-         instead of in any page. -->
-    <!-- The deploy copies this file to 404.html so routing works on GitHub Pages. That means
-         deep links get served with a 404 status and can't be indexed anyway, so the canonical
-         tag below really only matters for the home page. -->
+    <!-- The site renders client side, so a crawler only sees this file. The description
+         lives here. -->
+    <!-- Deploy copies this to 404.html, so deep links serve a 404 and can't be indexed.
+         Canonical only matters on the home page. -->
     <meta name="description" content="An unofficial encyclopedia of Frank Herbert's Dune and its Expanded Universe. Search every record, follow the connections, and read it without spoilers." />
     <link rel="canonical" href="https://www.duniverse.org/" />
     <meta name="theme-color" content="#0f0d0c" />
@@ -46,10 +44,9 @@
          This gives it the same icon the browser tab already has. -->
     <link rel="apple-touch-icon" href="icon-192.png" />
     <link rel="preload" href="fonts/marcellus-400.woff2" as="font" type="font/woff2" crossorigin />
-    <!-- Only Home and About use this background image, but every route serves this same file.
-         A normal preload tag would download it on the ten pages that never show it, so this
-         little script only preloads it on those two. The download still starts long before
-         the app boots, which is what keeps the hero art from popping in late. -->
+    <!-- Home and About show this background, but every route serves this file. A preload tag
+         would pull it on the ten pages that never use it, so I gate it. Starting early keeps
+         the hero art from popping in. -->
     <script>
         (function () {
             const path = location.pathname.replace(/\/+$/, '') || '/';
@@ -73,22 +70,16 @@
 <body>
     <div id="app"></div>
 
-    <!-- The loading screen sits OUTSIDE #app on purpose, and that is a load-bearing choice.
-         Inside it, Blazor's first render wiped the whole container in a single frame, which
-         is why the old boot screen vanished rather than ended. Out here it outlives that
-         render, so the storm can break over a page that is already sitting behind it.
-
-         The cost is that nothing takes it down automatically any more. The script at the
-         foot of this file owns that, and if it ever fails to run, every visitor gets a blank
-         screen over a working site. It is written to come down on every path: on success, on
-         a boot that throws, and on a timer that does not care which happened.
-
-         The gold seam is still a real progress bar, its width tracking
-         --blazor-load-percentage, and the storm is driven from the same number. -->
+    <!-- Outside #app since Blazor's first render wipes that container. Nothing removes it,
+         and a teardown that never runs leaves every visitor a blank screen over a working
+         site, so I take it down on success, a throw, and a timer. -->
     <div class="boot-screen" id="boot-screen">
         <canvas class="boot-sand" id="boot-sand" aria-hidden="true"></canvas>
         <div class="boot-stage">
             <div class="boot-wordmark">Duniverse</div>
+            <!-- A real progress bar, not decoration: I drive the gold fill's width straight
+                 off --blazor-load-percentage as the runtime downloads, and the script at the
+                 foot feeds the storm from that same number. -->
             <div class="boot-seam">
                 <div class="boot-seam-fill"></div>
             </div>
@@ -105,33 +96,18 @@
     <script src="js/universe-pan.js"></script>
     <script src="js/deep-link.js"></script>
     <script src="_framework/blazor.webassembly#[.{fingerprint}].js" autostart="false"></script>
-    <!-- GitHub Pages won't compress the framework files, so a first visit would be a
-         ~7 MB download. The build already makes a Brotli copy of each file at about a third
-         the size, so this fetches those instead and decodes them in the browser
-         (decode.min.js is Google's decoder, MIT licensed). On localhost the dev server
-         handles compression itself and never makes the .br files, so all of this steps
-         aside during development. -->
-    <!-- Decoding those files takes real time on every visit, and GitHub Pages caps browser
-         caching at ten minutes, so the normal cache can't carry that work between visits.
-         This saves the decoded bytes in Cache Storage instead, keyed by each file's URL, so
-         a repeat visit skips the fetch and the decode entirely. The filenames change
-         whenever their contents change, so a cached name can never hold stale bytes. Every
-         cache step is optional: if storage is missing or says no, it falls back to the
-         fetch-and-decode path above. Once boot settles it cleans out entries this visit
-         never asked for, so dead builds don't pile up. A boot that never finishes throws
-         the cache away and retries once, so nobody gets stuck holding a bad entry. -->
+    <!-- GitHub Pages won't compress the framework: 7 MB cold, cached ten minutes. My build
+         writes .br copies a third that size; decode.min.js, Google's MIT-licensed decoder,
+         unpacks them in the browser, and decoded bytes land in Cache Storage under
+         fingerprinted names. -->
     <script type="module">
         import { BrotliDecode } from './js/decode.min.js';
 
         const CACHE_NAME = 'duniverse-boot-v1';
 
-        // The dev server negotiates compression itself and its build output holds no .br twins at
-        // all, so on any local origin the hook has to step aside completely or boot dies on a 404.
-        // Hostname is a blunt test, but the alternative is probing for a twin on every visit and
-        // the deployed domain is the only host that ever needs the production path. Matching the
-        // bare word 'localhost' was not enough on its own: the loopback address typed as a number,
-        // and the machine's LAN address used to check the site on a phone, both fell through to
-        // the Brotli path and left the boot screen up with nothing to explain it.
+        // Dev builds have no .br twins, so I skip local origins or boot 404s and hangs.
+        // 'localhost' alone missed loopback and LAN. Hostname is blunt, but probing every
+        // visit is worse, and only the deployed domain gets the .br path.
         const host = location.hostname;
         const isLocal = ['localhost', '127.0.0.1', '[::1]', '::1'].includes(host)
             || host.endsWith('.local')
@@ -158,13 +134,9 @@
             return cachePromise;
         }
 
-        // A hit is rebuilt from its stored bytes rather than handed back as-is, so the
-        // content-type is always the one this boot expects. The length check catches an empty or
-        // truncated body and nothing further: it is measured against a header written from these
-        // same bytes, so it cannot notice a body of the right size holding the wrong content.
-        // Handing the runtime a Response also skips its own integrity check, which is why the
-        // only thing standing behind this is the recovery reload at the foot of the file. Any
-        // error reading the cache is treated as a miss.
+        // Rebuilt so the content-type is right. The length check only catches an empty or
+        // truncated body: the header came from those bytes. Any read error is a miss. A
+        // Response skips the integrity check, so the reload below backstops it.
         async function readFromCache(cache, key, contentType) {
             if (!cache) {
                 return undefined;
@@ -207,10 +179,9 @@
                 return;
             }
             try {
-                // Bumping CACHE_NAME abandons the whole previous cache, several megabytes of
-                // decoded payload nothing will read again, so earlier versions go first. Browsers
-                // evict an origin's storage all at once, and a bucket weighed down by dead builds
-                // is one that takes the live entries with it when it goes.
+                // Bumping CACHE_NAME strands the old cache, megabytes nothing will read again,
+                // so old versions go first. Browsers evict an origin's storage all at once, and
+                // a bucket full of dead builds takes the live entries down with it.
                 const names = await caches.keys();
                 await Promise.all(names
                     .filter(name => name.startsWith('duniverse-boot-') && name !== CACHE_NAME)
@@ -225,13 +196,8 @@
         }
 
         // ---- The boot storm ------------------------------------------------------------
-        // Sand drifts across while the runtime downloads, thickens as the load lands, and
-        // breaks over the page once the app is up.
-        //
-        // It plays in full on a first visit and otherwise only while there is a real wait to
-        // cover. Ceremony on this site happens once and is remembered, the way the spoiler
-        // ritual asks once: a reader who came back should never be made to stand through
-        // weather for a page that is already cached and ready.
+        // Sand drifts as the runtime downloads, thickens as it lands, breaks once the app is
+        // up. Full run on a first visit, otherwise just enough to cover a real wait.
         const STORM_KEY = 'duniverse.storm.v1';
         const bootScreen = document.getElementById('boot-screen');
         const bootBegan = performance.now();
@@ -355,13 +321,9 @@
             setTimeout(takeDownBootScreen, 420);
         }).catch(takeDownBootScreen);
 
-        // The stored bytes are only ever length-checked, so a cache entry that is wrong rather
-        // than short is handed to the runtime and boot never finishes. A hard reload does not
-        // touch Cache Storage, so left alone that visitor meets the same dead boot screen on
-        // every future visit and only clearing site data by hand would free them. The cache is
-        // the one thing this page can throw away, so a failed start throws it away and retries.
-        // The session flag holds the retry to one attempt, which means a boot that is broken for
-        // any other reason fails the second time and stays failed instead of reloading forever.
+        // A cache entry that is wrong rather than short kills boot, and a hard reload won't
+        // clear Cache Storage, so that visitor stays stuck. A failed start throws the cache
+        // away and reloads, once: the session flag caps it.
         const RETRY_FLAG = 'duniverse-boot-retry';
         async function retryWithoutCache() {
             try {
@@ -396,15 +358,9 @@
             }).catch(() => retryWithoutCache());
         }
 
-        // Every tab paints its hero over one of a handful of photographs, and the first
-        // visit to a tab used to pay for that photograph's download on the spot: a beat
-        // of bare grain before the art arrived. Once boot settles and the thread goes
-        // idle, walk the set in nav order and let the browser's cache take them, one at
-        // a time so the warm-up never crowds a request the visitor makes mid-list. The
-        // landing page's own art tops the list and resolves instantly from cache, and a
-        // reader who asked their connection for less data keeps that bargain: the
-        // warm-up stands down. Category art stays out of the list; those pages sit two
-        // clicks deep and their heaviest file outweighs any hero here.
+        // After boot I walk the heroes in nav order, one at a time so nothing crowds a real
+        // request. Landing art leads and resolves from cache, a deliberate no-op. Save-data
+        // skips it. Category art is two clicks deep and heavier.
         const heroArt = [
             '/images/main-menu-background.webp',
             '/images/entity-front-background.webp',

@@ -44,11 +44,10 @@
                 }
             </p>
             <div class="trial-guess">
-                @* Keyed by an epoch bumped on every selection, so each handled guess
-                   remounts the picker empty. Clearing the value alone can't do it: the
-                   parameter is null before and after a guess, and an unchanged
-                   parameter never overwrites the chip the picker set for itself when
-                   the suggestion was clicked. *@
+                @* I bump an epoch on every selection so each handled guess remounts the
+                   picker empty. Clearing the value can't do it: the parameter is null
+                   before and after a guess, and an unchanged parameter never overwrites
+                   the picker's own chip. *@
                 <EntityPicker @key="pickerEpoch" Label="Name the record"
                               Placeholder="e.g. Chani, Arrakis, the Spacing Guild..."
                               ShowDescriptions="false"
@@ -77,14 +76,10 @@
             <div class="trial-reveal category-@GraphLayoutService.CategorySlug(answer)" style="--i: @history.Count">
                 @if (won)
                 {
-                    @* Muad'Dib rising: naming the sealed record earns the naming moon, the way
-                       taking the name of the second moon's shadow earned Paul his place
-                       in the sietch. It climbs from behind the card's lower edge only at
-                       the moment of the solve; a solved trial reopened later shows it
-                       already risen, a completion mark instead of a replayed
-                       celebration. The mouse in the disc is mare-like shading, not a
-                       drawing: it should only resolve for someone who goes looking, the
-                       way the Fremen found it in the real moon. *@
+                    @* Muad'Dib rising: the solve earns the moon, and justSolved stops a
+                       replay. I keep the mouse shading, not a drawing: it should only
+                       resolve for someone who goes looking, the way the Fremen found it
+                       in the real moon. *@
                     <svg class="trial-moon @(justSolved ? "is-rising" : null)" width="64" height="64"
                          viewBox="0 0 64 64" aria-hidden="true" focusable="false">
                         <defs>
@@ -218,12 +213,9 @@
     }
 
     /// <summary>
-    /// Rehydrates a trial saved earlier. The streak ledger always carries over; the
-    /// day's guesses only do when the date and the pool fingerprint both match, so a
-    /// reader who moved their reading progress mid-day starts that tier's puzzle fresh
-    /// instead of replaying guesses against a different answer. A stored answer that's
-    /// no longer visible gets dropped without comment; its name must never surface
-    /// from stale state.
+    /// Rehydrates a saved trial. The streak carries over; the day's guesses only when the
+    /// date and pool fingerprint match, so moving reading progress mid-day starts that tier
+    /// fresh. A stored answer no longer visible gets dropped, never named.
     /// </summary>
     private async Task RestoreAsync()
     {
@@ -315,10 +307,9 @@
     }
 
     /// <summary>
-    /// Finishing a trial extends the run when yesterday's was finished too, restarts
-    /// it after a missed day, and counts at most once per day no matter how the state
-    /// gets replayed. Win or loss makes no difference; showing up and finishing is
-    /// the run.
+    /// Finishing extends the run when yesterday's was finished too, restarts it after a
+    /// missed day, and counts once per day no matter how the state gets replayed. Win or
+    /// loss, showing up and finishing is the run.
     /// </summary>
     private void ApplyStreak()
     {

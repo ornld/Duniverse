@@ -1,6 +1,6 @@
 /* The one strip Blazor itself owns, shown only if the runtime falls over. It shipped
    in template lightyellow, which made the site's worst moment its least themed one.
-   The reload link inside it picks up the site's own link gold on its own. */
+   The reload link picks up the site's gold on its own. */
 #blazor-error-ui {
     background: var(--dune-panel);
     color: var(--dune-text);
@@ -24,11 +24,9 @@
     }
 
 /* ---- Boot screen ----
-   What you see when the runtime is still downloading: the wordmark over a spice
-   seam that fills with the real load percentage. This replaced the template's blue
-   spinner and "(100%)" text, since blue is saved for the Eyes of Ibad. Colors are
-   hard-coded instead of var() so the screen still renders right if the theme block
-   ever moves below it. */
+   Wordmark over a spice seam filling with the real load percentage. No blue spinner:
+   blue belongs to the Eyes of Ibad. I hardcoded the colors so a theme block moving
+   below this can't break it. */
 
 .boot-screen {
     position: fixed;
@@ -113,11 +111,10 @@
 
 /* ---- Duniverse Archives theme ---- */
 
-/* Marcellus, by Brian J. Bonislawsky / Astigmatic (SIL Open Font License; the
-   license text sits next to the font file in /fonts). Self-hosted so the site makes
-   no third-party requests. It only comes in one weight (400), which is why the
-   heading rule below pins font-weight: asked for bold, a browser would fake it and
-   smear the letterforms. */
+/* Marcellus by Brian J. Bonislawsky (Astigmatic), SIL Open Font License, text in
+   /fonts. I self-host, so no third-party requests. One weight, 400, so the heading
+   rule pins font-weight: ask for bold and the browser fakes it, smearing the
+   letterforms. */
 @font-face {
     font-family: "Marcellus";
     font-style: normal;
@@ -130,71 +127,53 @@
     --dune-bg: #0f0d0c;
     --dune-panel: #241c16;
     --dune-border: #4a3a28;
-    /* The border a thing you can type into wears while nobody's touching it. Plain
-       --dune-border sits at 1.5:1 against the panel it encloses, so an empty search
-       field read as a faint suggestion of a box rather than a box. This clears 3:1,
-       which is the line for a control's own outline, and stays well under the accent
-       so focus still lands as an obvious change and not a small one. */
+    /* Resting border on an input. Plain --dune-border sits at 1.5:1 on the panel, so
+       an empty search field barely read as a box. This clears the 3:1 a control
+       outline needs, and stays under the accent so focus still shows. */
     --dune-border-strong: #806848;
     --dune-text: #f1e6d6;
     --dune-muted: #a89478;
-    /* Muted text that has to survive the lit top of a hero. The scrims put their warm end
-       right where the tagline sits, and plain --dune-muted fell to 4.4:1 over the busiest
-       category art, which is under the 4.5 line. This clears 5.3:1 on the worst of them and
-       still reads a step quieter than --dune-text. */
+    /* Muted text that survives the lit top of a hero. The scrims run warm where the tagline
+       sits, and plain --dune-muted fell to 4.4:1 over the busiest category art, under the
+       4.5 line. This clears 5.3:1 there. */
     --dune-muted-lit: #b8a487;
     --dune-accent: #e0a458;
     --dune-accent-bright: #f4c07c;
-    /* The same two golds as bare channels, for every wash and glow set with rgba().
-       rgba() can't open a hex token, so the channels live here beside them: if an
-       accent ever changes, its companion changes in the same breath. The boot screen
-       keeps its own hardcoded copies on purpose and stays out of this. */
+    /* The same two golds as bare channels, for washes and glows set with rgba(), since
+       rgba() can't open a hex token. Change one accent, change its companion too. The
+       boot screen keeps its own copies on purpose. */
     --dune-accent-rgb: 224, 164, 88;
     --dune-accent-bright-rgb: 244, 192, 124;
     /* The dark ink that sits on spice fills: button faces, the selected book chip.
        Reads as shadowed leather, not black. */
     --dune-ink: #201408;
-    /* The card wash, as three depths instead of one flat film. Every hero used to sit under a
-       single value held top to bottom, so seven different photographs all came out the same mud
-       and no card ever looked lit. These run warm at the top and cold at the foot, so a card
-       catches light on its top edge and sinks into the ground at its bottom, the way a glowglobe
-       tuned to yellow lights a sietch room from near the ceiling.
-
-       Three depths because the heroes already had three: 0.82/0.88 was the light end, 0.87/0.92
-       the middle, 0.90/0.94 the deep end where a graph needs quiet behind it. The bottom stop
-       stays neutral instead of leaning blue, since color on Arrakis comes off minerals, blooms
-       and stains, never out of the air. */
+    /* Three washes, warm on top and cold at the foot so a card reads lit. Deep sits
+       behind a graph. I keep the bottom stop off blue: color on Arrakis comes off
+       minerals, blooms and stains, never the air. */
     --scrim-soft: linear-gradient(rgba(45, 35, 25, 0.80), rgba(12, 11, 10, 0.93));
     --scrim-mid: linear-gradient(rgba(38, 29, 21, 0.86), rgba(12, 11, 10, 0.95));
     --scrim-deep: linear-gradient(rgba(34, 26, 19, 0.90), rgba(11, 10, 9, 0.96));
     /* The flat wash About reads under. An essay wants an even page, not a lit card,
        so this one holds a single tone top to bottom instead of running warm to cold. */
     --scrim-essay: linear-gradient(rgba(23, 19, 16, 0.82), rgba(23, 19, 16, 0.88));
-    /* Recipes that repeat. The spice border is the gradient running the rim of a
-       lifted card, and the plate shadow is the pressed-plate pair (a hairline of
-       light along the top edge, shade gathering low) the hero and the cards share.
-       Each is written once here so a tuning pass turns one dial, not three. */
+    /* Recipes that repeat. The spice border runs a lifted card's rim. The plate shadow
+       is a hairline of light up top and shade gathering low, shared by the hero and
+       the cards. Written once so tuning turns one dial. */
     --spice-border-gradient: linear-gradient(120deg, #8a4a2a, #e0a458 30%, #f4c07c 50%, #c76b3f 70%, #8a4a2a);
     --plate-shadow: inset 0 1px 0 rgba(241, 230, 214, 0.05), inset 0 -14px 28px -20px rgba(0, 0, 0, 0.45);
-    /* The motion grammar, named by role. Touch is color feedback under the cursor,
-       open is small things moving (lifts, chevrons, the nav's own colors), settle is
-       cards and clues landing on the desk, rite is ceremony (the ibad ignite, the
-       universe threading in). Values still written as literals nearby (0.18s, 0.22s,
-       0.3s and friends) are near-misses the eye chose; they keep their numbers until
-       a tuning pass judges them on screen. The two curves: pop is the overshoot every
-       dot lands with, crest is the naming moon's climb. The boot screen and the
-       camera glide in universe-pan.js keep their own copies on purpose. */
+    /* Motion by role: touch is cursor color, open small moves, settle cards landing,
+       rite ceremony. Pop is the overshoot every dot lands with, crest the naming
+       moon's climb. Nearby literals are near-misses I picked. Boot screen and
+       universe-pan.js keep copies. */
     --dur-touch: 0.15s;
     --dur-open: 0.2s;
     --dur-settle: 0.4s;
     --dur-rite: 0.6s;
     --ease-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
     --ease-crest: cubic-bezier(0.22, 0.61, 0.36, 1);
-    /* The Ridulian grain: one 128px tile of sparse noise, generated offline and
-       inlined so it costs no request. The tile carries its own faint alpha (little
-       flecks at 2-7%, most pixels fully clear), so wherever it layers it looks like
-       paper texture, never static. Declared once here since several background
-       stacks below use it, and the data URI should live in one place. */
+    /* The Ridulian grain: one 128px tile of sparse noise, inlined so it costs no
+       request. Flecks sit at 2-7% alpha with most pixels clear, so it reads as paper,
+       never static. Declared once since several stacks below use it. */
     --ridulian-grain: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAPhklEQVR42u1da5Ljugr2H8lSHO9/i7OMO7llpwgGCSSQ5amTqq50dx6WBfp4w/J6vRbu8fe1DH5Pn7/h+4+/f37g58Dz9zN//vzJf38+z/v5vFQe6Jrhs5bK+7/rBGtYwT38/3W4ZuI657UWq8fnfkc+jnuAv//cL3xjxDdKEHdlLpKoTeLefzDADn5+NobapA8hjDYjM/e3Hq9/nz0I4skADA1+aEzQN8A/UukUIW6KgtMfhJuyG23AitcACU2hGmKE75rhvVoT9u97w4iTD/YkQhTg9qEGHxdCUxtNwajzjQbqpioED8R3ZOmpwmjWiAQvyAw1BGxFAobZWZmZOYhgCJ0oiD2hpsphBnKtogOkErNCZqGYV3Li/z6v4Pd3L2J8vq8H8hnRHqHOc2EGDsJ7FmB18gmlMxIwRylvX5FWON0Ro5uCgOlD8FOPgcSroQJgmL2EDtq9pPYA7VMmDzWCd428vWjMTieeQqfIWSwlQhLfs+ANkSAMICKG79wgDk4GSkZyHxN95fb0iwBQiRJCi5usxwoLo2CuWAxRXC9lhFYUI1BADf/AEvqIk83KUkD7FznrjrSFFUgQHU/9Qq0LQDfF+dlrTZxG32PFIObZhT6RQOlgBSV35czei4PAS3FrZIBAiSZ06nMPunQS//Rn5BL0H0zCwb6Y8Ar9K5b8J0V9z9tsE5p1mfLWYW391HAZBWjE6d97P4ufrQ9RxTOaL4rgTURnPXaceKLeMwt6aR1EFjKfY3gKSTk3+EjfdC65lI8Fx4oDaiHQINxA4KAlKvWZQxRE6wOFLQBoIv/QYjT013wIlJuZ0AWgs2OZ9fTDuIcnCkj1nYuiLIEB6wVieVQyMxFsLSUFZzIGON28r4MBPibeNnqvK+J2VTGCs9afKIeM5bpGhmMBA2ww8gmdPiUzEjqbXBlBusEST5V0sdgDh7RUqBOkmu4wWjxpoB+ai4QHcT/jB6PzBH7M6ZGOE0LpY6N3SMsPdxO/01/warH3PZkDOoKyw01rNNVcidotMyp5jfsSif+9BJbDvHassdnC2v8WzHrbRjau5/b1ahIVWhbLEJ8lOnhPnJ14/z1kmv83q+e0Twv2a/SU1f8aAxEHKc7IBKRlMEI5m4FghzXwmv2kqhUbIcEDd8IF3xMGEz+B39fZ0QWHgKcwi7jU8Ut8WiA6RqJCq/l2p5lay4k0vVgrNFJOHg1R/xXTkFK2e1LHVanfd27owaHxLkRqIFJ4CkM17VNvsKUle9WQkTRKVwvx38u/+oCE5urkngzJVErWnae64vHbR60JxgIS+YIT/Mxi0mHl7i7HToE5XSKC7P57FUTO7nQZTfiTsNR1T5MaZQsnp5zBhTXL7lCuOEJ4Igbc8DsYkkoKBdnG35AxUzHdJfYv6WClMizHjdjuRoa79ADMdAVRsEucPgriZ7K+E2SPxpGVvr0Q3KrZY8XriNkPu4fTDYxrC8GazJGJDa2j5gh5pny7QTn+tyiBnHl5FpqAgtOX6wZri0NHn3LjkxcHEZdd4wyh5J9Dri0Nf5KWb4E+ym4hz7OmuPYqRsTJo07drGLnMckjVF+g1k1Bjozd49RbuGgLZVXdjHGkhKc7aCnRay73AyJ0gWnCQCoxpdz2JwVRvJBB2j1khLkpuUlxjx+gre7Q506URb2lG+zVnat0PWUYelWs72PmRXBQ4l0MINoroi6vyPm1ejetPdsbh+hV9Lja+V6dAKNgp98iCd+3UdfWeIlChfhBcyI1N608Zal1UymU4xpFtsRKnPIId0hgji5daWxKGN6xs8KrmNR604G4C0SCamwl/J1mLzj5+9nGrokex6YECQP0dsqS6AGEArohPcQEASjfyMz+EcbRtHcjEVd3P5NNC2EQ6BtBcY8rLkXXMspdvgbQnwgXnu6Cg83HBCReMELL/3a50DIIpxnXNp0qrbbUsmc79dJoIYMIeoVWGw6eJXXa4xR6xUiIxk1VnYPJIVhqv5sxAKVRdpQ+J+2GH7b1WjspxmlUyboVDdPBuwsBiHZ0NguFzGB1EcsO2Y4IAdvHJ4fvj+g6qWJ6Z8rsBf9LWEeilPIuRi7lqDWGZ5P0tNwpBhyuu4KfszoqaA4OgXqhmctbvFqzyX2lBVDVdSzS4oC7ebVgQA6Bh6MouPC2PPQhSGEPGlO4RASmbauaEVCfoZcr4bH8Hw2rA4pTU881ADFejWvKLTEHi8aSs7fZG4kCXRspIT6csYSUvYyKY5Py2nvJOnuUrf2v2PZaBrPqf9R9z44TP1yUuBq0Sq4vaH7xUqxdZM3A1HvUv180uYXKuWg0bX86hTcRbLYsYu19CBs/xpb1cqPaAPEvXTwkAy9a/TBnlhc1I+DWhM3RwxTvEkfQDCxNMBt4WAIJmS3aY0szR+DTjocr+XUXoe/yRDZ38+iw6BDzBcnI0YuyAidTgv8FYQRxQXNycudNNWnuIHMmeDFBSa/CuZdE0yyXZBSsg0DiBWkqdE1vKHEzmhv87mnC1GvHWyqeHQRJFu/Rog4eHJm4hs2lCR9QsxVu9hsxAc5dezdw86Ic+ni7KSxUUFNvn+TSzOCfVgDMRI5ATRUF0IX7+69CAuwAhiEaZKk5RcHZKFvayjrh0BYGh6j3aRmY258vLVHL1kzYp4lr46bt7M0MTXwjxtDIf2rNgTPlUCBrOANI+iHWGKDHJ4IOOzk6NhPuycyMb8U9/lYJxJ2pXGiCxt5SRcsNlXrqA9diWEz3QjI/HT+hODwacirgSBNliUpi7G3WNNJ+9hAHBTmdLYddEqN3V4pLmufqSrRylLfOjk3VWAZPOv3UVHPOde2Yi/hb/kfAOZSxps4Yqhce9AUoCZ9mJHKh4RVlaf34Uzz8HpTYJOGG2lQrLpTUCBI5bbslQSyKSa1kPTShgd61Wvg2BDrTxSuIO4ZWawO1G4NMvh2efM4biJXFmcy5Ds9lbUBW9lwH9tounr2BSgQFw5J2QfvUXGr5+jRGKOlLilB2El4nFkWA9gukpl4NBaSy8yEDGooTT2qE661D5Kw06EvgTPkiN/WaIKBkLKPT/KIcNS2m2ixNqsEmr6V9/LHB+e8q1glQ4pmZEZyRky5fooFa6GnRgGt2PowBgOjceyTxGkxeCl41ihj2vxTNWstEnQtaeIQdzwISwv3LlZZlgBrrESvYtKXOAu9hsEAOdKq0cnnF3Vg0Jp/GV1BFca3MkcCyZBoWKGfaNKYhFC0dHjizEwbkbOpEmswhixCRcjP8SYc2HadaxBhoeHICf8OAzLurrKlN8w4NxOmCX8EpvQzEFCTq3BMBlZ48FPvn7PwsYCQXhwiG2RETypFWbiaGsSgaQnyJLD6If+b8bQca3KrYUW5XGP62cLSQilZBCeMirTVTkgqBFyavhuFoQJzmgGsKPTtpUo2fcOAL5jFYhV6legiXKVRDAyJUzzFWMEU1LmZfi+UTjaR+fACj2rUz0JspZ8oI/wLjnMlKJqp6FN1OfimjtzfZY5CYoNykzcWwyvG3KqIX2thdmGCoc6zgxQsYBRAirMznXhMwhtSWD61Mg5VCjeKK4f9kAhcLwYKbDsfOjkakwLTwDOIEj+o30KkzlOz9QOgoNZMQWwV5Clc5kwUUcF7gLKJBoU+EHvOxpT8hInLE3kXOY3k7EjAZwTArGDZ93LwcQxJTVuqChS5dT2Qp1GaMk4NO8YKdSBK9A6GarAmPjGSgFwQULGpRTtcm+7+x3q5pQ6ncAE8m6LVIoLnokY5eClY1zHPuy+YeMUiS0g88GQHN54tWh8IyfZtAm7H+firOXWhe2AP/EYZ8R8F/r7iRmFmtjKCZ2KK5B9V6BucIRpww+qQ5Q7Vsqh5nkWD/khbJVDLHS4miPs80Qd4a7ucWp5G0ANR63T2xlO4AkQHhd6JCaOktFfNatybYY+EH8N5/1rwZRPwATv8FAZ5gDkKHEBYL3kh0JtuC/UoWxB+SZYJlVm8F0AxdL7mADO654O1bqTE0NSwyj5yPUysKNUazOEoMoIrqb+6BdDJpSwVWqaimhgi4R1C0cDwomABOGIuAId5W5k3LUMjWvARJ9o21/gDWu3UxOZeF4jBEGsP+ytX+KSuEY+cGikrUBFZUosK7x+FapYxh2Vm1W4/Cw6QtGYB7vcU7hzJ5Yscau5TnWnGNdOyMV4u4ZlhD2bO503TJcNJYQT9o9qK1OKN6T0wteKZN25qq9wHm3MbOoC8w5ADb/6nVsdE7zwf7IHosEGl2L8EsyUv0ejFE7tjwy3zBHsePxUQvlL+oEUG5NHRaob8kLkdQqRNETwea2AYWLnajiK8MzbrBZW0odYngKFMnaFDLYIbQ9qRYytILuyMcVRXmuyjLXHcvqmjEqiQNZFb5KoWUojXjhO0GogcNY2JNHbbcZeoPfvaq4L8IPQk57tAPGcFI7garNZWcO8KqZpUuQtUVSMxFTxR1YQDLRZ8ZOZ5u4FbRA51CLf4SZC4nrz10P+EDE0KSZx0AYDbRCWlhyCeOX6sNj1qtUaGUTnZorW+vk819N4pHwPXsTzpEVnrcrTfQOwSxgjCQwKtA9q9TnUihuapgzFi9uGaefSscShpB4AYOyo3Z8amm2tRRha4lFHhK5RLaQz7MT8yua+5Y2eqQ8WgHh7uRYqaAyIPc0rFmIk5mvr4LByhA0xKbqGe7eGh/Zo/sVWso08A/+PuHEQDx8Rib/QnNKYUlbtClnNhRtZBTECrEUieLUaajZlO0BSZe+sfdJm3NZBXrAUh7zE/ZDEL2r1JTD1UPFeHXGy0MO5Sv6FBHTFzqQ4kIA+fRXNvw3RtChXepBhG3tG1VNp0YQNvHUdcGD8ezmQGRuXVBNyBAqJh5ltfaPRVFbZ5mDY2oUTTUC2zbsZ78uyfJW21gxamXoZdJmIAoSMXmxb3pXwotNtxB3J7req+ZaAkTLb7rQmvuBa03UOoEYqqA4swnhwkcbUbfvVrsq9IKyHBsXATz5DIzRXStLajkMQS2dgJ9AXdcFjaDKdlhemZPNLD2DH5FPyH/E3QSEKNii4sSjI0jK4E1mzATYwgGYbmIBOV+sXOKKEWwqvVz3kKp6GBKwVtCsXEWppjBXYynjgKaJEIE/NIPvenSALE0JFrb1YJjhFo4thV1pN/H5fJr5iFPwASZONCYAYL6CyWKhZQYxNj4JmVQeiOU+SpBK6MmmXejQRIfVDQpnJxyWZIzrTN8JfDfaQaRHcHR/y7MYlktPXha+Xc2cPXEF6pXMjVMAWxMIJxG1b55jBn4stCCicnbuJNmqjEr1ZN3ecgDtofH01E4JvgfWpXPxX30qCkAAAAASUVORK5CYII=');
 }
 
@@ -211,8 +190,8 @@ h1, h2, h3, .site-title {
 }
 
 /* A letterpress look for the big type: a dark edge over the strokes and a faint
-   gold lip beneath, like the letters were pressed into the page. Kept off h3 and
-   the small sayings headings, where one-pixel shadows just muddy the letterforms. */
+   gold lip beneath. Kept off h3 and the small sayings headings, where one-pixel
+   shadows just muddy the letterforms. */
 h1,
 h2:not(.sayings-source),
 .site-title {
@@ -288,8 +267,8 @@ html {
 }
 
 /* No border-bottom on purpose. The head rule below already draws a line across the bar,
-   and a border under it would put two parallel lines across the top of every page. The
-   rule carries the separation now, and it tapers where a border can't. */
+   so a border here would put two parallel lines across every page. The rule carries the
+   separation, and it tapers where a border can't. */
 .site-header {
     display: flex;
     align-items: baseline;
@@ -304,10 +283,9 @@ html {
     color: var(--dune-accent-bright);
 }
 
-/* Crosses whatever gap the wordmark and the register leave between them, so the bar reads
-   as one drawn line instead of two things marooned at opposite ends. Fades at both ends so
-   it never runs hard into the type. Same drawn-rule language as the epigraph attribution
-   and the glossary leaders. */
+/* Crosses the gap between the wordmark and the register, so the bar reads as one line,
+   not two things marooned at opposite ends. Fades at both ends so it never runs into the
+   type, same as the epigraph attribution. */
 .head-rule {
     flex: 1;
     height: 1px;
@@ -328,10 +306,9 @@ html {
     white-space: nowrap;
 }
 
-/* The longest register (Appendix IV) plus the wordmark needs about 495px of bar before the
-   two collide, so the band stands down below 620px and the header goes back to the plain
-   border it had. Without this the register runs off the right edge on a phone and drags a
-   sideways scroll onto every page. */
+/* The longest register, Appendix IV, plus the wordmark needs about 495px before they
+   collide, so the band stands down below 620px. Without it the register runs off a phone
+   and drags a sideways scroll onto every page. */
 @media (max-width: 620px) {
     .site-header {
         border-bottom: 1px solid var(--dune-border);
@@ -347,9 +324,9 @@ html {
     flex: 1;
     width: 100%;
     margin: 0 auto;
-    /* All four gaps around the boxed page content should read as the same 2rem. The
-       bottom is only 0.5rem of padding since every page's last block (the hero, or
-       the final entity card) brings its own 1.5rem margin to the total. */
+    /* All four gaps around the boxed content should read as the same 2rem. The bottom
+       is only 0.5rem of padding since every page's last block brings its own 1.5rem
+       margin to the total. */
     padding: 2rem 2rem 0.5rem;
 }
 
@@ -360,10 +337,9 @@ html {
 }
 
 /* ---- Footer horizon ----
-   A band of open sky between the page and the footer text. The background stays
-   transparent so the page's own night shows through, with a little spice glow at
-   the dune line. The moons sit behind the dune svg in DOM order, so the crests
-   overlap the first moon's lower edge. */
+   A band of open sky above the footer text. The background stays transparent so the
+   page's own night shows through. The moons sit behind the dune svg in DOM order, so
+   the crests overlap them. */
 
 .footer-horizon {
     position: relative;
@@ -382,10 +358,9 @@ html {
     display: block;
 }
 
-/* The crest paints, out of the svg attributes and into the sheet. Depth runs light
-   to dark, far to near, and the near crest reads --dune-panel itself: the footer
-   text below sits on that same tone, so one source can't drift into two. The gold
-   hairline is moonlight catching the near crest. */
+/* I keep the crest paints here, off the svg. Depth runs light to dark, far to near.
+   The near crest reads --dune-panel itself, so one source can't drift into two. The
+   gold hairline is moonlight catching the near crest. */
 .horizon-dunes .crest-far { fill: #2f251a; }
 .horizon-dunes .crest-mid { fill: #292017; }
 .horizon-dunes .crest-near { fill: var(--dune-panel); }
@@ -403,10 +378,9 @@ html {
     bottom: 28px;
 }
 
-/* The nearest crest and this fill match on purpose: the text should feel like it
-   sits on the shadowed face of the closest dune, not in a separate box below the
-   art. The crest fills live a few rules up, where the near crest reads --dune-panel
-   itself, so the pairing can't drift apart any more. */
+/* I match this fill to the nearest crest: the text should sit on the shadowed face
+   of the closest dune, not a box below the art. The crest fills live a few rules up,
+   so the pairing can't drift. */
 .footer-content {
     background: var(--dune-panel);
     padding: 1rem;
@@ -454,10 +428,9 @@ html {
     box-shadow: var(--plate-shadow);
 }
 
-/* Some of the source pictures have a frame baked into their pixels (vehicles.avif
-   a white border, worlds.webp a dark edge line). This repaints the background on a
-   slightly oversized layer so those baked-in edges land outside the card and get
-   clipped. The image files themselves stay untouched. */
+/* A few of the source pictures have a frame baked into their pixels: vehicles.avif
+   a white border, worlds.webp a dark line. I repaint the background oversized so
+   those edges land outside the card and clip. The files stay untouched. */
 .hero::before {
     content: "";
     position: absolute;
@@ -466,13 +439,9 @@ html {
     background: inherit;
 }
 
-/* Grain over the hero art. The heroes set their backgrounds inline per page, so
-   the tile can't join those stacks from here. It rides its own layer instead,
-   painted after the ::before repaint and under the content.
-
-   About Dune opts out. It's the one page whose hero wraps a whole essay instead of
-   a banner, and the tile would sit behind screens of long-form prose. Grain belongs
-   on the cards, not under sustained reading. */
+/* Heroes set backgrounds inline per page, so the grain tile can't join those stacks.
+   I give it its own layer, painted after the ::before repaint and under the content.
+   About Dune opts out: grain belongs on cards, not prose. */
 .hero:not(.about-hero)::after {
     content: "";
     position: absolute;
@@ -486,11 +455,9 @@ html {
     z-index: 1;
 }
 
-/* On desktop, categories with only a few records would leave the card ending
-   partway down the screen. So the card stretches to reach near the bottom of the
-   viewport, and fuller categories just grow past this on their own. The 190px
-   covers the header, nav, back link, and page padding above the card, tuned to
-   leave a slim gap below. */
+/* A category with only a few records used to end partway down the screen, so the
+   card now stretches near the bottom and fuller ones grow past it. The 190px is
+   the header, nav, back link, and padding above. */
 @media (min-width: 900px) {
     .category-hero {
         min-height: calc(100vh - 190px);
@@ -725,9 +692,9 @@ html {
     }
 
 /* ---- The Unexpurgated View ----
-   Naming the book behind each passage. The mark is set as a caption above its paragraph in
-   letterspaced caps, the same register the site already uses for epigraph attributions, so a
-   record reading with marks on still reads as a record and not as a debug view. */
+   Naming the book behind each passage. I caption the mark above its paragraph in the
+   letterspaced caps the epigraph attributions use, so the record still reads as a
+   record, not a debug view. */
 
 .edition-note {
     /* Wants real air above it. Sitting tight under the meta rows, in the same letterspaced
@@ -756,14 +723,9 @@ html {
     }
 
 /* ---- Unsealing the Record ----
-   The one moment on this site that earns a motion. A passage the reader just unlocked opens
-   under a gold seal that parts from the middle, then settles in beneath it. Plays once ever,
-   per record, per layer: the ledger in UnsealedRecords is what keeps it from repeating, and
-   what keeps it off a first visit, where nothing has been unlocked at all.
-
-   The seal is two halves, each retreating toward its own outer edge, so the gap opens at the
-   centre and widens. One pseudo-element could only wipe in one direction, which reads as a
-   line being drawn rather than a seal being broken. */
+   I split the seal in two so the gap opens at the centre and widens. One pseudo-element
+   could only wipe one way, reading as a line drawn, not a seal breaking. Plays once per
+   record and per layer, and UnsealedRecords keeps it off first visits. */
 
 .layer-unsealing {
     position: relative;
@@ -838,10 +800,9 @@ html {
     opacity: 0.8;
 }
 
-/* The first mark opens the history, so it does not need the gap the later ones use to
-   separate one passage from the one above it. Matched on adjacency rather than :first-of-type,
-   which could never fire: the toggle above it is a <p> too, so a mark is never the first <p>
-   among its siblings. */
+/* The first mark opens the history, so it skips the gap the later ones need. I match on
+   adjacency, not :first-of-type, which never fires: the toggle above is a <p> too, so a
+   mark is never the first. */
 .edition-note + .edition-mark {
     margin-top: 0.25rem;
 }
@@ -855,30 +816,14 @@ html {
     gap: 0.35rem;
 }
 
-/* The appendix, set as an appendix. This used to render as a stack of rounded boxes with
-   a gold bar down each one, which is a settings screen, not the back matter of a novel.
-   The page's own tagline says it means to be true to the appendix Herbert bound into the
-   back of Dune, so the entries now run the way that appendix runs: headword out in the
-   margin, definition flowing on the same line, nothing boxed. Dropping the boxes also
-   doubles how many terms fit a screen, which is why PageSize went 13 to 26. */
-/* The ledger. Definitions used to start wherever their headword happened to end, so every
-   line opened at a different spot and the page read as ragged. One grid now owns the whole
-   list, so every headword shares a single column and every definition opens at the same
-   edge, all the way down the page.
-
-   The column is a fixed width, NOT fit-content. Letting it size to its contents lined every
-   page up beautifully on its own but moved the edge between pages (measured 132px to 227px
-   across the nine), and it slid on every keystroke in the filter as the result set changed.
-   An edge that walks around while you type is the same complaint in a new costume.
-
-   15rem is the ceiling because letterspaced caps run about a quarter wider than a character
-   count suggests: "Sorceresses of Rossak" measures 203px, not the ~150 you would guess, and
-   the leader needs its own minimum after that. It clamps down on narrow screens so the
-   definitions never get starved, which can wrap a long term onto two lines. That is fine.
-   The leader still ends where every other leader ends. */
+/* The appendix, set as an appendix: headword in the margin, definition on the same
+   line, nothing boxed. That doubled terms per screen, so PageSize is 26. */
 .glossary {
     margin: 1.5rem 0 0;
     display: grid;
+    /* I capped the term column at 15rem since letterspaced caps run about a quarter wider
+       than the character count suggests: "Sorceresses of Rossak" measures near 203px, not
+       the 150 you would guess. fit-content slid the edge as you typed. */
     grid-template-columns: clamp(8rem, 24vw, 15rem) 1fr;
     column-gap: 1.1rem;
     row-gap: 0.85rem;
@@ -887,9 +832,9 @@ html {
     line-height: 1.55;
 }
 
-/* The wrapper only exists to pair a dt with its dd in the markup. Taking it out of the box
-   tree lets both sit directly in the grid above, which is what puts every row on the same
-   two columns. The dl/dt/dd semantics are untouched. */
+/* The wrapper only exists to pair a dt with its dd in the markup. display: contents takes
+   it out of the box tree so both sit in the grid above and every row shares two columns.
+   The semantics stay. */
 .glossary-entry {
     display: contents;
 }
@@ -905,11 +850,9 @@ html {
         text-transform: uppercase;
     }
 
-    /* The printed book puts a colon here. This draws a rule instead, the same trick the
-       epigraph attribution uses for Herbert's dash, and with the ledger column it grew
-       into a leader: it fills whatever gap the term leaves, so every rule ends at the
-       same edge and walks the eye across to the definition. Our house style, not the
-       Chilton's. */
+    /* The printed book puts a colon here. I draw a rule instead, same as the epigraph
+       attribution does for Herbert's dash. It fills whatever gap the term leaves, so
+       every leader ends at the same edge. My house style. */
     .glossary-entry dt::after {
         content: "";
         flex: 1;
@@ -932,13 +875,9 @@ html {
     white-space: nowrap;
 }
 
-/* Phones and small tablets: a headword column starves the definitions here, so the ledger
-   collapses to one column and each term sits above its own definition. Every line still
-   opens at the same edge, just the left one.
-
-   700px rather than the 600px the nav uses. Measured at 620 the two-column form gave
-   definitions 38 characters a line and wrapped 7 of 26 headwords, which reads worse than
-   stacking. At 701 they get 45 characters and only the single longest term wraps. */
+/* Phones and small tablets: a headword column starves the definitions, so the ledger
+   stacks into one. 700px, not the 600px the nav uses. At 620 two columns gave
+   definitions 38 characters a line and wrapped seven headwords. */
 @media (max-width: 700px) {
     .glossary {
         grid-template-columns: 1fr;
@@ -1016,11 +955,9 @@ html {
     font-size: 0.8rem;
 }
 
-/* Atreides wears the archive's own spice gold, so it reads the token instead of a
-   copy. The lines below stay their own literals on purpose: Fremen and Companions
-   happen to share values with two category colors today, but a house is not a
-   drawer, and the category palette has to stay free to move without dragging the
-   bloodlines along with it. */
+/* Atreides reads the archive's spice gold token, not a copy. The lines below stay
+   literals on purpose: Fremen and Companions match two category colors today, but
+   a house is not a drawer, and that palette has to stay free. */
 .lineage-atreides { color: var(--dune-accent); }
 /* Lighter than the instinctive Harkonnen red: #c9413f failed reading contrast as the
    legend chip's text on the night ground, and the node rings follow the legend. */
@@ -1140,12 +1077,9 @@ html {
 }
 
 /* ---- Chart entrance ----
-   The chart settles one generation at a time, oldest first: a row's people land
-   (a fade on the group, a little overshoot pop on the circle), their lines flow
-   down a beat later, and the next row follows. Every element reads its row from
-   --row, set inline by the page. The entrances use a backwards fill instead of
-   forwards, so once an element lands the base styles own its transform again and
-   the hover states keep working. */
+   Generations land oldest first: people fade and pop, lines follow a beat later.
+   Elements read --row, set inline by the page. Backwards fill, not forwards, so
+   base styles get the transform back and hover works. */
 
 @keyframes blood-appear {
     from { opacity: 0; }
@@ -1212,11 +1146,9 @@ html {
 }
 
 /* ---- Crestline dividers ----
-   Printed books close their sections with an ornament, not empty space: the twin
-   moons over dune-crest hairlines that taper off to nothing. About a kilobyte of
-   SVG carried as a mask, so it tints from the theme instead of shipping its own
-   colors. Saved for true section breaks, between groups of sayings and the About
-   page's essays. Sprinkled anywhere smaller, it would turn into wallpaper. */
+   Books close a section with an ornament, not empty space. The moons ride a dune
+   crest, an SVG mask so it tints from the theme. Only for true breaks: anywhere
+   smaller it turns into wallpaper. */
 .sayings-group + .sayings-group::before,
 .home-section + .home-section::before {
     content: "";
@@ -1238,12 +1170,9 @@ html {
 }
 
 /* ---- The Irulan rule ----
-   Epigraphs set like type in a book, not like interface. Herbert opens every
-   chapter of Dune the same way: an italic excerpt, then the source alone on the
-   next line behind a short dash. So the card box gives way to hairline rules above
-   and below, an oversized Marcellus quote mark hangs in the left padding, and the
-   attribution draws its dash as a CSS rule element. That matches the look of the
-   novels and keeps the site's no-typed-dashes rule in one stroke. */
+   Herbert opens every chapter with an italic excerpt, then the source underneath.
+   So no card box: hairline rules top and bottom, a Marcellus quote mark in the
+   padding, and the dash drawn, never typed. */
 
 .epigraph {
     position: relative;
@@ -1295,10 +1224,9 @@ html {
         margin-right: 0.6em;
     }
 
-/* Quotes stacked under one source heading should read as one continuous run of
-   type: later entries drop their own top rule and lean on the previous entry's
-   bottom one, and only the first in the run hangs the big quote mark. Padding
-   stays put so the whole run keeps one left edge. */
+/* Quotes stacked under one heading should read as one continuous run. Later
+   entries drop their top rule and lean on the one above, and only the first hangs
+   the quote mark. Padding stays put so the left edge holds. */
 .sayings-group .epigraph + .epigraph {
     margin-top: 0;
     border-top: none;
@@ -1356,9 +1284,9 @@ html {
 .entity-card {
     background-color: var(--dune-panel);
     /* Plain cards carry the grain alone. The photo variants below repeat it at the
-       head of their own stacks, since background-image lists replace each other
-       instead of merging. Each stack then sizes its layers one by one: the tile
-       stays at its native 128px and the art keeps covering the card. */
+       head of their stacks, since background-image lists replace each other instead
+       of merging. Each stack sizes its layers: tile at 128px, art covering the
+       card. */
     background-image: var(--ridulian-grain);
     border: 1px solid var(--dune-border);
     border-radius: 8px;
@@ -1420,12 +1348,9 @@ html {
         box-shadow: 0 6px 18px -10px rgba(0, 0, 0, 0.6);
     }
 
-    /* Was three characters off the character map. Now the drawn marks, sized to sit level
-       with the pill's own text.
-
-       Qualified by the pill on purpose. The base .mark rule lives further down the sheet,
-       so a bare .explore-glyph ties with it on specificity and loses on source order, and
-       the size set here would quietly do nothing. */
+    /* These were three characters from a font. Now they're drawn marks, sized level with
+       the pill's text. Qualified by the pill on purpose: .mark sits further down the
+       sheet, so a bare .explore-glyph would lose on source order. */
     .explore-link .explore-glyph {
         color: var(--dune-accent);
         width: 17px;
@@ -1546,12 +1471,10 @@ html {
         opacity: 1;
     }
 
-/* The site-wide category palette. Graph stars, the connection finder's chips and
-   dots, and the tinted card edges below all read from --cat-color, so each
-   category's color gets decided exactly once, right here. The cooler drawers lean
-   warm on purpose, mineral versions of themselves, so every hue reads as something
-   the desert could yield without giving up telling ten drawers apart. */
-/* Artifacts are the spice: literally the accent, read from the token so it stays true. */
+/* I decide each drawer's color once, here. Graph stars, finder chips, tinted card
+   edges all read --cat-color. Cool drawers lean warm so every hue reads as desert
+   mineral. */
+/* Artifacts are the spice, so they read the accent token. */
 .category-artifacts { --cat-color: var(--dune-accent); }
 .category-disciplines { --cat-color: #8fb3a4; }
 .category-flora-fauna { --cat-color: #8fae5c; }
@@ -1565,13 +1488,9 @@ html {
 .category-unknown { --cat-color: var(--dune-muted); }
 
 /* ---- The drawn marks ----
-   One mark per drawer, plus three for the doors out of a record. The shapes live in
-   Components/Mark.razor; everything about how big they are and what color they take is
-   decided here, per surface, because a mark in the Index and a mark heading a drawer are
-   not doing the same job.
-
-   None of them carry a color of their own. They stroke with currentColor, so setting
-   `color` on the mark (or on anything above it) is the whole tinting story. */
+   Shapes live in Components/Mark.razor. Size and color get decided here, per surface:
+   an Index mark and a drawer heading aren't the same job. None carry color: they
+   stroke with currentColor, so `color` tints them. */
 
 .mark {
     display: inline-block;
@@ -1614,9 +1533,9 @@ html {
     margin-top: -0.15rem;
 }
 
-/* A record's kind tints the top edge of its card, its browse page's hero, and the
-   left edge of every tile inside, carrying the graphs' color language through the
-   rest of the site. Anything without a category keeps the plain border color. */
+/* A record's kind tints the top of its card, its browse page's hero, and the left
+   edge of every tile inside, so the graphs' color language carries through the
+   site. No category means the plain border color. */
 .entity-card.front,
 .category-hero {
     border-top: 2px solid var(--cat-color, var(--dune-border));
@@ -1626,11 +1545,9 @@ html {
     border-left: 2px solid var(--cat-color, var(--dune-border));
 }
 
-/* A record's front card wears its own category's backdrop, the same art that heads
-   that category's browse page, so an artifact looks like an artifact before you
-   read a word. Only the photo swaps here. The darker overlay and the sizing from
-   .entity-card.front carry over, so the entry text stays readable. Categories
-   without their own art fall back to the shared front backdrop. */
+/* A front card wears its category's art, the same photo heading that browse page.
+   Only the photo swaps: the overlay and sizing from .entity-card.front carry over,
+   so the text stays readable. Categories without art keep the shared backdrop. */
 .entity-card.front.category-artifacts {
     background-image: var(--ridulian-grain), var(--scrim-mid), url('/images/categories/artifacts.webp');
 }
@@ -1669,18 +1586,11 @@ html {
 }
 
 /* ---- Graphs without a cursor ----
-   Node names are drawn but held at zero opacity until hover, which is a rule a touchscreen
-   can never satisfy: every graph became a field of unnamed colored dots on a phone. Where
-   there is no hover, the record web simply shows all its names. It carries a few dozen
-   nodes at most, so they fit.
-
-   The whole-Duniverse graph is left out of this on purpose. A hundred and twenty names at
-   once is not a map, it is a wall, so that page answers a press instead: the first press
-   names a star and lights its threads, the second opens it. */
-/* The node a reader has singled out, by cursor or by finger. Hover cannot carry this on
-   its own: a touchscreen never hovers, so without a class the name of the thing you just
-   pressed stays invisible. */
+   Names hide until hover. The record web names them all. The Duniverse web has too
+   many, so one press names a star and lights its threads, a second opens it. */
 .graph-node.is-active text {
+    /* The singled-out node. A touchscreen never hovers, so without this class the name
+       of the thing you just pressed would stay invisible. */
     opacity: 1;
 }
 
@@ -1690,11 +1600,9 @@ html {
 }
 
 @media (hover: none) {
-    /* Names are drawn at a size that suits a graph filling a desktop card. On a phone the
-       whole web scales to under half, which takes an 11px name down to about five: too
-       small to read even before it collides with its neighbours. Since only the pressed
-       node shows a name here, there is nothing to collide with, and it can be set large
-       enough to actually read. */
+    /* Names are sized for a graph filling a desktop card. A phone scales the whole web
+       under half, so 11px lands near five: unreadable. Only the pressed node shows a
+       name, so nothing collides and it can go big. */
     .relationship-graph .graph-node.is-active text {
         font-size: 26px;
     }
@@ -1796,11 +1704,9 @@ html {
 }
 
 /* ---- The birth of the universe ----
-   On arrival (and again whenever reading progress rebuilds the graph), creation
-   blooms outward from the center: each star lights up at its --birth delay, set
-   inline from its distance to the middle, and each thread laces in only after the
-   later of its two stars exists. Backwards fill keeps elements dark until their
-   moment, then hands transform control back to the hover styles. */
+   Stars light outward from the center at their --birth delay, set inline from
+   distance, again on every rebuild. Threads wait for the later of their two stars.
+   Backwards fill keeps hover working. */
 
 @keyframes uni-appear {
     from { opacity: 0; }
@@ -2059,10 +1965,9 @@ html {
     overflow: visible;
 }
 
-/* Each link's reveal is staggered by its spot (--i) along the chain: the node pops
-   in, the edge draws toward the next node, its label fades up, and the next node
-   lands. pathLength="1" on the lines normalizes every edge, so one dash animation
-   draws them all no matter their pixel length. */
+/* I stagger each link by its spot along the chain (--i): node, edge, label, next
+   node. pathLength="1" normalizes every line, so one dash animation draws them
+   all whatever their pixel length. */
 .chain-edge {
     stroke: var(--dune-accent);
     stroke-width: 1.8;
@@ -2372,11 +2277,9 @@ button.chip {
 }
 
 /* ---- Page entrance ----
-   Every route change re-mounts the page wrapper (keyed by path in MainLayout), and
-   the fresh element settles with one short fade. Kept under a fifth of a second.
-   Any longer and the whole site starts feeling slower, not smoother. Record pages
-   and the trial opt out through :has, since their own staged entrances already
-   cover the arrival. */
+   Every route change re-mounts this wrapper, keyed by path in MainLayout. One
+   short fade. Longer than 0.18s and the site feels slow. Record pages and the
+   trial stage their own, so :has opts them out. */
 
 @keyframes page-enter {
     from {
@@ -2401,9 +2304,9 @@ button.chip {
 }
 
 /* ---- Dossier entrance ----
-   Opening a record lays its file on the desk: the record card settles first, then
-   the divider and relationship web, the related sections last. The page keys the
-   whole subtree by entity id, so walking record to record replays it. */
+   Opening a record lays its file on the desk: card first, then the divider and
+   relationship web, related sections last. The page keys the subtree by entity
+   id, so walking record to record replays it. */
 
 @keyframes dossier-settle {
     from {
@@ -2520,10 +2423,9 @@ button.chip {
     letter-spacing: 0.08em;
 }
 
-    /* Each flank is a dune-crest hairline tapering toward the page edge, with one
-       moon riding beside the words: the twin moons split across the break. The
-       right flank is the same asset mirrored, which puts its moon at the inner
-       end where it belongs. */
+    /* Each flank is a dune-crest hairline tapering toward the edge, with one moon
+       beside the words: the twin moons split across the break. I mirror the same
+       asset on the right, so its moon sits inside. */
     .connections-divider::before,
     .connections-divider::after {
         content: "";
@@ -2568,12 +2470,9 @@ button.chip {
 
 /* ---- Navigation ---- */
 
-/* The nav is pinned and built from translucent, top-lit material: once content
-   scrolls underneath, the page ghosts through the blur like smoked glass. A
-   hairline of light runs along its top face, and its bottom edge is the same spice
-   seam the Index dropdown uses (brightest in the center, dissolving at the ends)
-   instead of a flat border. Sticky keeps every page one click away on long
-   timelines and category lists. */
+/* I pinned the nav so every page stays one click away on long lists, and kept it
+   translucent: content ghosts through the blur. The bottom edge is the spice seam
+   the Index dropdown uses, not a flat border. */
 .top-nav {
     position: sticky;
     top: 0;
@@ -2618,25 +2517,10 @@ button.chip {
             color: var(--dune-accent-bright);
         }
 
-        /* ---- Active tab: the Eyes of Ibad ----
-           The one blue element on the whole site. The spice marks what you're
-           looking at. Blue within blue, like the books describe the eyes: no single
-           flat color. The letters carry two blues (darker at the edges, brighter
-           within) through a gradient clipped to the text, and the glow blooms from
-           drop-shadows so the gradient stays crisp inside the glyphs. Both blues
-           run a register brighter than the first pass: the old edge ink measured
-           under 2:1 against the bar, real smudge territory, so the pair moved up
-           together and the center went paler to keep the depth. Each shadow
-           layer halves the opacity of the last and doubles its reach, so the bloom
-           dissolves into the background instead of stopping at a hard line.
-
-           Two motions keep the eyes alive. On arrival the glow ignites: it starts
-           dim, flares past its resting brightness, and settles (ibad-ignite, once
-           per activation). At rest a faint gleam drifts through the letters every
-           few seconds (ibad-gleam): a third gradient layer, clipped to the same
-           text, sweeps a soft highlight across and then waits off-glyph for most of
-           the cycle. Both are stripped under prefers-reduced-motion, leaving the
-           static glow. */
+        /* ---- Active tab: Eyes of Ibad ----
+           The site's one blue. Two blues clipped to the text, glow from
+           drop-shadows so the gradient stays crisp. I raised both: the edge ink
+           measured under 2:1. Reduced motion strips the animations. */
 
         /* Direct children only, plus the two labels. Inside the Index panel the treatment
            takes the label span rather than the whole link, so its bloom stops at the words
@@ -2652,6 +2536,9 @@ button.chip {
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+            /* I stack these so each layer halves the opacity of the one above and doubles
+               its reach. The bloom dissolves that way instead of stopping on a hard line.
+               Keep the ratio if you retune. */
             filter:
                 drop-shadow(0 0 2px rgba(56, 116, 228, 0.9))
                 drop-shadow(0 0 7px rgba(44, 98, 212, 0.5))
@@ -2663,6 +2550,8 @@ button.chip {
                 ibad-gleam 7s ease-in-out 1.2s infinite;
         }
 
+        /* ibad-ignite is my one-off flare when a tab goes active: dim, overshoot at 30%,
+           then settle. Its 100% repeats the resting filter above, so retune both together. */
         @keyframes ibad-ignite {
             0% {
                 filter:
@@ -2692,7 +2581,7 @@ button.chip {
             }
         }
 
-        /* The sweep itself takes about 2.8s. For the other 4.2s of each cycle the
+        /* ibad-gleam: the sweep itself takes about 2.8s. For the other 4.2s of each cycle the
            highlight rests beyond the letters, so the gleam reads as an occasional
            catch of light, not a marquee. Only the first (highlight) layer moves. */
         @keyframes ibad-gleam {
@@ -2715,11 +2604,9 @@ button.chip {
     margin: 0 0.25rem;
 }
 
-/* Does nothing whenever the whole nav fits one row. On phones and tablets it
-   becomes a full-width flex break so the rows land in fixed threes, with the Mentat
-   Trial and the Index closing the third. The 920px threshold sits just above where
-   a single row runs out of room, so the bar skips the awkward in-between wraps on
-   its way down. */
+/* Inert when the nav fits one row. Under 920px it turns into a full-width flex
+   break, so rows land in threes with the Trial and Index closing the last. 920 is
+   just above where one row runs out. */
 .nav-break {
     display: none;
 }
@@ -2732,12 +2619,9 @@ button.chip {
     }
 }
 
-/* The third break only wakes at phone widths. Five items can't share the last
-   tablet row on a 375px screen, and the narrowest phones lack the room with the
-   gap squeezed to nothing. So below 600px the Index drops to a row of its own and
-   the three rows above it each keep a tidy three tabs. The divider goes with it:
-   it earns its keep separating the Index from the tab beside it, but once the
-   Index stands alone that hairline is just a stray mark leading the row. */
+/* Only wakes on phones. Five items can't share the last tablet row at 375px, so
+   under 600px the Index gets its own row and the rows above keep three. The
+   divider hides with it, a stray mark alone. */
 .nav-break-phone {
     display: none;
 }
@@ -2755,10 +2639,8 @@ button.chip {
 }
 
 /* Above the wrap threshold the tabs stop clustering in the middle: each takes an
-   equal share of the bar, so the row spreads out evenly. The share is capped so the
-   tabs stay within comfortable reach on wide screens instead of stretching to the
-   far edges. Long labels keep their natural width (flex min-content), so nothing
-   ever truncates. */
+   equal share of the bar. I capped the share so they stay in reach on wide
+   screens, and long labels keep their natural width. */
 @media (min-width: 921px) {
     .top-nav {
         column-gap: 0.7rem;
@@ -2779,13 +2661,9 @@ button.chip {
 }
 
 /* ---- Index dropdown ----
-   The ten categories live behind one "Index" tab. The panel centers under the
-   whole nav bar (not the trigger) so it never clips a screen edge, and it opens
-   like blown sand: a spice seam, a translucent haze over the page, grains falling
-   on a canvas, and the entries settling in one after another.
-
-   (No positioning rule needed here: the nav is position: sticky, which counts as
-   a positioned ancestor, so the panel's absolute centering anchors to it.) */
+   Ten categories behind one tab. The panel centers on the nav bar, not the
+   trigger, so it never clips a screen edge. No positioning rule needed here: the
+   sticky nav is already a positioned ancestor. */
 
 .nav-index {
     display: inline-block;
@@ -3050,11 +2928,9 @@ button.chip {
         transition: color 0.3s ease;
     }
 
-/* One pass of light along the rim, out and back, and then it's done. This used to loop
-   forever, which meant a card you happened to leave the cursor on kept flickering for as
-   long as you sat there and pulled the eye away from whatever you were reading. Ending
-   where it started matters: the resting position is the same one the card holds with no
-   animation at all, so reduced motion and the settled state look identical. */
+/* One pass of light along the rim, out and back, then done. I had it looping forever,
+   so a card left under the cursor kept flickering. It ends where it starts, so reduced
+   motion and the settled card match. */
 @keyframes spice-shimmer {
     0% {
         background-position: 0 0, 0% 50%;
@@ -3128,8 +3004,8 @@ button.chip {
     }
 
     /* The dot on the spine and its card answer each other's hover: either one lights
-       both. The dot gets a padded pseudo-element to widen its hover target, since a
-       bare 14px circle is a fiddly thing to rest a cursor on. */
+       both. I pad the dot's hover target with a pseudo-element, since a bare 14px
+       circle is fiddly to rest a cursor on. */
     .timeline-dot::after {
         content: "";
         position: absolute;
@@ -3221,11 +3097,9 @@ button.chip {
 }
 
 /* ---- Timeline reveal ----
-   Events are dealt off the spine as they scroll into view: each card starts against
-   the center line and settles out to its side as it fades in. The animation scrubs
-   with the scroll position (view timeline, no script), so scrolling back up rewinds
-   it. Browsers without scroll-driven animations skip the @supports block and just
-   show the settled state. */
+   Cards start against the center line and settle out as they scroll in. A view
+   timeline scrubs it, no script, so scrolling back rewinds. Browsers without
+   scroll-driven animations skip @supports and get the settled state. */
 
 @keyframes timeline-reveal-left {
     from {
@@ -3281,10 +3155,9 @@ button.chip {
 }
 
 /* ---- Lost in the deep desert ----
-   Any dead end, whether that's a URL with no page or a record id with no record:
-   open desert at night. A faint horizon glow and the drifting sand set the scene,
-   and the words stay sparse. The copy sits above the canvas by DOM order alone;
-   both carry the same stacking level. */
+   Any dead end, a bad URL or a missing record, gets open desert at night. I keep
+   the copy above the canvas on DOM order alone, since both share a stacking
+   level. */
 
 .lost-desert {
     position: relative;
@@ -3437,21 +3310,18 @@ button.chip {
 }
 /* ---- The Mentat Trial ---- */
 
-/* On desktop the trial card stretches to reach near the bottom of the viewport,
-   the category pages' own trick, so a short or finished trial doesn't strand a
-   band of bare page below itself. 160 covers the header, nav, and page padding
-   above the card; the trial has no back link, so it runs 30 shy of the category
-   figure. */
+/* On desktop the card stretches near the viewport bottom, the category pages'
+   trick, so a short trial doesn't strand bare page. 160 covers header, nav, and
+   padding; no back link here, so it's 30 shy of the category figure. */
 @media (min-width: 900px) {
     .trial-hero {
         min-height: calc(100vh - 160px);
     }
 }
 
-/* Clues stack as dossier lines: each one a labeled strip of the day's file, dealt
-   onto the desk as it's earned, spanning the card the way every other tab's content
-   fills its hero. The reveal below reads the category palette the same way the
-   connection finder does (--cat-color set by a category-* class). */
+/* Clues stack as dossier lines, a labeled strip of the day's file dealt onto the
+   desk as it's earned. The reveal below reads the category palette the way the
+   connection finder does, off --cat-color set by a category-* class. */
 .trial-clues {
     list-style: none;
     margin: 1.5rem 0 0;
@@ -3485,11 +3355,9 @@ button.chip {
     line-height: 1.5;
 }
 
-/* Trial elements stage their own arrival the way the dossier does: the page-enter
-   fade stands down (the :has rule next to the dossier's) and each clue, guess row,
-   and the reveal settles on its own --i beat. The page sets --i from its loop
-   indexes, so a return visit deals the whole stack in order, and a clue earned
-   mid-game lands one beat after the verdict row that bought it. */
+/* Trial elements stage their arrival like the dossier: the page-enter fade stands
+   down in the :has rule beside the dossier's, and each clue, guess row, and reveal
+   settles on its own --i beat, set from the page's loop indexes. */
 @keyframes trial-clue-settle {
     from {
         opacity: 0;
@@ -3550,10 +3418,9 @@ button.chip {
     font-size: 0.85rem;
 }
 
-/* The end of the trial: the record laid open, tinted by its category along the
-   top edge like the entity cards. The card doubles as the sky the naming moon
-   climbs through: relative for the moon's anchor, clip so the moon waiting below
-   the lower edge stays hidden until it rises. */
+/* The end of the trial: the record laid open, tinted along the top edge by
+   category like the entity cards. It's the moon's sky too, relative for the
+   anchor and clipped so the moon stays hidden until it rises. */
 .trial-reveal {
     position: relative;
     overflow: clip;
@@ -3568,10 +3435,9 @@ button.chip {
 }
 
 /* ---- Muad'Dib rising ----
-   The win's verdict sets itself as an epigraph, and the naming moon hangs high in
-   the card's corner. The epigraph cedes the moon's column so the two never collide,
-   and the rise waits for the card's own settle before it begins. The climb plays
-   once, at the solve. A restored trial never gets the is-rising class. */
+   The win's verdict reads as an epigraph, the naming moon rises in the corner. The
+   epigraph cedes the moon's column so they never collide. The climb plays once: a
+   restored trial never gets is-rising. */
 .trial-epigraph {
     margin: 0.25rem 0 0.9rem;
     max-width: min(60ch, calc(100% - 4.25rem));

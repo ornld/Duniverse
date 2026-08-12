@@ -3,11 +3,9 @@
 @inject NavigationManager Nav
 @inject IJSRuntime JS
 
-@* Open sand, for any address the archive can't answer. Two pages land here: a URL with no
-   page behind it, and a record id with no record behind it. They used to look nothing alike,
-   one a night desert and the other a bare card, even though they're the same dead end. The
-   canvas comes first so the copy and actions, painted later in DOM order, stay readable above
-   the drifting sand. *@
+@* Open sand for a URL with no page or an id with no record. I keep the canvas first in
+   DOM order, so copy and actions paint above it; moved after, it would cover them and
+   swallow their clicks. *@
 <div class="hero lost-desert">
     <canvas class="lost-sand" @ref="sandCanvas"></canvas>
     <h1>@Heading</h1>

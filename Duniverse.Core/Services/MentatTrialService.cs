@@ -8,17 +8,9 @@ using Duniverse.Models;
 namespace Duniverse.Services
 {
     /// <summary>
-    /// The pure engine behind the Mentat Trial, the archive's daily deduction game. Each day
-    /// it seals one record from the pool the reader's spoiler settings admit, deals out five
-    /// clues from vague to specific, and measures every wrong guess by how many relationship
-    /// links it sits from the answer. Nothing here touches the clock, the browser, or storage:
-    /// the date and the visibility rule arrive as arguments, so the same inputs always produce
-    /// the same trial and a plain console can exercise the whole game.
-    ///
-    /// Spoiler safety is the governing constraint throughout. The pool, the record named in
-    /// the connection clue, the relationship label on that connection, and the graph the link
-    /// distance is measured through are all filtered by the caller's tier rule, so a reader
-    /// sees nothing from books they have not reached, not even as a hint.
+    /// The engine behind the Mentat Trial, my daily deduction game. Each day it seals one record
+    /// from the reader's visible pool, deals five clues vague to specific, and scores misses by
+    /// link distance. Nothing here touches the clock or storage.
     /// </summary>
     public class MentatTrialService
     {
@@ -65,15 +57,9 @@ namespace Duniverse.Services
         }
 
         /// <summary>
-        /// The day's sealed record, or null when the pool is empty. The site's convention for
-        /// daily selection is the Home page's: a number derived from the date indexes a
-        /// spoiler-filtered pool, with no randomness anywhere. This extends that idiom with a
-        /// mixing step, because the raw day count would walk neighboring ids on consecutive
-        /// days and a regular visitor would learn the pool's alphabet. The mix is fixed
-        /// arithmetic (a splitmix-style finisher), not System.Random, so every runtime lands
-        /// on the same record for the same date and pool. Different reading progress means a
-        /// different pool and usually a different record; that is by design, since each tier's
-        /// pool must stand alone without leaking what the others hold.
+        /// The day's sealed record, or null on an empty pool. A date-derived number indexes the
+        /// pool, fixed arithmetic and not System.Random, so every runtime lands the same. I mix
+        /// it so consecutive days don't walk neighboring ids.
         /// </summary>
         public DuneEntity? SelectDaily(DateOnly date, IReadOnlyList<DuneEntity> pool)
         {
@@ -87,10 +73,9 @@ namespace Duniverse.Services
         }
 
         /// <summary>
-        /// The trial's five clues for a record, ordered vague to specific: the redacted
-        /// summary, the category, the book of first appearance, one visible connection, and
-        /// the shape of the name. Always exactly five, each non-empty; missing data degrades
-        /// to an honest archive line rather than a gap.
+        /// The five clues, vague to specific: redacted summary, category, book of first
+        /// appearance, one visible connection, and the shape of the name. Always exactly five and
+        /// never empty, since missing data degrades to an honest archive line.
         /// </summary>
         public IReadOnlyList<string> BuildClues(DuneEntity answer, Func<SpoilerTier, bool> tierVisible)
         {
@@ -105,11 +90,9 @@ namespace Duniverse.Services
         }
 
         /// <summary>
-        /// Judges one guess against the answer: whether it is the record itself, whether it is
-        /// filed in the same category, and how many relationship links separate the two through
-        /// the spoiler-filtered web. A null distance means no visible chain joins them; the
-        /// chain may exist in the full archive, but a route through sealed records must not be
-        /// measured, or its length would whisper about what the seals hide.
+        /// Judges one guess: the record itself, the same category, and how many links separate
+        /// the two through the visible web. Null distance means no visible chain joins them,
+        /// since a route through sealed records would whisper what they hide.
         /// </summary>
         public TrialGuessResult EvaluateGuess(DuneEntity guess, DuneEntity answer, Func<SpoilerTier, bool> tierVisible)
         {
@@ -154,13 +137,9 @@ namespace Duniverse.Services
         }
 
         /// <summary>
-        /// Blacks out the record's own name inside a piece of text: the full name, every word
-        /// of it longer than three characters, and the fragments those words break into around
-        /// hyphens and apostrophes. Matching is case-insensitive, tolerates the curly
-        /// apostrophe, and swallows a trailing possessive, so "Muad'Dib's" falls with
-        /// "Muad'Dib". Longer tokens are replaced first, keeping a fragment from biting a hole
-        /// in a larger token it belongs to. Short words (of, the, Ix) survive; a bar for every
-        /// two-letter word would draw more attention than the word itself.
+        /// Blacks out the record's name: the full name, every word over three characters, and
+        /// their fragments. Longer tokens go first so a fragment can't bite a hole in a bigger
+        /// one. Short words survive, since a bar draws more attention.
         /// </summary>
         private static string RedactName(string text, string name)
         {
@@ -185,9 +164,9 @@ namespace Duniverse.Services
             var redacted = text;
             foreach (var token in tokens.OrderByDescending(t => t.Length))
             {
-                // Apostrophes inside the token match either typographic form; the optional
-                // tail swallows a possessive. Lookarounds stand in for \b because a token
-                // can end next to punctuation \b treats as part of a word.
+                // Apostrophes inside the token match either typographic form, and the optional
+                // tail swallows a possessive. I use lookarounds instead of \b, since a token can
+                // end next to punctuation \b treats as part of a word.
                 var pattern = Regex.Escape(token).Replace("'", "['’]");
                 redacted = Regex.Replace(
                     redacted,
@@ -223,12 +202,9 @@ namespace Duniverse.Services
         // ---- Clue four: one visible connection ----
 
         /// <summary>
-        /// Names one directly connected record the reader is cleared to see, walking neighbors
-        /// in id order so the same trial always names the same one. A neighbor whose
-        /// relationship label is also admitted is preferred, and the label rides along exactly
-        /// as the related sections show it; a label above the reader's tier stays unsaid even
-        /// when the neighbor itself is visible, the precedent RelatedSection set. With no
-        /// visible neighbors at all, the isolation is itself the clue.
+        /// Names one connected record the reader can see, walking neighbors in id order so the
+        /// same trial always names the same one. I prefer a neighbor whose label is also visible,
+        /// and a label above the reader's tier stays unsaid.
         /// </summary>
         private string ConnectionClue(DuneEntity answer, Func<SpoilerTier, bool> tierVisible)
         {
@@ -289,8 +265,8 @@ namespace Duniverse.Services
 
         /// <summary>
         /// FNV-1a over the pool's ids, uppercased so the fingerprint shares the registry's
-        /// indifference to letter case. Order-sensitive, which is safe because BuildPool
-        /// always hands the pool over in its one canonical order.
+        /// indifference to letter case. Order-sensitive, which is safe since BuildPool always
+        /// hands the pool over in its one canonical order.
         /// </summary>
         private static ulong HashPool(IReadOnlyList<DuneEntity> pool)
         {

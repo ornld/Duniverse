@@ -6,10 +6,9 @@
 @if (graph is not null && graph.Nodes.Count > 1)
 {
     <div class="graph-wrapper">
-        @* Described as one picture rather than a web of controls. Everything drawn here is
-           listed underneath in Related, as ordinary links a keyboard and a screen reader
-           already handle, so announcing the same records twice would only make the page
-           longer to get through. *@
+        @* I describe this as one picture, not a web of controls. Everything drawn here is
+           listed in Related below as plain links a keyboard and screen reader already
+           handle, so naming every node twice would only lengthen the page. *@
         <svg class="relationship-graph @(hoveredNodeId is null ? null : "has-hover")" viewBox="0 0 @Width @Height" preserveAspectRatio="xMidYMid meet"
              role="img" aria-label="@($"A web of {graph.Nodes.Count - 1} records connected to this one. Each is listed with its relationship below.")">
             <g class="graph-edges">
@@ -124,10 +123,9 @@
         }
     }
 
-    // Mouse keeps one click. Touch takes two: the first names the node and lights what it
-    // touches, the second opens it. Showing every name at once was the other option and it
-    // does not survive a phone, where the whole web scales to under half and three dozen
-    // names land on top of each other.
+    // Mouse keeps one click. Touch takes two: the first names the node and lights its web,
+    // the second opens it. Showing every name at once dies on a phone, where the web scales
+    // under half and labels stack.
     private void Activate(string id)
     {
         if (lastPointerWasTouch && !string.Equals(revealedByTouch, id, StringComparison.OrdinalIgnoreCase))

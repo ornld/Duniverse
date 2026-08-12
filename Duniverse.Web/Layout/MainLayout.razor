@@ -3,11 +3,9 @@
 @inject NavigationManager Nav
 
 <div class="page">
-    @* The running head. The wordmark used to sit alone at the far left with the rest of the
-       bar empty, which read as a template with the logo slot filled in. Now a drawn rule
-       crosses the gap to a register naming which part of the volume you are in, the way a
-       bound book prints one. It also gives location a second signal that isn't color, which
-       matters since the blue tab is the only thing saying it today. *@
+    @* The running head. A rule crosses to a register naming which part of the volume
+       you're in, the way a bound book prints one. That gives location a signal that
+       isn't color. The blue tab was doing it alone. *@
     <header class="site-header">
         <a href="/" class="site-title">Duniverse</a>
         <span class="head-rule" aria-hidden="true"></span>
@@ -20,11 +18,10 @@
     <NavMenu />
 
     <main class="site-body">
-        @* Hold the body until the spoiler preferences load from storage, so a returning
-           reader with protection on never sees a flash of hidden content. The @key
-           wrapper re-mounts the current page when the first-visit ritual applies a
-           choice (re-filtering whatever page they landed on) and on every route
-           change, which replays the page-enter settle each time. *@
+        @* I hold the body until spoiler preferences load from storage, so a protected
+           reader never sees hidden content flash. The @key re-mounts on a ritual choice,
+           re-filtering the page they landed on, and on route changes, replaying the
+           entrance. *@
         @if (Spoiler.Loaded)
         {
             <div class="page-enter" @key="PageKey">
@@ -36,12 +33,9 @@
     <SpoilerRitual OnApplied="OnRitualApplied" />
 
     <footer class="site-footer">
-        @* The footer's straight line became a horizon: the twin moons hang in a band
-           of open sky, and three dune crests step forward in deepening panel tones.
-           The moons render before the dunes so their glow melts into the crests
-           instead of floating over them. The nearest crest shares the content
-           area's fill, so the footer reads as the shadowed face of the closest
-           dune. *@
+        @* A horizon, not a straight line: twin moons over three dune crests. Moons
+           render before the dunes so their glow melts into the crests. The near
+           crest takes the content fill, so the footer reads as the closest dune. *@
         <div class="footer-horizon" aria-hidden="true">
             <TwinMoons />
             <svg class="horizon-dunes" viewBox="0 0 1440 90" preserveAspectRatio="none"
@@ -83,26 +77,18 @@
     // text, anchors), and re-mounting on them would replay the entrance mid-use.
     private string PageKey => $"{spoilerEpoch}:{Nav.ToBaseRelativePath(Nav.Uri).Split('?', '#')[0]}";
 
-    // Which part of the volume the reader is in, printed at the right of the running head.
-    // Real appendix titles wherever Herbert supplied one, our own wording in his register
-    // where he didn't. Cased normally here and uppercased in CSS, so the strings stay
-    // readable and the presentation stays in the stylesheet.
-    //
-    // Home returns null on purpose: a bound book prints no running head on its title page,
-    // and the wordmark is already doing that job there. The rule still crosses the bar.
+    // I take Herbert's appendix titles where he gave one, mine where he didn't, cased here
+    // since CSS uppercases them. Home returns null: a bound book prints no running head on
+    // its title page, and the wordmark does that job. The rule still crosses the bar.
     private string? Register
     {
         get
         {
             var path = "/" + Nav.ToBaseRelativePath(Nav.Uri).Split('?', '#')[0].TrimEnd('/');
 
-            // Two of the ten drawers have a real appendix standing behind them. Appendix I is
-            // the sandtrout-to-plankton-to-worm-to-spice chain plus the desert life Kynes
-            // catalogues, which is most of Flora & Fauna. Appendix II is the Orange Catholic
-            // Bible, the Zensunni migration and the Butlerian commandment, which is the older
-            // half of Theological Systems. The looser of the two is Appendix II, since the
-            // later-book faiths in that drawer postdate it. The other eight drawers take the
-            // house label rather than an invented appendix number.
+            // Two drawers have a real appendix behind them. Appendix I is the ecology, most
+            // of Flora & Fauna. II is the older half of Theological Systems, looser since
+            // later-book faiths postdate it. The other eight take the house label.
             if (path.StartsWith("/category/", StringComparison.OrdinalIgnoreCase))
             {
                 return path["/category/".Length..].ToLowerInvariant() switch

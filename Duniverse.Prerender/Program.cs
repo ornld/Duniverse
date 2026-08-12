@@ -4,24 +4,9 @@ using Duniverse.Data;
 using Duniverse.Models;
 using Duniverse.Services;
 
-// Turns the published single-page app into a set of real pages.
-//
-// The whole site renders in the browser, which means every route except the front door is
-// served by the SPA fallback and comes back with a 404 status. People never notice, because
-// the router recovers and draws the page. Crawlers notice: they read the status line and
-// leave, so two hundred entries of researched canon sit outside every search index there is.
-//
-// This walks every route the app can serve and writes a real index.html for each one, so the
-// host answers with a 200 and a page that already has its title, its description, its share
-// card and its text in the markup. The Blazor script is still in there and still boots, wipes
-// the shell, and takes over, so nothing about the live experience changes.
-//
-// Spoilers are the reason this could not be built before. Whatever lands in the shell lands in
-// Google's index, in link previews, and in front of readers who never asked for it. The
-// tier-layered history split gave every record a version that is safe at its own tier, so this
-// prints DetailedHistory and never touches HistoryLayers. Records sealed above the site's own
-// default get a bare shell and a noindex, which keeps their URL working without publishing
-// their name to the open web.
+// Turns the published SPA into real pages. Every route but the front door 404s from the
+// fallback, so crawlers leave. I write an index.html per route, and I print DetailedHistory
+// only: HistoryLayers never ships. Sealed records get a noindex shell.
 
 if (args.Length < 1)
 {
@@ -175,12 +160,9 @@ foreach (var entity in registry.GetAllEntities<DuneEntity>().OrderBy(e => e.Id, 
 static string Swap(string html, string find, string replacement) =>
     html.Contains(find) ? html.Replace(find, replacement) : html;
 
-// The empty container the app renders into, and the only thing here that gets rewritten. The
-// boot screen used to live inside it and had to be reconstructed around the content; it is a
-// sibling now, so this leaves it entirely alone and just fills the slot.
-//
-// Checked once rather than per page: if the published shell ever stops looking like this, the
-// run should stop with a message instead of quietly writing two hundred pages of nothing.
+// The empty container the app renders into, the only thing I rewrite. The boot screen sits
+// beside it now, so I leave it alone. Checked once: if the shell changes, this stops instead
+// of writing two hundred empty pages.
 const string AppSlot = "<div id=\"app\"></div>";
 if (!template.Contains(AppSlot, StringComparison.Ordinal))
 {
@@ -193,11 +175,9 @@ var indexable = new List<string>();
 
 foreach (var (route, title, description, body, index) in pages)
 {
-    // Trailing slash, because that is the address the host actually serves. Each route is a
-    // folder with an index.html in it, and asking for the bare path gets a 301 onto the slashed
-    // form. A canonical or a sitemap entry pointing at the unslashed version would name a URL
-    // that redirects, which Search Console files under "page with redirect" rather than
-    // indexing. The router handles either form, so the slash costs nothing.
+    // Trailing slash, since that is what the host serves: each route is a folder with an
+    // index.html. Bare paths 301 onto it, and a canonical or sitemap URL that redirects lands
+    // in Search Console as a redirect, not indexed.
     var url = route.Length == 0 ? $"{origin}/" : $"{origin}/{route}/";
     var pageTitle = route.Length == 0 ? title : $"{title} - Duniverse";
     var html = template;
@@ -230,16 +210,9 @@ foreach (var (route, title, description, body, index) in pages)
         indexable.Add(url);
     }
 
-    // The entry goes straight into the slot. Nothing is hidden with display:none, which would
-    // read as cloaking and get the content discounted anyway, and it does not need to be:
-    // .boot-screen is fixed, inset 0 and opaque, so it covers the entry while the runtime
-    // loads, and Blazor clears the container on its first render. A visitor sees the boot
-    // storm; a crawler reads the page sitting under it.
-    //
-    // Simple string swap now that the boot screen is a sibling rather than a child. It used to
-    // be an index slice around a reconstructed boot screen, which was both fiddly and a real
-    // bug once: the offsets were measured against the template while being applied to a copy
-    // the meta rewrites had already lengthened.
+    // I keep the entry visible; display:none reads as cloaking. .boot-screen is fixed, inset 0 and
+    // opaque, so it covers the viewport. No offsets: I measured them on the template and applied
+    // them to a copy the meta rewrites had lengthened.
     html = html.Replace(AppSlot,
         $"<div id=\"app\"><main class=\"prerendered-entry\">{body}</main></div>",
         StringComparison.Ordinal);

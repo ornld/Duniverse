@@ -9,24 +9,13 @@ using Microsoft.JSInterop;
 namespace Duniverse.Web.Services
 {
     /// <summary>
-    /// Remembers which of a record's later passages the reader has already been shown, so the
-    /// site can tell the difference between a passage that is merely there and one that has
-    /// just opened.
-    ///
-    /// The spoiler tiers make the archive grow as the reader reads, and until now that growth
-    /// was silent: finish a book, come back to a record, and it is simply longer, with nothing
-    /// marking the moment. This is the ledger that lets the moment be marked once.
-    ///
-    /// The important case is the first sight of any record. A reader landing on an entry for
-    /// the first time has not unlocked anything, they have just arrived, so whatever is visible
-    /// then is written down without ceremony. Only a passage that appears on a LATER visit,
-    /// because the reader moved their progress in between, counts as newly opened. Storing per
-    /// record rather than per tier is what makes that distinction possible: an absent record
-    /// means never seen, an empty list means seen while holding nothing.
-    ///
-    /// Losing this ledger costs a reader nothing but a small moment, so every failure path
-    /// simply behaves as though everything has already been witnessed.
+    /// I track which tiers a record has shown a reader, so a passage that opens on a later
+    /// visit gets marked. Failures act as already witnessed.
     /// </summary>
+    /// <remarks>
+    /// I key the ledger per record, not per tier, since that is what separates an absent
+    /// record, meaning never seen, from an empty list, meaning seen with nothing open.
+    /// </remarks>
     public class UnsealedRecords
     {
         private const string StorageKey = "duniverse.unsealed.v1";
@@ -70,10 +59,9 @@ namespace Duniverse.Web.Services
         }
 
         /// <summary>
-        /// Which of the currently visible layers the reader has not been shown before, and so
-        /// deserve to be marked as newly opened. Empty on a record this reader has never
-        /// opened, because arriving somewhere for the first time is not the same as unlocking
-        /// it.
+        /// Visible layers I haven't shown this reader yet, so the page can mark them as newly
+        /// opened. Empty on a record this reader has never opened, since arriving for the
+        /// first time isn't the same as unlocking.
         /// </summary>
         public IReadOnlyList<SpoilerTier> NewlyOpened(string entityId, IEnumerable<SpoilerTier> visible)
         {

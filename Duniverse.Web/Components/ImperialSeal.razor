@@ -1,27 +1,17 @@
 @inject SpoilerSettings Spoiler
 
 @*
-    How much archive is still shut, said out loud.
-
-    Spoiler protection has always worked as pure absence: records the reader has not reached
-    simply are not there, and nothing tells them the shelf is short. This gives the absence a
-    number, the way an Imperial archive would admit that a drawer holds sealed records without
-    admitting what is in them.
-
-    It never names anything. Only a count, the next book that opens some of it, and, when it
-    applies, how much sits outside the six novels entirely.
-
-    Deliberately kept to whole categories and to the archive as a whole. The same line under a
-    small roster would be an invitation to guess: "one member of this House remains sealed"
-    narrows to a handful of people and hands over the fact that one of them matters later.
+    How much archive is shut, said out loud: a count, the next book that opens some, what
+    sits outside the six novels. It never names anything. Whole categories only, since one
+    sealed record in a small House names someone.
 *@
 
 @if (sealedCount > 0)
 {
-    @* A status region so the count reaches a screen reader when the reader moves their
-       progress and the number changes under them. *@
-    @* The spaces before each clause are written out. Razor eats the whitespace sitting between
-       a closing brace and the next block, so without them the sentences run together. *@
+    @* I made it a status region, so the count reaches a screen reader when progress shifts
+       and the number changes under them. *@
+    @* Razor eats whitespace between a closing brace and the next block, so I write the
+       spaces out. *@
     <p class="imperial-seal" role="status" aria-live="polite">
         @sealedCount @(sealedCount == 1 ? "record" : "records") @Scope
         @(sealedCount == 1 ? "remains" : "remain") under seal.
@@ -55,9 +45,9 @@
         var hidden = All.Where(e => !Spoiler.IsVisible(e)).ToList();
         sealedCount = hidden.Count;
 
-        // Counted separately because reading on will never open them. Lumping them into a total
-        // whose only follow-up names the next novel would promise more than finishing the saga
-        // delivers, and leave a reader who did finish it wondering what they got wrong.
+        // Counted separately, since reading on never opens these. Rolled into the total, the
+        // line would promise that the next novel unseals them, and a reader who finished the
+        // saga would wonder what they missed.
         expandedOnly = hidden.Count(e => e.SpoilerTier == SpoilerTier.ExpandedUniverse);
 
         // The nearest novel along the spine that would actually open something.

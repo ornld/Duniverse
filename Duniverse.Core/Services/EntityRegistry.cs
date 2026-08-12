@@ -13,20 +13,17 @@ namespace Duniverse.Services
         private readonly Dictionary<string, DuneEntity> _database = new Dictionary<string, DuneEntity>(StringComparer.OrdinalIgnoreCase);
 
         // Reverse-link index: for each ID, the IDs of every entity whose RelatedEntityIds points
-        // at it. Maintained at registration time so relationship lookups only touch actual
-        // neighbors instead of scanning the whole databank on every page view.
+        // at it. I build it at registration time so lookups only touch real neighbors instead of
+        // scanning the whole databank on every page view.
         private readonly Dictionary<string, HashSet<string>> _inboundLinks = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
 
         // Labeled relationships, keyed "viewedId|otherId" -> what the other entity is to the
         // viewed one. Each registered relationship writes two entries, one per direction.
         private readonly Dictionary<string, RelationshipLabel> _relationshipLabels = new Dictionary<string, RelationshipLabel>(StringComparer.OrdinalIgnoreCase);
 
-        // Connections this class invented, keyed the same way, holding the tier of the
-        // relationship that justified them. When no seeder joins a pair, the link exists purely
-        // because RelationshipMap named it, so the link carries the same spoiler weight the
-        // label does: hiding "Wife" from a reader who hasn't got there still leaves a bare line
-        // drawn between two people, which is the fact itself. Seeder-declared links never land
-        // here, because those stand on their own regardless of what any label says about them.
+        // Links I invented, keyed the same way, holding the tier that justified them. Hiding the
+        // label "Wife" still leaves a bare line, which is the fact itself. Seeder-declared links
+        // never land here, since those stand on their own.
         private readonly Dictionary<string, SpoilerTier> _inventedLinks = new Dictionary<string, SpoilerTier>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>The total number of registered entities.</summary>
@@ -85,18 +82,9 @@ namespace Duniverse.Services
         }
 
         /// <summary>
-        /// Every Persona who belongs to the given house or organization, found by ID. A figure
-        /// who serves two masters carries two IDs and shows up on both rosters, which is the
-        /// truthful answer. Callers apply their own spoiler filter.
-        ///
-        /// This is the reverse of the link a Persona already shows: a member's record names
-        /// their house, but the house's record had no way to name its members.
-        ///
-        /// Takes the ID and not the display name on purpose. Matching the name meant matching a
-        /// substring of free-text prose, which got it wrong in both directions: a member whose
-        /// affiliation read "House Corrino" never appeared on his own House Fenring roster, and
-        /// any Museum Fremen would have landed on the Fremen roster because one name contains
-        /// the other. An ID is exact and it is the same key the rest of the archive links by.
+        /// Every Persona in this house or order, with spoiler filtering left to the caller. Two
+        /// masters means two IDs and both rosters. I take the ID, not the display name, since
+        /// substring matching on prose got it wrong both ways.
         /// </summary>
         public IEnumerable<Persona> GetAffiliates(string organizationId)
         {
@@ -112,11 +100,9 @@ namespace Duniverse.Services
         }
 
         /// <summary>
-        /// Returns a single entity chosen at random from the whole databank, or null if the
-        /// databank is empty. Backs the "Surprise me" control, which drops a reader on an
-        /// arbitrary entity page as a starting point for exploring the archive. An optional
-        /// filter narrows the pool - the spoiler gate passes one so a reader with protection on
-        /// never lands on an entity from a book they have not reached yet.
+        /// One entity at random, or null on an empty databank. This backs "Surprise me". The
+        /// optional filter narrows the pool, and the spoiler gate passes one so nobody lands on
+        /// a book they haven't reached.
         /// </summary>
         public DuneEntity? GetRandomEntity(Func<DuneEntity, bool>? filter = null)
         {
@@ -130,11 +116,9 @@ namespace Duniverse.Services
         }
 
         /// <summary>
-        /// Finds every entity whose Name or any of its <see cref="DuneEntity.Aliases"/> contains
-        /// the given query. Names and queries are normalized (punctuation stripped, case folded)
-        /// first, so "muaddib" still matches "Muad'Dib" despite the apostrophe. Aliases count as
-        /// fully as the display name, since the name a reader happens to know a figure by is not
-        /// always the one the record is filed under.
+        /// Every entity whose Name or <see cref="DuneEntity.Aliases"/> contains the query. I
+        /// normalize both first, so "muaddib" still matches "Muad'Dib". Aliases count as fully as
+        /// the display name, since readers know figures by whatever name stuck.
         /// </summary>
         public IEnumerable<DuneEntity> SearchByName(string query)
         {
@@ -155,24 +139,13 @@ namespace Duniverse.Services
         }
 
         /// <summary>
-        /// Finds every entity whose entry text mentions the given query, searching the summary
-        /// and the history rather than the name. Readers remember facts before they remember
-        /// names ("the tooth with the poison gas"), and a name-only search answers none of
-        /// those. Text is normalized the same way names are, so an apostrophe or a capital
-        /// never decides a match.
-        ///
-        /// Deliberately kept out of <see cref="Resolve"/>: that chain decides what a URL and a
-        /// bare Enter press mean, and it navigates on a single hit. A phrase found in the body
-        /// of an entry is a weaker signal than a name, so it belongs in a list the reader
-        /// chooses from, never in a redirect. Short queries are refused because two letters
-        /// appear in almost every entry and would return the whole archive.
-        ///
-        /// The optional <paramref name="layerVisible"/> predicate keeps the search inside the
-        /// part of each entry the reader has actually earned. Without it, searching a phrase
-        /// that only appears in a held-back layer would find the record and hand back an excerpt
-        /// quoting the very sentence the layer exists to withhold, which would rebuild the leak
-        /// through the search box after the page had closed it.
+        /// Every entity whose entry text mentions the query, searching the body instead of the
+        /// name, since readers remember facts first. I keep it out of <see cref="Resolve"/>: a
+        /// body hit is weaker than a name and shouldn't redirect.
         /// </summary>
+        /// <param name="layerVisible">Keeps the search inside what the reader has earned. Without
+        /// it, a phrase from a held-back layer would surface an excerpt quoting the very sentence
+        /// the layer exists to withhold.</param>
         public IEnumerable<DuneEntity> SearchByContent(string query,
             Func<SpoilerTier, bool>? layerVisible = null)
         {
@@ -182,10 +155,9 @@ namespace Duniverse.Services
                 return Array.Empty<DuneEntity>();
             }
 
-            // Every word has to appear, but not side by side. A reader recalling a fact rarely
-            // recalls the archive's exact phrasing ("sandworm tooth" for "tooth of a slain
-            // sandworm"), so demanding the literal phrase would fail the very searches this is
-            // here to answer. Requiring all the words keeps it from matching on one loose word.
+            // Every word has to appear, but not side by side. Nobody recalls the archive's exact
+            // phrasing ("sandworm tooth" for "tooth of a slain sandworm"), and requiring all the
+            // words still keeps one loose word from matching.
             var terms = normalizedQuery
                 .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                 .Distinct()
@@ -204,10 +176,9 @@ namespace Duniverse.Services
         }
 
         /// <summary>
-        /// Everything on a record the given reader is allowed to read: its summary, its opening
-        /// history, and only those later layers their progress has unlocked. Anything that reads
-        /// an entry's prose on a reader's behalf should go through here, so a layer held back on
-        /// the page cannot surface anywhere else.
+        /// Everything on a record this reader is allowed to read: summary, opening history, and
+        /// only the layers their progress unlocked. Anything reading an entry's prose on a
+        /// reader's behalf goes through here, so a held-back layer can't surface elsewhere.
         /// </summary>
         public static string ReadableText(DuneEntity entity, Func<SpoilerTier, bool>? layerVisible = null)
         {
@@ -224,9 +195,9 @@ namespace Duniverse.Services
         }
 
         /// <summary>
-        /// The later chapters of an entry the reader has earned, in the order they were written.
-        /// A caller passing no predicate wants the whole story (the console app, anything with no
-        /// spoiler notion), which keeps this something callers opt into rather than switch off.
+        /// The later chapters a reader has earned, in written order. Passing no predicate hands
+        /// back the whole story (the console app, anything with no spoiler notion), so this is a
+        /// filter you opt into.
         /// </summary>
         public static IEnumerable<HistorySegment> VisibleLayers(DuneEntity entity,
             Func<SpoilerTier, bool>? layerVisible = null)
@@ -237,12 +208,9 @@ namespace Duniverse.Services
         }
 
         /// <summary>
-        /// Finds the entities whose Name is the closest edit-distance match to the given query,
-        /// for suggesting corrections when an exact ID and a substring name search both come up
-        /// empty (e.g. a typo like "Pull Atriedes"). The allowed distance scales with the
-        /// query's length so short queries don't end up matching everything. Returns every
-        /// entity tied for the closest distance found, or an empty list if nothing is close
-        /// enough to be a reasonable suggestion.
+        /// The entities whose name sits closest by edit distance, for suggesting a fix when an
+        /// exact ID and a name search both miss ("Pull Atriedes"). The allowed distance scales
+        /// with query length. Returns everything tied at the closest distance.
         /// </summary>
         public IReadOnlyList<DuneEntity> FindClosestByName(string query)
         {
@@ -312,11 +280,9 @@ namespace Duniverse.Services
         }
 
         /// <summary>
-        /// Resolves a free-form query (an exact ID, a full or partial name, or a typo) down to
-        /// either a single matching entity or a list of candidates to disambiguate between.
-        /// Tries an exact ID match first, then a substring name search, then falls back to
-        /// closest-edit-distance suggestions - the same tiered resolution used by the console
-        /// app, factored out so any UI (web included) gets identical behavior for free.
+        /// Turns a free-form query (an ID, a full or partial name, a typo) into either one entity
+        /// or a list to pick from. Exact ID first, then a name search, then closest-distance
+        /// suggestions. Every UI gets the same behavior.
         /// </summary>
         public ResolveResult Resolve(string query)
         {
@@ -350,11 +316,9 @@ namespace Duniverse.Services
         }
 
         /// <summary>
-        /// Retrieves all entities of a specific category (e.g., Artifact) that are connected
-        /// to the given ID, in either direction: entities that list this ID in their own
-        /// RelatedEntityIds (reverse), plus entities that this ID's own RelatedEntityIds points
-        /// at (forward). A link recorded on just one side of a relationship is enough for both
-        /// sides to find each other.
+        /// Every entity of one category connected to this ID, in either direction: entities
+        /// listing this ID in their own RelatedEntityIds, plus the ones this ID points at. A link
+        /// recorded on one side finds both.
         /// </summary>
         public IEnumerable<T> GetRelatedEntities<T>(string relatedId,
             Func<SpoilerTier, bool>? linkVisible = null) where T : DuneEntity
@@ -363,10 +327,9 @@ namespace Duniverse.Services
         }
 
         /// <summary>
-        /// Retrieves every entity directly connected to the given ID, in either direction and
-        /// regardless of type - the untyped counterpart to GetRelatedEntities&lt;T&gt;, used by
-        /// the relationship graph to walk the web of connections one hop at a time without
-        /// needing to know in advance what categories it will find.
+        /// Every entity directly connected to this ID, whatever its type. The untyped counterpart
+        /// to GetRelatedEntities&lt;T&gt;, used by the graph to walk the web one hop at a time
+        /// without knowing what it'll find.
         /// </summary>
         public IEnumerable<DuneEntity> GetDirectlyRelated(string id,
             Func<SpoilerTier, bool>? linkVisible = null)
@@ -403,11 +366,9 @@ namespace Duniverse.Services
         }
 
         /// <summary>
-        /// Whether a connection should stay out of sight: true only for a link this class
-        /// invented from a relationship whose book the caller says the reader has not reached.
-        /// Callers that pass no predicate (the console app, anything indifferent to spoilers)
-        /// always see everything, which keeps this a filter callers opt into rather than one
-        /// they have to remember to switch off.
+        /// Whether a connection should stay out of sight: true only for a link I invented whose
+        /// book the caller says the reader hasn't reached. Pass no predicate and you see
+        /// everything, so this is opt-in rather than opt-out.
         /// </summary>
         private bool IsHeldBack(string viewedId, string otherId, Func<SpoilerTier, bool>? linkVisible)
         {
@@ -417,11 +378,9 @@ namespace Duniverse.Services
         }
 
         /// <summary>
-        /// Loads labeled relationships into the lookup, one entry per direction. A labeled pair
-        /// that isn't linked in either entity's RelatedEntityIds becomes a real connection here,
-        /// so the relationship map can introduce canon links (Paul and his grandfather the
-        /// Baron) without touching the seeders. The inbound-link index is kept in step, which is
-        /// why this must run after every seeder has registered.
+        /// Loads labeled relationships, one entry per direction. A labeled pair that isn't linked
+        /// in either entity's RelatedEntityIds becomes a real connection here, so I can add canon
+        /// links without touching the seeders. Run this after every seeder registers.
         /// </summary>
         public void RegisterRelationships(IEnumerable<EntityRelationship> relationships)
         {
@@ -471,10 +430,9 @@ namespace Duniverse.Services
         }
 
         /// <summary>
-        /// Retrieves every House locked in a historical rivalry with the given House ID, in
-        /// either direction: Houses that list this ID in their own HistoricalRivalries, plus
-        /// Houses that this ID's own HistoricalRivalries points at. A rivalry only needs to be
-        /// recorded on one side to show up for both Houses.
+        /// Every House in a historical rivalry with this one, either direction: Houses listing
+        /// this ID in their HistoricalRivalries, plus the ones this House points at. Recording a
+        /// rivalry on one side shows it for both.
         /// </summary>
         public IEnumerable<House> GetRivalHouses(string houseId)
         {

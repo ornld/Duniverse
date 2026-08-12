@@ -6,11 +6,9 @@
     <NavLink href="/about">About Dune</NavLink>
     <NavLink href="/archives">Archives</NavLink>
     <NavLink href="/timeline">Timeline</NavLink>
-    @* Forced wrap points that wake at phone and tablet widths: the bar breaks into
-       fixed rows instead of wrapping wherever the text runs out. Tablets get three
-       rows of three tabs with the Index closing the third. Phones can't fit the
-       Index on the end of that third row, so a further break below 600px sends it
-       down to a fourth row on its own, leaving three clean rows of three above it. *@
+    @* I break the rows by hand instead of letting text run out. These spans sleep at
+       desktop and wake under 920px, where tabs land in threes with Index closing the
+       last. Under 600px Index drops to a row alone. *@
     <span class="nav-break" aria-hidden="true"></span>
     <NavLink href="/bloodlines">Bloodlines</NavLink>
     <NavLink href="/connections">Connections</NavLink>
@@ -22,10 +20,9 @@
     <span class="nav-break-phone" aria-hidden="true"></span>
     <span class="nav-divider"></span>
     <div class="nav-index @(open ? "open" : "")" @onkeydown="OnKeyDown">
-        @* aria-expanded is spelled out as a string on purpose. Handing Blazor the bool
-           gets it treated like a checkbox's checked: false drops the attribute off the
-           button entirely and true writes it empty, so a screen reader never once hears
-           whether this panel is open. *@
+        @* aria-expanded is a string on purpose. Hand Blazor the bool and it treats it
+           like a checkbox's checked: false drops the attribute, true writes it empty,
+           so a screen reader never hears whether this panel is open. *@
         <button type="button" class="index-trigger @(IsCategoryPage ? "active" : "")"
                 aria-haspopup="true" aria-expanded="@(open ? "true" : "false")" @onclick="Toggle">
             <span class="index-label">Index</span>
@@ -41,11 +38,10 @@
                 <canvas class="index-sand" @ref="sandCanvas"></canvas>
                 <div class="index-seam"></div>
                 <ul>
-                    @* Each drawer carries its own mark. They tint from --cat-color, so the
-                       panel is the one place on the site where all ten colors sit together. *@
-                    @* The label sits in its own span so the Eyes of Ibad treatment can take
-                       the words alone. Left on the whole link, its glow bloomed over the
-                       mark beside it and turned a drawer's own color blue. *@
+                    @* Each drawer carries its own mark, tinted from --cat-color. All ten
+                       colors only sit together here. *@
+                    @* The label needs its own span: on the whole link, the Eyes of Ibad
+                       glow bled over the mark and turned it blue. *@
                     <li style="--i: 0" class="category-artifacts"><NavLink href="/category/artifacts"><Mark Name="artifacts" CssClass="index-mark" /><span class="index-label">Artifact</span></NavLink></li>
                     <li style="--i: 1" class="category-disciplines"><NavLink href="/category/disciplines"><Mark Name="disciplines" CssClass="index-mark" /><span class="index-label">Discipline</span></NavLink></li>
                     <li style="--i: 2" class="category-flora-fauna"><NavLink href="/category/flora-fauna"><Mark Name="flora-fauna" CssClass="index-mark" /><span class="index-label">Flora & Fauna</span></NavLink></li>

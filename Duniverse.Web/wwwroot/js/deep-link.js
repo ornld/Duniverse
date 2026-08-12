@@ -1,10 +1,7 @@
-// When a link brings someone in with ?focus=, the record they want might sit way down
-// the page. This scrolls it to the center of the screen so they land looking right at it.
-//
-// I can't just use scrollIntoView here: the targets are SVG <g> nodes, and Chrome doesn't
-// reliably scroll the page for those. Measuring with getBoundingClientRect and scrolling
-// by hand works for SVG and regular elements alike. The jump is instant on purpose, since
-// a slow scroll from the top on page load just looks broken.
+// A ?focus= link centers the record. I measure with getBoundingClientRect and scroll by
+// hand, one path for SVG and ordinary elements alike. No element-type branch, no
+// scrollIntoView: Chrome won't scroll reliably for SVG <g>. Instant on purpose, since a
+// slow scroll from the top on load looks broken.
 window.duneScroll = {
     toId: function (id) {
         const el = document.getElementById(id);

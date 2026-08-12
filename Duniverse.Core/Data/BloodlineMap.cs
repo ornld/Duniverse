@@ -6,15 +6,9 @@ using Duniverse.Services;
 namespace Duniverse.Data
 {
     /// <summary>
-    /// The curated data behind the Bloodlines chart: who stands in it, where, and how the
-    /// lines of descent and marriage run. Hand-placed rather than computed, the way a
-    /// genealogist would draw it, so the Atreides and Harkonnen lines visibly converge on
-    /// Paul and the chart below him narrows to the Golden Path.
-    ///
-    /// Spoiler behavior needs no special handling here: every node is gated by its entity's
-    /// tier (plus its own, when presence in the chart is itself a reveal), and the page drops
-    /// hidden people and every line touching them. Like the other maps, this is a
-    /// canon-informed first pass, grouped for review; move people and lines freely.
+    /// The curated data behind the Bloodlines chart. I placed it by hand rather than computing
+    /// it, so the Atreides and Harkonnen lines converge on Paul. A hidden person takes every line
+    /// touching them along too.
     /// </summary>
     public static class BloodlineMap
     {
