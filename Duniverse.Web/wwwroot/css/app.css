@@ -2636,6 +2636,15 @@ button.chip {
     .nav-divider {
         display: none;
     }
+
+    /* Each phone row is three tabs. Centering them left every row its own width, so
+       the columns drifted a few pixels between rows. Equal thirds line them up, and
+       the Index keeps its own centered row below. */
+    .top-nav > a {
+        flex: 1 1 0;
+        text-align: center;
+        white-space: nowrap;
+    }
 }
 
 /* Above the wrap threshold the tabs stop clustering in the middle: each takes an
