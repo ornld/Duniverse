@@ -212,10 +212,12 @@
        near 55 for a deck. */
     --measure-prose: 30em;
     --measure-deck: 26em;
-    /* The art runs the full page and bleeds to the screen's own edges, finishing its
-       fade to black right where the screen ends. The foot melts over --art-melt-bottom
-       so nothing cuts. */
-    --art-melt: clamp(64px, 7vw, 140px);
+    /* The art runs the full page and bleeds to the screen's own edges. It stays fully
+       lit over the content column, then eases into black across the whole side margin,
+       reaching it right at the screen's edge. 43rem is half the capped column; the 64px
+       floor keeps a fade when the window is no wider than the column. The foot melts
+       over --art-melt-bottom so nothing cuts. */
+    --art-melt: max(calc(50% - 43rem), 64px);
     --art-melt-bottom: 200px;
     /* The type scale. Display is fluid; the rest sits still. */
     --font-body: "Alegreya Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
@@ -526,8 +528,10 @@ html {
     background-size: 0 0;
     background-position: center;
     border: 0;
-    border-top: var(--rule-heavy) solid var(--dune-accent);
     border-radius: var(--r-sharp);
+    /* The pair's color; drawn in ::after so it can run to the screen edges and fade
+       in step with the art. Browse pages and records override it with their mineral. */
+    --plate-rule: var(--dune-accent);
     padding: var(--sp-6) 0 0;
     margin-bottom: var(--sp-5);
 }
@@ -539,8 +543,9 @@ html {
     content: "";
     position: absolute;
     /* The negative sides stretch the layer from the centered column out to the
-       viewport, so the fade meets the screen edge, not the column edge. */
-    inset: 6px calc(50% - 50vw) 0;
+       viewport, so the fade meets the screen edge, not the column edge. Top sits
+       below the pair, which now lives at 0 to 8px of the same box. */
+    inset: 10px calc(50% - 50vw) 0;
     z-index: 0;
     background: inherit;
     background-size: cover;
@@ -552,27 +557,31 @@ html {
     mask-composite: intersect;
 }
 
-/* The grain, on its own layer under the content. The same layer draws the thin rule of
-   the pair, four pixels under the heavy one. About Dune has no grain, so it draws the
-   thin rule on its own below. */
-.hero:not(.about-hero)::after {
+/* The pair and the grain, on one layer under the content. Both rules run to the
+   screen edges and fade out on the same melt the art uses, so bar and picture die
+   together. About Dune keeps its rules and skips the grain: paper stays off prose. */
+.hero::after {
     content: "";
     position: absolute;
-    inset: 4px 0 0 0;
+    inset: 0 calc(50% - 50vw) 0;
     z-index: 0;
-    border-top: var(--rule-hair) solid var(--dune-border);
-    padding-top: 1px;
-    background-image: var(--ridulian-grain);
-    background-clip: content-box;
+    background-image:
+        linear-gradient(to right, transparent, var(--plate-rule) var(--art-melt), var(--plate-rule) calc(100% - var(--art-melt)), transparent),
+        linear-gradient(to right, transparent, var(--dune-border) var(--art-melt), var(--dune-border) calc(100% - var(--art-melt)), transparent),
+        var(--ridulian-grain);
+    background-size: 100% 3px, 100% 1px, auto;
+    background-position: 0 0, 0 7px, 0 0;
+    background-repeat: no-repeat, no-repeat, repeat;
+    pointer-events: none;
 }
 
 .hero.about-hero::after {
-    content: "";
-    position: absolute;
-    inset: 4px 0 auto 0;
-    height: 0;
-    border-top: var(--rule-hair) solid var(--dune-border);
-    pointer-events: none;
+    background-image:
+        linear-gradient(to right, transparent, var(--plate-rule) var(--art-melt), var(--plate-rule) calc(100% - var(--art-melt)), transparent),
+        linear-gradient(to right, transparent, var(--dune-border) var(--art-melt), var(--dune-border) calc(100% - var(--art-melt)), transparent);
+    background-size: 100% 3px, 100% 1px;
+    background-position: 0 0, 0 7px;
+    background-repeat: no-repeat, no-repeat;
 }
 
 .hero > * {
@@ -582,7 +591,7 @@ html {
 
 /* A browse page takes its drawer's mineral on the rule. */
 .hero.category-hero {
-    border-top-color: var(--cat-color, var(--dune-accent));
+    --plate-rule: var(--cat-color, var(--dune-accent));
 }
 
 /* A category with only a few records used to end partway down the screen, so the
@@ -606,15 +615,16 @@ html {
        the left, the box in from the right, the same air on both sides. The title
        keeps the left edge above them, so the head reads title, then stage. The
        doubled class on the archives hero outranks its flex base rule below. */
+    /* Five tracks: free side, text, the gap, instrument, free side. The pair stays
+       centered by the equal sides, and anything spanning 1/-1 below the head runs the
+       whole column, the way the bloodlines chart always has. */
     .trial-hero,
     .hero.search-hero,
     .hero:has(.connection-pickers),
     .hero:has(.universe-find),
     .hero:has(.home-search) {
         display: grid;
-        grid-template-columns: minmax(0, 26em) minmax(24rem, 28rem);
-        column-gap: clamp(4rem, 6vw, 6rem);
-        justify-content: center;
+        grid-template-columns: 1fr minmax(0, 26em) clamp(4rem, 6vw, 6rem) minmax(24rem, 28rem) 1fr;
         align-items: start;
     }
 
@@ -630,12 +640,12 @@ html {
     .hero.search-hero > h1,
     .hero:has(.connection-pickers) > h1,
     .hero:has(.universe-find) > h1 {
-        grid-column: 1;
+        grid-column: 2;
         grid-row: 1;
     }
 
     .hero:has(.home-search) > h1 {
-        grid-column: 1 / -1;
+        grid-column: 2 / 5;
         grid-row: 1;
     }
 
@@ -644,7 +654,7 @@ html {
     .hero:has(.connection-pickers) > .tagline,
     .hero:has(.universe-find) > .tagline,
     .hero:has(.home-search) > .tagline {
-        grid-column: 1;
+        grid-column: 2;
         grid-row: 2;
     }
 
@@ -653,13 +663,13 @@ html {
        right, its first line level with the tagline. The title crowns both. On a long
        saying the rows share the slack; most days it rests shorter than the stack. */
     .hero:has(.home-search) > .home-search {
-        grid-column: 1;
+        grid-column: 2;
         grid-row: 3;
         max-width: none;
     }
 
     .hero:has(.home-search) > .cta {
-        grid-column: 1;
+        grid-column: 2;
         grid-row: 4;
         align-self: start;
     }
@@ -668,7 +678,7 @@ html {
        title and the Ways heading (any more and the rows stretch instead); the
        transform slides it the last touch lower without moving anything else. */
     .hero:has(.home-search) > .daily-saying {
-        grid-column: 2;
+        grid-column: 4;
         grid-row: 2 / span 3;
         align-self: center;
         margin: 2.875rem 0 0;
@@ -679,19 +689,19 @@ html {
        example records answer from the right. Results, the reading-progress panel and
        the seal line span the stage below, so found records read at full width. */
     .hero.search-hero > .surprise-line {
-        grid-column: 1;
+        grid-column: 2;
         grid-row: 3;
         align-self: start;
     }
 
     .hero.search-hero > .search-box {
-        grid-column: 2;
+        grid-column: 4;
         grid-row: 2;
         max-width: none;
     }
 
     .hero.search-hero > .examples {
-        grid-column: 2;
+        grid-column: 4;
         grid-row: 3;
         align-self: start;
         margin-top: 0.75rem;
@@ -701,7 +711,7 @@ html {
        the description's own default top margin), and its words move below it: the
        picker's label flips under the input, the counter follows as a caption. */
     .trial-hero > .trial-guess {
-        grid-column: 2;
+        grid-column: 4;
         grid-row: 2;
         align-self: start;
         margin-top: 1.125rem;
@@ -722,7 +732,7 @@ html {
        whatever the rows do. An open suggestion list paints over this line; it is
        opaque and momentary, so nothing garbles. */
     .trial-hero > .trial-counter {
-        grid-column: 2;
+        grid-column: 4;
         grid-row: 2;
         align-self: start;
         margin: 6.4rem 0 0;
@@ -732,28 +742,28 @@ html {
        fields sit side by side. That column would fold the title in half, so here
        the title runs across the whole head and the pickers sit beside the tagline. */
     .hero:has(.connection-pickers) {
-        grid-template-columns: minmax(0, 26em) minmax(28rem, 38rem);
+        grid-template-columns: 1fr minmax(0, 26em) clamp(4rem, 6vw, 6rem) minmax(28rem, 38rem) 1fr;
     }
 
     .hero:has(.connection-pickers) > h1 {
-        grid-column: 1 / -1;
+        grid-column: 2 / 5;
     }
 
     .hero:has(.connection-pickers) > .connection-pickers {
-        grid-column: 2;
+        grid-column: 4;
         grid-row: 2;
         align-self: start;
         max-width: none;
     }
 
     .hero:has(.connection-pickers) > .examples {
-        grid-column: 2;
+        grid-column: 4;
         grid-row: 3;
         margin-top: 0.75rem;
     }
 
     .hero:has(.universe-find) > .universe-find {
-        grid-column: 2;
+        grid-column: 4;
         grid-row: 1 / span 2;
         align-self: center;
         margin-bottom: 0;
@@ -972,7 +982,7 @@ html {
 
 /* A sealed record withholds its mineral: the rule stays, drained to dust. */
 .entity-card.front.spoiler-gate {
-    border-top-color: var(--dune-muted);
+    --plate-rule: var(--dune-muted);
 }
 
 /* ---- Under Imperial Seal ----
@@ -1720,8 +1730,8 @@ html {
 .entity-card.back::before {
     content: "";
     position: absolute;
-    /* Bled to the screen edges like the hero's art. */
-    inset: 6px calc(50% - 50vw) 0;
+    /* Bled to the screen edges like the hero's art, seated below the pair. */
+    inset: 10px calc(50% - 50vw) 0;
     z-index: 0;
     background: inherit;
     background-size: auto, cover, cover;
@@ -1733,13 +1743,19 @@ html {
     mask-composite: intersect;
 }
 
-/* The thin rule of the pair, under the front's heavy one. */
+/* The record's pair, full bleed and fading on the art's own melt. */
 .entity-card.front::after {
     content: "";
     position: absolute;
-    inset: 4px 0 auto 0;
-    height: 0;
-    border-top: var(--rule-hair) solid var(--dune-border);
+    inset: 0 calc(50% - 50vw) auto;
+    height: 8px;
+    z-index: 0;
+    background-image:
+        linear-gradient(to right, transparent, var(--plate-rule) var(--art-melt), var(--plate-rule) calc(100% - var(--art-melt)), transparent),
+        linear-gradient(to right, transparent, var(--dune-border) var(--art-melt), var(--dune-border) calc(100% - var(--art-melt)), transparent);
+    background-size: 100% 3px, 100% 1px;
+    background-position: 0 0, 0 7px;
+    background-repeat: no-repeat, no-repeat;
     pointer-events: none;
 }
 
@@ -1999,7 +2015,7 @@ html {
    drawer's color is spent on a page. The browse page's rule is set with the plate
    rules above. No category means the spice. */
 .entity-card.front {
-    border-top: var(--rule-heavy) solid var(--cat-color, var(--dune-accent));
+    --plate-rule: var(--cat-color, var(--dune-accent));
 }
 
 /* A front card wears its category's art, the same photo heading that browse page.
@@ -3102,6 +3118,24 @@ button.chip {
     margin: 0 0.25rem;
 }
 
+/* On a wide screen the nav band melts at the screen edges like everything else:
+   its fill, lit top hairline and gold seam all fade on the art's own melt. The
+   tabs sit centered, far inside the fade; the blur stays full width, invisible
+   over art that is already dark there. Phones keep the solid band, their tabs
+   reach the edges. The vertical tint flattens to its middle tone here. */
+@media (min-width: 1100px) {
+    .top-nav {
+        background:
+            linear-gradient(to right, transparent, rgba(241, 230, 214, 0.05) var(--art-melt), rgba(241, 230, 214, 0.05) calc(100% - var(--art-melt)), transparent) top / 100% 1px no-repeat,
+            linear-gradient(to right, transparent, rgba(37, 29, 22, 0.82) var(--art-melt), rgba(37, 29, 22, 0.82) calc(100% - var(--art-melt)), transparent);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+    }
+
+    .top-nav::after {
+        background: linear-gradient(to right, transparent, rgba(var(--dune-accent-rgb), 0.4) var(--art-melt), rgba(var(--dune-accent-rgb), 0.4) calc(100% - var(--art-melt)), transparent);
+    }
+}
+
 /* Inert when the nav fits one row. Under 920px it turns into a full-width flex
    break, so rows land in threes with the Trial and Index closing the last. 920 is
    just above where one row runs out. */
@@ -4082,4 +4116,60 @@ button.chip {
     .trial-moon.is-rising {
         animation: none;
     }
+}
+
+/* ---- The sayings spread ----
+   A source with several sayings lays them out two across, the way About sets
+   Herbert's own words, each saying in its own frame with its own mark. An odd
+   last saying centers under the pair; a lone saying keeps the reading column. */
+.sayings-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(26rem, 100%), 1fr));
+    column-gap: 2.5rem;
+    row-gap: 1.5rem;
+    max-width: min(100%, 70rem);
+}
+
+    .sayings-group > .sayings-source {
+        grid-column: 1 / -1;
+        margin-bottom: 0;
+    }
+
+    /* Framed on both edges again: the continuous-run rules above stand down here,
+       since side-by-side frames each carry their own. */
+    .sayings-group .epigraph {
+        max-width: none;
+        margin: 0;
+        border-top: var(--rule-hair) solid var(--dune-border);
+    }
+
+    .sayings-group .epigraph:first-of-type {
+        border-top: var(--rule-hair) solid var(--dune-border);
+    }
+
+    .sayings-group .epigraph:not(:first-of-type)::before {
+        content: "\201C";
+    }
+
+    .sayings-group .epigraph-text {
+        max-width: 60ch;
+    }
+
+    .sayings-group .epigraph:only-of-type {
+        grid-column: 1 / -1;
+        width: 100%;
+        max-width: 60ch;
+        justify-self: center;
+    }
+
+    .sayings-group .epigraph:last-of-type:nth-of-type(odd):not(:only-of-type) {
+        grid-column: 1 / -1;
+        width: 100%;
+        max-width: 60ch;
+        justify-self: center;
+    }
+
+/* The crest divider becomes a grid item inside the group; it keeps its own row. */
+.sayings-group + .sayings-group::before {
+    grid-column: 1 / -1;
 }
