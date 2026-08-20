@@ -227,8 +227,10 @@
     --fs-h3: 1.125rem;
     --fs-body: 1.125rem;
     --fs-small: 0.95rem;
-    --fs-caption: 0.85rem;
-    --fs-label: 0.75rem;
+    /* Captions grew with the face: they kept their old pixel sizes when the body
+       moved to 18px Alegreya and fell behind the page. 0.9rem reads at a distance. */
+    --fs-caption: 0.9rem;
+    --fs-label: 0.78rem;
     --lh-body: 1.6;
     --track-label: 0.12em;
     /* Motion by role: touch is cursor color, open small moves, settle cards landing,
@@ -439,7 +441,7 @@ html {
 .site-footer {
     text-align: center;
     color: var(--dune-muted);
-    font-size: 0.8rem;
+    font-size: var(--fs-caption);
 }
 
 /* ---- Footer horizon ----
@@ -925,6 +927,38 @@ html {
     gap: 0.7rem;
 }
 
+/* On a wide screen the open panel reads as one filter bar: the reading-progress
+   label and its six books on the left, the Expanded Universe toggle seated at the
+   far right, the explanation running beneath. Stacked rows return on small screens. */
+@media (min-width: 900px) {
+    .spoiler-options {
+        grid-template-columns: auto 1fr auto;
+        align-items: baseline;
+        column-gap: 1.25rem;
+    }
+
+    .spoiler-options .spoiler-label {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    .spoiler-options .spoiler-books {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    .spoiler-options .spoiler-eu {
+        grid-column: 3;
+        grid-row: 1;
+        justify-self: end;
+    }
+
+    .spoiler-options .spoiler-note {
+        grid-column: 1 / -1;
+        grid-row: 2;
+    }
+}
+
 .spoiler-label {
     margin: 0;
     color: var(--dune-muted);
@@ -977,7 +1011,7 @@ html {
 
 .spoiler-note {
     margin: 0;
-    font-size: 0.8rem;
+    font-size: var(--fs-small);
 }
 
 /* A sealed record withholds its mineral: the rule stays, drained to dust. */
@@ -993,7 +1027,7 @@ html {
     margin: 1.5rem 0 0;
     padding-top: 0.85rem;
     border-top: 1px solid var(--dune-border);
-    font-size: 0.82rem;
+    font-size: var(--fs-caption);
     color: var(--dune-muted);
     letter-spacing: 0.01em;
 }
@@ -1159,7 +1193,7 @@ html {
         align-items: baseline;
         margin: 0;
         color: var(--dune-accent-bright);
-        font-size: 0.82rem;
+        font-size: var(--fs-caption);
         letter-spacing: 0.12em;
         text-transform: uppercase;
     }
@@ -1176,9 +1210,11 @@ html {
         background: var(--dune-border);
     }
 
+    /* No measure here on purpose: the ledger's own two columns are its reading
+       structure, and definitions fill the page beside their terms as they always
+       did. Capping them once left the whole dictionary huddled on the left. */
     .glossary-entry dd {
         margin: 0;
-        max-width: var(--measure-prose);
         color: var(--dune-text);
     }
 
@@ -1186,7 +1222,7 @@ html {
 .glossary-see {
     display: inline-block;
     margin-left: 0.4rem;
-    font-size: 0.85rem;
+    font-size: var(--fs-caption);
     white-space: nowrap;
 }
 
@@ -1221,7 +1257,7 @@ html {
     width: 100%;
     text-align: center;
     margin-bottom: 0.5rem;
-    font-size: 0.8rem;
+    font-size: var(--fs-caption);
     color: var(--dune-muted);
     letter-spacing: 0.03em;
 }
@@ -1262,12 +1298,12 @@ html {
     padding: 0.2rem 0.7rem;
     border-radius: var(--r-sharp);
     border: var(--rule-hair) solid currentColor;
-    font-size: 0.85rem;
+    font-size: var(--fs-caption);
 }
 
 .legend-note {
     flex-basis: 100%;
-    font-size: 0.8rem;
+    font-size: var(--fs-small);
 }
 
 /* Atreides reads the archive's spice gold token, not a copy. The lines below stay
@@ -1466,7 +1502,7 @@ html {
 
 .bloodline-note {
     margin-top: 0.75rem;
-    font-size: 0.85rem;
+    font-size: var(--fs-small);
     text-align: center;
 }
 
@@ -1479,16 +1515,6 @@ html {
     margin: 2.5rem auto 0;
     max-width: 60ch;
     text-align: left;
-}
-
-/* The sayings themselves speak in the display face, slanted. Marcellus cuts no italic,
-   so the browser leans the upright; on a quotation it reads as an inscription leaning,
-   and it beats a second face. Sized up a step, since Marcellus runs small on the eye. */
-.sayings-group .epigraph-text {
-    font-family: var(--font-display);
-    font-style: italic;
-    font-size: 1.15rem;
-    line-height: 1.75;
 }
 
 /* ---- Crestline dividers ----
@@ -1559,10 +1585,14 @@ html {
         opacity: 0.55;
     }
 
+/* Every epigraph on the site, the sayings, the daily one on home, the trial's
+   verdict, speaks in one voice: Marcellus, leaned, a step larger. */
 .epigraph-text {
     margin: 0;
+    font-family: var(--font-display);
     font-style: italic;
-    line-height: 1.7;
+    font-size: 1.15rem;
+    line-height: 1.75;
     color: var(--dune-text);
     white-space: pre-line;
 }
@@ -1639,9 +1669,8 @@ html {
    over AA the way the old opaque panel did. */
 .candidates {
     margin-top: 1.5rem;
-    margin-left: -1rem;
+    margin-inline: -1rem;
     padding: 0.75rem 1rem 0.5rem;
-    max-width: calc(44em + 2rem);
     background: rgba(15, 13, 12, 0.62);
     border: 0;
     border-radius: var(--r-sharp);
@@ -2052,9 +2081,10 @@ html {
     background-image: var(--ridulian-grain), var(--scrim-mid), url('/images/categories/worlds.webp');
 }
 
+/* Instructions you read, not statuses you glance at: these sit a tier up. */
 .graph-hint {
     margin-top: 0.5rem;
-    font-size: 0.8rem;
+    font-size: var(--fs-small);
     text-align: center;
 }
 
@@ -2260,7 +2290,7 @@ html {
     border: var(--rule-hair) solid var(--dune-border);
     border-radius: var(--r-sharp);
     color: var(--dune-text);
-    font-size: 0.82rem;
+    font-size: var(--fs-caption);
     letter-spacing: 0.04em;
     white-space: nowrap;
     pointer-events: none;
@@ -2285,7 +2315,7 @@ html {
     gap: 0.4rem 1rem;
     margin-top: 0.9rem;
     color: var(--dune-muted);
-    font-size: 0.8rem;
+    font-size: var(--fs-caption);
 }
 
     .universe-legend > span {
@@ -2538,7 +2568,7 @@ html {
 button.chip {
     color: var(--dune-text);
     font-family: inherit;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     cursor: pointer;
 }
 
@@ -2805,15 +2835,15 @@ button.chip {
 }
 
 /* The deck, and the prose under it at a reading measure. */
+ /* No measure on the record's own text: an entry reads wide, like About and the
+   Terminology, by the owner's standing ruling. */
 .short-desc {
     color: var(--dune-accent-bright);
     font-style: italic;
     font-size: 1.1rem;
-    max-width: var(--measure-deck);
 }
 
 .detailed-history {
-    max-width: var(--measure-prose);
     line-height: var(--lh-body);
 }
 
@@ -2909,20 +2939,26 @@ button.chip {
 /* A record's own lines take the epigraph setting: hairlines above and below, italic,
    at the deck measure. No hung mark, since these carry their own quotation marks.
    The left bar means an excerpt elsewhere on the site, so it goes here. */
+ /* Centered at a saying's width under the wide prose, the way a lone saying sits
+   on its own page. */
 .entity-quotes {
-    margin-top: 1.25rem;
+    margin: 1.25rem auto 0;
     padding: 1rem 1.25rem 0.9rem;
-    max-width: var(--measure-deck);
+    max-width: 60ch;
     border-top: var(--rule-hair) solid var(--dune-border);
     border-bottom: var(--rule-hair) solid var(--dune-border);
     display: grid;
     gap: 0.6rem;
 }
 
+/* A record's spoken lines take the sayings' own voice: Marcellus, leaned, a step
+   larger. One face for every quotation on the site. */
 .entity-quote {
     margin: 0;
+    font-family: var(--font-display);
     font-style: italic;
-    line-height: 1.65;
+    font-size: 1.15rem;
+    line-height: 1.75;
     color: var(--dune-text);
 }
 
@@ -3412,9 +3448,14 @@ button.chip {
     color: var(--dune-text);
 }
 
-.quote-text {
+/* Herbert's words speak in the same voice as the collected sayings. Scoped by the
+   card: the .home-section p rule outranks a lone class and was keeping the body's
+   leading. */
+.quote-card .quote-text {
+    font-family: var(--font-display);
     font-style: italic;
-    line-height: 1.65;
+    font-size: 1.15rem;
+    line-height: 1.75;
     margin: 0 0 0.5rem;
 }
 
@@ -3620,7 +3661,7 @@ button.chip {
 .timeline-era {
     display: block;
     color: var(--dune-accent-bright);
-    font-size: 0.85rem;
+    font-size: var(--fs-caption);
     font-style: italic;
     margin-bottom: 0.3rem;
 }
@@ -3657,7 +3698,7 @@ button.chip {
         padding: 0.35rem 0.75rem;
         background: var(--dune-bg);
         color: var(--dune-accent-bright);
-        font-size: 0.85rem;
+        font-size: var(--fs-caption);
         text-transform: uppercase;
         letter-spacing: 0.12em;
     }
@@ -3674,7 +3715,7 @@ button.chip {
     border: var(--rule-hair) solid var(--dune-accent);
     border-radius: var(--r-sharp);
     color: var(--dune-accent-bright);
-    font-size: 0.8rem;
+    font-size: var(--fs-caption);
     font-weight: 700;
     letter-spacing: 0.05em;
 }
@@ -3687,7 +3728,7 @@ button.chip {
         padding: 0;
         background: none;
         border: 0;
-        font-size: 0.85rem;
+        font-size: var(--fs-caption);
         letter-spacing: 0.08em;
         text-transform: uppercase;
         white-space: nowrap;
@@ -3704,7 +3745,7 @@ button.chip {
 
 .timeline-footnote {
     margin-top: 0.5rem;
-    font-size: 0.85rem;
+    font-size: var(--fs-small);
     text-align: center;
 }
 
@@ -3994,8 +4035,8 @@ button.chip {
 
 .trial-counter {
     margin: 1.25rem 0 0.4rem;
-    color: var(--dune-muted);
-    font-size: 0.8rem;
+    color: var(--dune-muted-lit);
+    font-size: var(--fs-caption);
     text-transform: uppercase;
     letter-spacing: 0.08em;
 }
@@ -4033,7 +4074,7 @@ button.chip {
 }
 
 .trial-guess-verdict {
-    font-size: 0.85rem;
+    font-size: var(--fs-small);
 }
 
 /* The end of the trial: the record laid open as a small plate, the heavy rule in its
@@ -4102,7 +4143,7 @@ button.chip {
     margin: 0.9rem 0 0;
     padding-top: 0.7rem;
     border-top: 1px solid var(--dune-border);
-    font-size: 0.85rem;
+    font-size: var(--fs-caption);
 }
 
 @media (prefers-reduced-motion: reduce) {
