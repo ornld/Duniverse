@@ -205,16 +205,17 @@
     --sp-7: 3rem;
     --sp-8: 4rem;
     /* One content column, capped on wide monitors, with a gutter that breathes. */
-    --page-max: 80rem;
+    --page-max: 90rem;
     --gutter: clamp(1rem, 3vw, 2rem);
     /* Measures in em, not ch: a ch is the width of a zero, and 68ch came out near 95
        characters. Measured in Alegreya at 18px these land at 76 a line for prose,
        near 55 for a deck. */
     --measure-prose: 30em;
     --measure-deck: 26em;
-    /* The art runs the full page as it always did. Its side edges melt into the ground
-       over --art-melt and its foot over --art-melt-bottom, so nothing cuts to black. */
-    --art-melt: 64px;
+    /* The art runs the full page and bleeds to the screen's own edges, finishing its
+       fade to black right where the screen ends. The foot melts over --art-melt-bottom
+       so nothing cuts. */
+    --art-melt: clamp(64px, 7vw, 140px);
     --art-melt-bottom: 200px;
     /* The type scale. Display is fluid; the rest sits still. */
     --font-body: "Alegreya Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
@@ -519,10 +520,9 @@ html {
    inline art list is inherited by ::before, which paints the art and melts its edges. */
 .hero {
     position: relative;
-    /* clip, not hidden: hidden makes the hero a scroll container, which would capture
-       the timeline's view() timeline. clip crops the background art the same way
-       and leaves the document as the nearest scroller. */
-    overflow: clip;
+    /* No overflow clipping: the art layer reaches past the column to the screen edges.
+       Never set hidden here, it would turn the hero into a scroll container and break
+       the timeline's view() animations. */
     background-size: 0 0;
     background-position: center;
     border: 0;
@@ -538,7 +538,9 @@ html {
 .hero::before {
     content: "";
     position: absolute;
-    inset: 6px 0 0 0;
+    /* The negative sides stretch the layer from the centered column out to the
+       viewport, so the fade meets the screen edge, not the column edge. */
+    inset: 6px calc(50% - 50vw) 0;
     z-index: 0;
     background: inherit;
     background-size: cover;
@@ -1718,7 +1720,8 @@ html {
 .entity-card.back::before {
     content: "";
     position: absolute;
-    inset: 6px 0 0 0;
+    /* Bled to the screen edges like the hero's art. */
+    inset: 6px calc(50% - 50vw) 0;
     z-index: 0;
     background: inherit;
     background-size: auto, cover, cover;
@@ -1757,7 +1760,7 @@ html {
 }
 
     .entity-card.back::before {
-        inset: 0;
+        inset: 0 calc(50% - 50vw);
     }
 
     .entity-card.back .muted {
