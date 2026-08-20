@@ -48,6 +48,11 @@
          This gives it the same icon the browser tab already has. -->
     <link rel="apple-touch-icon" href="icon-192.png" />
     <link rel="preload" href="fonts/marcellus-400.woff2" as="font" type="font/woff2" crossorigin />
+    <!-- The body face rides along with the headings, so text never swaps mid-read.
+         All three cuts together weigh about as much as Marcellus alone. -->
+    <link rel="preload" href="fonts/alegreya-sans-400.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="fonts/alegreya-sans-400-italic.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="fonts/alegreya-sans-700.woff2" as="font" type="font/woff2" crossorigin />
     <!-- Home and About show this background, but every route serves this file. A preload tag
          would pull it on the ten pages that never use it, so I gate it. Starting early keeps
          the hero art from popping in. -->

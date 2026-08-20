@@ -123,6 +123,33 @@
     src: url('../fonts/marcellus-400.woff2') format('woff2');
 }
 
+/* Alegreya Sans by Juan Pablo del Peral (Huerta Tipografica), SIL Open Font License,
+   text in /fonts. The body face. Same calligraphic roots as Marcellus, a true italic
+   for the decks and excerpts. Regular, italic and bold; 600 falls through to bold. */
+@font-face {
+    font-family: "Alegreya Sans";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('../fonts/alegreya-sans-400.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: "Alegreya Sans";
+    font-style: italic;
+    font-weight: 400;
+    font-display: swap;
+    src: url('../fonts/alegreya-sans-400-italic.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: "Alegreya Sans";
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('../fonts/alegreya-sans-700.woff2') format('woff2');
+}
+
 :root {
     --dune-bg: #0f0d0c;
     --dune-panel: #241c16;
@@ -133,10 +160,10 @@
     --dune-border-strong: #806848;
     --dune-text: #f1e6d6;
     --dune-muted: #a89478;
-    /* Muted text that survives the lit top of a hero. The scrims run warm where the tagline
-       sits, and plain --dune-muted fell to 4.4:1 over the busiest category art, under the
-       4.5 line. This clears 5.3:1 there. */
-    --dune-muted-lit: #b8a487;
+    /* Muted text that survives the lit top of a hero. Plain --dune-muted fell under 4.5:1
+       over the busiest art, and two lighter tries still grazed 4.4 at the worst pixel.
+       This one clears 4.6 everywhere I sampled, with the art at full height. */
+    --dune-muted-lit: #d2c1a6;
     --dune-accent: #e0a458;
     --dune-accent-bright: #f4c07c;
     /* The same two golds as bare channels, for washes and glows set with rgba(), since
@@ -147,20 +174,60 @@
     /* The dark ink that sits on spice fills: button faces, the selected book chip.
        Reads as shadowed leather, not black. */
     --dune-ink: #201408;
-    /* Three washes, warm on top and cold at the foot so a card reads lit. Deep sits
-       behind a graph. I keep the bottom stop off blue: color on Arrakis comes off
-       minerals, blooms and stains, never the air. */
-    --scrim-soft: linear-gradient(rgba(45, 35, 25, 0.80), rgba(12, 11, 10, 0.93));
-    --scrim-mid: linear-gradient(rgba(38, 29, 21, 0.86), rgba(12, 11, 10, 0.95));
-    --scrim-deep: linear-gradient(rgba(34, 26, 19, 0.90), rgba(11, 10, 9, 0.96));
+    /* Three washes, warm on top and cold at the foot so a page reads lit. Each holds its
+       top tone through the first third, then darkens; the art stayed visible longer that
+       way. Deep sits behind a graph. The bottom stop stays off blue: color on Arrakis
+       comes off minerals, blooms and stains, never the air. */
+    --scrim-soft: linear-gradient(rgba(45, 35, 25, 0.80) 0%, rgba(45, 35, 25, 0.80) 33%, rgba(12, 11, 10, 0.93) 100%);
+    --scrim-mid: linear-gradient(rgba(38, 29, 21, 0.86) 0%, rgba(38, 29, 21, 0.86) 33%, rgba(12, 11, 10, 0.95) 100%);
+    --scrim-deep: linear-gradient(rgba(34, 26, 19, 0.90) 0%, rgba(34, 26, 19, 0.90) 33%, rgba(11, 10, 9, 0.96) 100%);
     /* The flat wash About reads under. An essay wants an even page, not a lit card,
        so this one holds a single tone top to bottom instead of running warm to cold. */
     --scrim-essay: linear-gradient(rgba(23, 19, 16, 0.82), rgba(23, 19, 16, 0.88));
-    /* Recipes that repeat. The spice border runs a lifted card's rim. The plate shadow
-       is a hairline of light up top and shade gathering low, shared by the hero and
-       the cards. Written once so tuning turns one dial. */
+    /* The spice border runs a lifted card's rim. Written once so tuning turns one dial. */
     --spice-border-gradient: linear-gradient(120deg, #8a4a2a, #e0a458 30%, #f4c07c 50%, #c76b3f 70%, #8a4a2a);
-    --plate-shadow: inset 0 1px 0 rgba(241, 230, 214, 0.05), inset 0 -14px 28px -20px rgba(0, 0, 0, 0.45);
+    /* ---- The Register: shape, rules, space, type ----
+       Every container reads these. Corners are sharp everywhere; dots stay dots. Rules
+       come in three weights: hair for leaders and frames, heavy for the head of a plate,
+       note for a status line. */
+    --r-sharp: 0;
+    --r-dot: 50%;
+    --rule-hair: 1px;
+    --rule-heavy: 3px;
+    --rule-note: 2px;
+    /* A 4px spacing scale. */
+    --sp-1: 0.25rem;
+    --sp-2: 0.5rem;
+    --sp-3: 0.75rem;
+    --sp-4: 1rem;
+    --sp-5: 1.5rem;
+    --sp-6: 2rem;
+    --sp-7: 3rem;
+    --sp-8: 4rem;
+    /* One content column, capped on wide monitors, with a gutter that breathes. */
+    --page-max: 80rem;
+    --gutter: clamp(1rem, 3vw, 2rem);
+    /* Measures in em, not ch: a ch is the width of a zero, and 68ch came out near 95
+       characters. Measured in Alegreya at 18px these land at 76 a line for prose,
+       near 55 for a deck. */
+    --measure-prose: 30em;
+    --measure-deck: 26em;
+    /* The art runs the full page as it always did. Its side edges melt into the ground
+       over --art-melt and its foot over --art-melt-bottom, so nothing cuts to black. */
+    --art-melt: 64px;
+    --art-melt-bottom: 200px;
+    /* The type scale. Display is fluid; the rest sits still. */
+    --font-body: "Alegreya Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --font-display: "Marcellus", Georgia, serif;
+    --fs-display: clamp(2.25rem, 1.6rem + 2.6vw, 3.25rem);
+    --fs-h2: 1.5rem;
+    --fs-h3: 1.125rem;
+    --fs-body: 1.125rem;
+    --fs-small: 0.95rem;
+    --fs-caption: 0.85rem;
+    --fs-label: 0.75rem;
+    --lh-body: 1.6;
+    --track-label: 0.12em;
     /* Motion by role: touch is cursor color, open small moves, settle cards landing,
        rite ceremony. Pop is the overshoot every dot lands with, crest the naming
        moon's climb. Nearby literals are near-misses I picked. Boot screen and
@@ -182,11 +249,39 @@
 }
 
 /* Headings and the wordmark use Marcellus, a Roman-inscription serif that feels
-   like an archive instead of an operating system. Body text stays on the system
-   stack for easy reading. */
+   like an archive instead of an operating system. Body text runs in Alegreya Sans,
+   a humanist sans from the same calligraphic tradition, at a real measure. */
 h1, h2, h3, .site-title {
-    font-family: "Marcellus", Georgia, serif;
+    font-family: var(--font-display);
     font-weight: 400;
+}
+
+h2 {
+    font-size: var(--fs-h2);
+    line-height: 1.2;
+}
+
+h3 {
+    font-size: var(--fs-h3);
+    line-height: 1.3;
+}
+
+/* Set like a book: balanced heads, no orphans in the prose, figures that line up,
+   and focus that never lands under the pinned nav. */
+h1, h2, .tagline, .short-desc {
+    text-wrap: balance;
+}
+
+.detailed-history, .home-section p, .epigraph-text, .glossary-entry dd {
+    text-wrap: pretty;
+}
+
+.timeline-date, .imperial-seal, .entity-meta dd, .pager-status {
+    font-variant-numeric: tabular-nums;
+}
+
+html {
+    scroll-padding-top: 4.5rem;
 }
 
 /* A letterpress look for the big type: a dark edge over the strokes and a faint
@@ -198,10 +293,16 @@ h2:not(.sayings-source),
     text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.55), 0 1px 0 rgba(var(--dune-accent-bright-rgb), 0.1);
 }
 
+/* The body size lives on body, never html: on html it would move the rem itself and
+   scale every rem on the site with it. */
+body {
+    font-size: var(--fs-body);
+}
+
 html, body {
     background: var(--dune-bg);
     color: var(--dune-text);
-    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    font-family: var(--font-body);
     /* Without this reset, the browser's default 8px body margin pushes the nav bar in
        from the window edges and pads the sides of every page more than the top and
        bottom. */
@@ -320,14 +421,16 @@ html {
     }
 }
 
+/* One column, capped on wide monitors so grids and rules get a fixed stage. The reading
+   leading lives here, not on body, so the header and nav keep their own heights. The
+   bottom is only 0.5rem of padding since every page's last block brings its own 1.5rem. */
 .site-body {
     flex: 1;
     width: 100%;
+    max-width: var(--page-max);
     margin: 0 auto;
-    /* All four gaps around the boxed content should read as the same 2rem. The bottom
-       is only 0.5rem of padding since every page's last block brings its own 1.5rem
-       margin to the total. */
-    padding: 2rem 2rem 0.5rem;
+    padding: var(--sp-6) var(--gutter) var(--sp-2);
+    line-height: var(--lh-body);
 }
 
 .site-footer {
@@ -410,44 +513,64 @@ html {
         height: 18px;
     }
 
+/* ---- The plate ----
+   Every page opens on one: a heavy rule in the page's color, a hairline under it, the
+   title in Marcellus, the art behind. No frame. The hero itself paints nothing; its
+   inline art list is inherited by ::before, which paints the art and melts its edges. */
 .hero {
     position: relative;
     /* clip, not hidden: hidden makes the hero a scroll container, which would capture
        the timeline's view() timeline. clip crops the background art the same way
        and leaves the document as the nearest scroller. */
     overflow: clip;
-    background-size: cover;
+    background-size: 0 0;
     background-position: center;
-    border: 1px solid var(--dune-border);
-    border-radius: 8px;
-    padding: 2rem;
-    margin-bottom: 1.5rem;
-    /* The pressed-plate look: a hairline of light along the top edge and a soft shade
-       gathering low, so the border feels stamped instead of drawn. The entity cards
-       use the same pair. */
-    box-shadow: var(--plate-shadow);
+    border: 0;
+    border-top: var(--rule-heavy) solid var(--dune-accent);
+    border-radius: var(--r-sharp);
+    padding: var(--sp-6) 0 0;
+    margin-bottom: var(--sp-5);
 }
 
-/* A few of the source pictures have a frame baked into their pixels: vehicles.avif
-   a white border, worlds.webp a dark line. I repaint the background oversized so
-   those edges land outside the card and clip. The files stay untouched. */
+/* The art. Seated 6px down so both rules of the pair sit on night, not on the picture.
+   The mask melts the sides and the foot so the page never cuts to black, and the baked
+   frames on vehicles.avif and worlds.webp vanish in the melt. The files stay untouched. */
 .hero::before {
     content: "";
     position: absolute;
-    inset: -3%;
+    inset: 6px 0 0 0;
     z-index: 0;
     background: inherit;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 var(--art-melt), #000 calc(100% - var(--art-melt)), transparent), linear-gradient(to bottom, #000 calc(100% - var(--art-melt-bottom)), transparent);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(to right, transparent, #000 var(--art-melt), #000 calc(100% - var(--art-melt)), transparent), linear-gradient(to bottom, #000 calc(100% - var(--art-melt-bottom)), transparent);
+    mask-composite: intersect;
 }
 
-/* Heroes set backgrounds inline per page, so the grain tile can't join those stacks.
-   I give it its own layer, painted after the ::before repaint and under the content.
-   About Dune opts out: grain belongs on cards, not prose. */
+/* The grain, on its own layer under the content. The same layer draws the thin rule of
+   the pair, four pixels under the heavy one. About Dune has no grain, so it draws the
+   thin rule on its own below. */
 .hero:not(.about-hero)::after {
     content: "";
     position: absolute;
-    inset: 0;
+    inset: 4px 0 0 0;
     z-index: 0;
+    border-top: var(--rule-hair) solid var(--dune-border);
+    padding-top: 1px;
     background-image: var(--ridulian-grain);
+    background-clip: content-box;
+}
+
+.hero.about-hero::after {
+    content: "";
+    position: absolute;
+    inset: 4px 0 auto 0;
+    height: 0;
+    border-top: var(--rule-hair) solid var(--dune-border);
+    pointer-events: none;
 }
 
 .hero > * {
@@ -455,36 +578,202 @@ html {
     z-index: 1;
 }
 
+/* A browse page takes its drawer's mineral on the rule. */
+.hero.category-hero {
+    border-top-color: var(--cat-color, var(--dune-accent));
+}
+
 /* A category with only a few records used to end partway down the screen, so the
-   card now stretches near the bottom and fuller ones grow past it. The 190px is
-   the header, nav, back link, and padding above. */
+   plate stretches near the bottom and its art fills the screen. The connection finder
+   gets the same. The 190px is the header, nav, back link, and padding above. */
 @media (min-width: 900px) {
-    .category-hero {
+    .category-hero,
+    .hero:has(.connection-pickers) {
         min-height: calc(100vh - 190px);
     }
 }
 
+/* ---- Tool heads ----
+   On a wide screen a tool page opens as two columns: the title and its description
+   keep their measure on the left, and the instrument sits across from them in the
+   space that used to lie empty. Reading text keeps a measure; instruments occupy.
+   The art and grain layers stay put: absolutely positioned pseudo-elements sit out
+   of the grid. Everything after the head spans both columns as before. */
+@media (min-width: 1100px) {
+    /* The text and its instrument sit as one centered pair: the text shifts in from
+       the left, the box in from the right, the same air on both sides. The title
+       keeps the left edge above them, so the head reads title, then stage. The
+       doubled class on the archives hero outranks its flex base rule below. */
+    .trial-hero,
+    .hero.search-hero,
+    .hero:has(.connection-pickers),
+    .hero:has(.universe-find),
+    .hero:has(.home-search) {
+        display: grid;
+        grid-template-columns: minmax(0, 26em) minmax(24rem, 28rem);
+        column-gap: clamp(4rem, 6vw, 6rem);
+        justify-content: center;
+        align-items: start;
+    }
+
+    .trial-hero > *,
+    .hero.search-hero > *,
+    .hero:has(.connection-pickers) > *,
+    .hero:has(.universe-find) > *,
+    .hero:has(.home-search) > * {
+        grid-column: 1 / -1;
+    }
+
+    .trial-hero > h1,
+    .hero.search-hero > h1,
+    .hero:has(.connection-pickers) > h1,
+    .hero:has(.universe-find) > h1 {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    .hero:has(.home-search) > h1 {
+        grid-column: 1 / -1;
+        grid-row: 1;
+    }
+
+    .trial-hero > .tagline,
+    .hero.search-hero > .tagline,
+    .hero:has(.connection-pickers) > .tagline,
+    .hero:has(.universe-find) > .tagline,
+    .hero:has(.home-search) > .tagline {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+    /* Home's head splits into its two real masses: the working stack on the left,
+       tagline, finder, the door at random, and the day's saying reading from the
+       right, its first line level with the tagline. The title crowns both. On a long
+       saying the rows share the slack; most days it rests shorter than the stack. */
+    .hero:has(.home-search) > .home-search {
+        grid-column: 1;
+        grid-row: 3;
+        max-width: none;
+    }
+
+    .hero:has(.home-search) > .cta {
+        grid-column: 1;
+        grid-row: 4;
+        align-self: start;
+    }
+
+    /* Centered in the head's rows, then eased down. The margin evens it between the
+       title and the Ways heading (any more and the rows stretch instead); the
+       transform slides it the last touch lower without moving anything else. */
+    .hero:has(.home-search) > .daily-saying {
+        grid-column: 2;
+        grid-row: 2 / span 3;
+        align-self: center;
+        margin: 2.875rem 0 0;
+        transform: translateY(0.75rem);
+    }
+
+    /* Archives: the invitation stays under the title on the left; the field and its
+       example records answer from the right. Results, the reading-progress panel and
+       the seal line span the stage below, so found records read at full width. */
+    .hero.search-hero > .surprise-line {
+        grid-column: 1;
+        grid-row: 3;
+        align-self: start;
+    }
+
+    .hero.search-hero > .search-box {
+        grid-column: 2;
+        grid-row: 2;
+        max-width: none;
+    }
+
+    .hero.search-hero > .examples {
+        grid-column: 2;
+        grid-row: 3;
+        align-self: start;
+        margin-top: 0.75rem;
+    }
+
+    /* The field's top lines up with the description's first line (the margin matches
+       the description's own default top margin), and its words move below it: the
+       picker's label flips under the input, the counter follows as a caption. */
+    .trial-hero > .trial-guess {
+        grid-column: 2;
+        grid-row: 2;
+        align-self: start;
+        margin-top: 1.125rem;
+        max-width: none;
+    }
+
+    .trial-hero .trial-guess .endpoint-picker {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .trial-hero .trial-guess .endpoint-label {
+        order: 3;
+        margin: 0.5rem 0 0;
+    }
+
+    /* Same cell as the field, pushed past its height, so the two never drift apart
+       whatever the rows do. An open suggestion list paints over this line; it is
+       opaque and momentary, so nothing garbles. */
+    .trial-hero > .trial-counter {
+        grid-column: 2;
+        grid-row: 2;
+        align-self: start;
+        margin: 6.4rem 0 0;
+    }
+
+    /* The finder wants more room than one picker: its column widens so the two
+       fields sit side by side. That column would fold the title in half, so here
+       the title runs across the whole head and the pickers sit beside the tagline. */
+    .hero:has(.connection-pickers) {
+        grid-template-columns: minmax(0, 26em) minmax(28rem, 38rem);
+    }
+
+    .hero:has(.connection-pickers) > h1 {
+        grid-column: 1 / -1;
+    }
+
+    .hero:has(.connection-pickers) > .connection-pickers {
+        grid-column: 2;
+        grid-row: 2;
+        align-self: start;
+        max-width: none;
+    }
+
+    .hero:has(.connection-pickers) > .examples {
+        grid-column: 2;
+        grid-row: 3;
+        margin-top: 0.75rem;
+    }
+
+    .hero:has(.universe-find) > .universe-find {
+        grid-column: 2;
+        grid-row: 1 / span 2;
+        align-self: center;
+        margin-bottom: 0;
+        max-width: none;
+    }
+}
+
 .hero h1 {
-    font-size: 2.2rem;
+    font-size: var(--fs-display);
+    line-height: 1.08;
     margin-top: 0;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.35rem;
 }
 
 .search-hero {
-    min-height: 75vh;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    padding: 3rem;
+    padding: var(--sp-6) 0 0;
 }
 
-    .search-hero h1 {
-        font-size: 3rem;
-    }
-
     .search-hero .tagline {
-        font-size: 1.15rem;
-        max-width: 40rem;
+        font-size: 1.1rem;
     }
 
     .search-hero .search-box {
@@ -493,6 +782,7 @@ html {
 
 .tagline {
     color: var(--dune-muted-lit);
+    max-width: var(--measure-deck);
     margin-bottom: 1.5rem;
 }
 
@@ -501,24 +791,27 @@ html {
     gap: 0.5rem;
 }
 
+    /* A field: square, brass edge, rock fill. */
     .search-box input {
         flex: 1;
         min-width: 0;
         padding: 0.6rem 0.8rem;
         background: var(--dune-panel);
-        border: 1px solid var(--dune-border-strong);
-        border-radius: 4px;
+        border: var(--rule-hair) solid var(--dune-border-strong);
+        border-radius: var(--r-sharp);
         color: var(--dune-text);
         font-size: 1rem;
     }
 
+    /* A key: the primary action, square, spice with dark ink. */
     .search-box button {
         padding: 0.6rem 1.2rem;
         background: var(--dune-accent);
         border: none;
-        border-radius: 4px;
+        border-radius: var(--r-sharp);
         color: var(--dune-ink);
         font-weight: 600;
+        letter-spacing: 0.03em;
         cursor: pointer;
     }
 
@@ -539,13 +832,15 @@ html {
     margin-right: 0.25rem;
 }
 
+/* A tag: square, brass edge, rock fill. The same shape on every small selector and
+   label across the site. */
 .chip {
     padding: 0.25rem 0.7rem;
     background: var(--dune-panel);
-    border: 1px solid var(--dune-border);
-    border-radius: 999px;
+    border: var(--rule-hair) solid var(--dune-border-strong);
+    border-radius: var(--r-sharp);
     text-decoration: none;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
 }
 
     .chip:hover {
@@ -561,14 +856,16 @@ html {
     flex-wrap: wrap;
 }
 
+/* The outlined key. */
 .surprise-btn {
     padding: 0.55rem 1.15rem;
     background: transparent;
-    border: 1px solid var(--dune-accent);
-    border-radius: 999px;
+    border: var(--rule-hair) solid var(--dune-accent);
+    border-radius: var(--r-sharp);
     color: var(--dune-accent-bright);
     font-weight: 600;
     font-size: 0.95rem;
+    letter-spacing: 0.03em;
     cursor: pointer;
     transition: background var(--dur-touch) ease, color var(--dur-touch) ease;
 }
@@ -580,12 +877,15 @@ html {
 
 /* ---- Spoiler protection control ---- */
 
+/* A panel: the one settings instrument. Square, hairline, translucent rock. It spans
+   the whole column: reading text gets a measure, but a control that governs the page
+   should anchor the page's full width, like the charts above it. */
 .spoiler-control {
     margin-top: 1.5rem;
     padding: 1rem 1.1rem;
     background: rgba(36, 28, 22, 0.5);
-    border: 1px solid var(--dune-border);
-    border-radius: 8px;
+    border: var(--rule-hair) solid var(--dune-border);
+    border-radius: var(--r-sharp);
     text-align: left;
 }
 
@@ -630,10 +930,10 @@ html {
 .book-chip {
     padding: 0.35rem 0.8rem;
     background: var(--dune-panel);
-    border: 1px solid var(--dune-border);
-    border-radius: 999px;
+    border: var(--rule-hair) solid var(--dune-border-strong);
+    border-radius: var(--r-sharp);
     color: var(--dune-text);
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     cursor: pointer;
     transition: border-color var(--dur-touch) ease, background var(--dur-touch) ease, color var(--dur-touch) ease;
 }
@@ -668,8 +968,9 @@ html {
     font-size: 0.8rem;
 }
 
-.entity-card.spoiler-gate {
-    border-left: 4px solid var(--dune-accent-bright);
+/* A sealed record withholds its mineral: the rule stays, drained to dust. */
+.entity-card.front.spoiler-gate {
+    border-top-color: var(--dune-muted);
 }
 
 /* ---- Under Imperial Seal ----
@@ -709,7 +1010,8 @@ html {
     background: none;
     font: inherit;
     font-size: 0.78rem;
-    color: var(--dune-muted);
+    /* Lit dust: it sits over the plate art, where plain dust measured 4.5 and under. */
+    color: var(--dune-muted-lit);
     letter-spacing: 0.06em;
     text-transform: uppercase;
     cursor: pointer;
@@ -864,6 +1166,7 @@ html {
 
     .glossary-entry dd {
         margin: 0;
+        max-width: var(--measure-prose);
         color: var(--dune-text);
     }
 
@@ -914,8 +1217,8 @@ html {
 .pager-btn {
     padding: 0.35rem 0.7rem;
     background: var(--dune-panel);
-    border: 1px solid var(--dune-border);
-    border-radius: 999px;
+    border: var(--rule-hair) solid var(--dune-border-strong);
+    border-radius: var(--r-sharp);
     color: var(--dune-text);
     font-size: 0.95rem;
     line-height: 1;
@@ -945,9 +1248,9 @@ html {
 
 .legend-chip {
     padding: 0.2rem 0.7rem;
-    border-radius: 999px;
-    border: 1px solid currentColor;
-    font-size: 0.8rem;
+    border-radius: var(--r-sharp);
+    border: var(--rule-hair) solid currentColor;
+    font-size: 0.85rem;
 }
 
 .legend-note {
@@ -966,12 +1269,29 @@ html {
 .lineage-fremen { color: #8fae5c; }
 .lineage-other { color: #7fb3b0; }
 
+/* ---- The well ----
+   Charts and graphs are figures, so they get a figure's frame: a double hairline,
+   square, the way an engraved plate sits in a printed volume. The inner line is a
+   pseudo-element so the chart markup stays as it is. The entity graph and the whole
+   Duniverse share the recipe further down. */
 .bloodline-wrapper {
+    position: relative;
     margin-top: 1.5rem;
     background: rgba(23, 19, 16, 0.55);
-    border: 1px solid var(--dune-border);
-    border-radius: 8px;
+    border: var(--rule-hair) solid var(--dune-border);
+    border-radius: var(--r-sharp);
     padding: 0.75rem;
+}
+
+.bloodline-wrapper::after,
+.entity-card.graph-card::after,
+.universe-card::after {
+    content: "";
+    position: absolute;
+    inset: 3px;
+    border: var(--rule-hair) solid var(--dune-border);
+    opacity: 0.6;
+    pointer-events: none;
 }
 
 .bloodline-chart {
@@ -1140,9 +1460,23 @@ html {
 
 /* ---- Collected Sayings ---- */
 
+/* Capped at the quote measure so a source's rule ends where its quotes end, and
+   centered: the sayings are the heart of this page, so the column sits in the middle
+   with even air on both sides instead of hugging the left edge. */
 .sayings-group {
-    margin-top: 2rem;
+    margin: 2.5rem auto 0;
+    max-width: 60ch;
     text-align: left;
+}
+
+/* The sayings themselves speak in the display face, slanted. Marcellus cuts no italic,
+   so the browser leans the upright; on a quotation it reads as an inscription leaning,
+   and it beats a second face. Sized up a step, since Marcellus runs small on the eye. */
+.sayings-group .epigraph-text {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.15rem;
+    line-height: 1.75;
 }
 
 /* ---- Crestline dividers ----
@@ -1162,11 +1496,29 @@ html {
     mask: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20260%2016'%3E%3Cpath%20d='M4%209.5%20C%2060%207.8%2095%207.4%20116%208.1%20L116%209.3%20C%2095%209.4%2060%2010.4%204%209.5%20Z'%20fill-opacity='0.9'/%3E%3Ccircle%20cx='126'%20cy='6.4'%20r='3.2'%20fill-opacity='0.8'/%3E%3Ccircle%20cx='138'%20cy='8.6'%20r='5'/%3E%3Cpath%20d='M256%209.5%20C%20200%207.8%20165%207.4%20144%208.1%20L144%209.3%20C%20165%209.4%20200%2010.4%20256%209.5%20Z'%20fill-opacity='0.9'/%3E%3C/svg%3E") center / contain no-repeat;
 }
 
+/* A section head runs a hairline from the end of its words to the edge, dying out
+   over the last stretch the way the running head does. The same device heads the
+   home sections and the related-record groups. */
+.sayings-source,
+.home-section h2,
+.related-section h3 {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+}
+
+    .sayings-source::after,
+    .home-section h2::after,
+    .related-section h3::after {
+        content: "";
+        flex: 1;
+        height: var(--rule-hair);
+        background: linear-gradient(to right, var(--dune-border) 85%, transparent);
+    }
+
 .sayings-source {
     font-size: 1.05rem;
     color: var(--dune-accent-bright);
-    border-bottom: 1px solid var(--dune-border);
-    padding-bottom: 0.4rem;
 }
 
 /* ---- The Irulan rule ----
@@ -1242,8 +1594,9 @@ html {
     content: none;
 }
 
+/* Flush left, under a left-aligned search, not centered beneath it. */
 .daily-saying {
-    margin: 1.5rem auto 0;
+    margin: 1.5rem 0 0;
     text-align: left;
 }
 
@@ -1255,19 +1608,76 @@ html {
     flex-wrap: wrap;
 }
 
-.no-results, .candidates {
-    margin-top: 1.25rem;
-    padding: 1rem;
-    background: var(--dune-panel);
-    border: 1px solid var(--dune-border);
-    border-radius: 6px;
+/* ---- Notes ----
+   A status line is not a box: a 2px spice rule above it and nothing else. */
+.no-results,
+.trace-note {
+    margin-top: 1.5rem;
+    padding: 0.6rem 0 0;
+    max-width: 42rem;
+    background: none;
+    border: 0;
+    border-top: var(--rule-note) solid var(--dune-accent);
+    border-radius: var(--r-sharp);
 }
 
-/* Records found by their text instead of their name. A muted edge marks the whole
-   block as the weaker answer, sitting below the name matches without competing. */
+/* ---- The results ledger ----
+   Name matches as ruled rows, the count line running a leader to the edge. They sit
+   on the plate's lightest art, so a soft wash with no edge keeps the descriptions
+   over AA the way the old opaque panel did. */
+.candidates {
+    margin-top: 1.5rem;
+    margin-left: -1rem;
+    padding: 0.75rem 1rem 0.5rem;
+    max-width: calc(44em + 2rem);
+    background: rgba(15, 13, 12, 0.62);
+    border: 0;
+    border-radius: var(--r-sharp);
+}
+
+    .candidates > p {
+        display: flex;
+        align-items: baseline;
+        gap: 0.75rem;
+        margin: 0 0 0.35rem;
+    }
+
+        .candidates > p::after {
+            content: "";
+            flex: 1;
+            min-width: 2rem;
+            height: var(--rule-hair);
+            background: linear-gradient(to right, var(--dune-border-strong) 85%, transparent);
+        }
+
+    .candidates ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .candidates li {
+        padding: 0.45rem 0;
+        border-bottom: var(--rule-hair) solid var(--dune-border);
+    }
+
+        .candidates li:last-child {
+            border-bottom: 0;
+        }
+
+/* Records found by their text instead of their name. The muted left bar means quoted
+   text everywhere on the site, and these rows are excerpts, so the bar stays and the
+   row rules go: one device per list. */
 .candidates.text-matches {
+    margin-left: 0;
+    padding-left: 0.9rem;
     border-left: 3px solid var(--dune-muted);
 }
+
+    .candidates.text-matches li {
+        padding: 0.3rem 0;
+        border-bottom: 0;
+    }
 
     /* The excerpt is quoted out of an entry, so italics set it apart from the site's
    own voice. */
@@ -1281,51 +1691,100 @@ html {
     text-decoration: none;
 }
 
+/* ---- The record ----
+   A record is not a stack of cards any more. The front is a plate: the drawer's mineral
+   on the rule pair, the name, the deck, the facts, the prose, with the art behind.
+   The back is a ledger of related records on its own art. Only the graph keeps a frame. */
 .entity-card {
-    background-color: var(--dune-panel);
-    /* Plain cards carry the grain alone. The photo variants below repeat it at the
-       head of their stacks, since background-image lists replace each other instead
-       of merging. Each stack sizes its layers: tile at 128px, art covering the
-       card. */
-    background-image: var(--ridulian-grain);
-    border: 1px solid var(--dune-border);
-    border-radius: 8px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    box-shadow: var(--plate-shadow);
+    background: none;
+    border: 0;
+    border-radius: var(--r-sharp);
+    padding: 0;
+    margin-bottom: var(--sp-6);
 }
 
+/* The front paints nothing itself; its art list is inherited by ::before, the same
+   trick the hero uses, so the per-category art rules below keep working unchanged. */
 .entity-card.front {
-    border-left: 4px solid var(--dune-accent);
+    position: relative;
+    padding: var(--sp-5) 0;
     background-image: var(--ridulian-grain), var(--scrim-mid), url('/images/entity-front-background.webp');
-    background-size: auto, cover, cover;
+    background-size: 0 0;
     background-position: 0 0, center, center;
     background-repeat: repeat, no-repeat, no-repeat;
 }
 
+.entity-card.front::before,
+.entity-card.back::before {
+    content: "";
+    position: absolute;
+    inset: 6px 0 0 0;
+    z-index: 0;
+    background: inherit;
+    background-size: auto, cover, cover;
+    background-position: 0 0, center, center;
+    background-repeat: repeat, no-repeat, no-repeat;
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 var(--art-melt), #000 calc(100% - var(--art-melt)), transparent), linear-gradient(to bottom, #000 calc(100% - var(--art-melt-bottom)), transparent);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(to right, transparent, #000 var(--art-melt), #000 calc(100% - var(--art-melt)), transparent), linear-gradient(to bottom, #000 calc(100% - var(--art-melt-bottom)), transparent);
+    mask-composite: intersect;
+}
+
+/* The thin rule of the pair, under the front's heavy one. */
+.entity-card.front::after {
+    content: "";
+    position: absolute;
+    inset: 4px 0 auto 0;
+    height: 0;
+    border-top: var(--rule-hair) solid var(--dune-border);
+    pointer-events: none;
+}
+
+.entity-card.front > *,
+.entity-card.back > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* The back keeps its art under the deeper scrim, so the descriptions clear AA. */
 .entity-card.back {
-    background-image: var(--ridulian-grain), var(--scrim-mid), url('/images/entity-back-background.webp');
-    background-size: auto, cover, cover;
+    position: relative;
+    padding: var(--sp-5) 0;
+    background-image: var(--ridulian-grain), var(--scrim-deep), url('/images/entity-back-background.webp');
+    background-size: 0 0;
     background-position: 0 0, center, center;
     background-repeat: repeat, no-repeat, no-repeat;
 }
 
+    .entity-card.back::before {
+        inset: 0;
+    }
+
+    .entity-card.back .muted {
+        color: var(--dune-muted-lit);
+    }
+
+/* The well around the relationship web. */
 .entity-card.graph-card {
+    position: relative;
     background-image: var(--ridulian-grain), var(--scrim-deep), url('/images/entity-graph-background.webp');
     background-size: auto, cover, cover;
     background-position: 0 0, center, center;
     background-repeat: repeat, no-repeat, no-repeat;
+    border: var(--rule-hair) solid var(--dune-border);
     padding: 1.25rem 1rem;
 }
 
 /* Doors out of a record and into the site's bigger tools, each already aimed at
-   this entity. Pills that lift on hover, same language as the chips and the footer
-   icons. */
+   this entity. Tags seated on a hairline, so they belong to the well above instead
+   of floating on open ground. They lift on hover like the footer icons. */
 .entity-explore {
     display: flex;
     flex-wrap: wrap;
     gap: 0.6rem;
     margin-bottom: 1.5rem;
+    padding-top: var(--sp-4);
+    border-top: var(--rule-hair) solid var(--dune-border);
 }
 
 .explore-link {
@@ -1334,10 +1793,10 @@ html {
     gap: 0.5rem;
     padding: 0.6rem 1rem;
     background: var(--dune-panel);
-    border: 1px solid var(--dune-border);
-    border-radius: 999px;
+    border: var(--rule-hair) solid var(--dune-border-strong);
+    border-radius: var(--r-sharp);
     color: var(--dune-text);
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     text-decoration: none;
     transition: border-color var(--dur-touch) ease, transform var(--dur-touch) ease, box-shadow var(--dur-touch) ease;
 }
@@ -1413,8 +1872,8 @@ html {
     margin-left: 0.45rem;
     padding: 0.1rem 0.55rem;
     background: rgba(var(--dune-accent-rgb), 0.12);
-    border: 1px solid var(--dune-accent);
-    border-radius: 999px;
+    border: var(--rule-hair) solid var(--dune-accent);
+    border-radius: var(--r-sharp);
     color: var(--dune-accent-bright);
     font-size: 0.72rem;
     letter-spacing: 0.03em;
@@ -1533,16 +1992,11 @@ html {
     margin-top: -0.15rem;
 }
 
-/* A record's kind tints the top of its card, its browse page's hero, and the left
-   edge of every tile inside, so the graphs' color language carries through the
-   site. No category means the plain border color. */
-.entity-card.front,
-.category-hero {
-    border-top: 2px solid var(--cat-color, var(--dune-border));
-}
-
-.category-hero .category-tile {
-    border-left: 2px solid var(--cat-color, var(--dune-border));
+/* A record's kind runs as the heavy rule at the head of its plate, the one place the
+   drawer's color is spent on a page. The browse page's rule is set with the plate
+   rules above. No category means the spice. */
+.entity-card.front {
+    border-top: var(--rule-heavy) solid var(--cat-color, var(--dune-accent));
 }
 
 /* A front card wears its category's art, the same photo heading that browse page.
@@ -1625,6 +2079,8 @@ html {
 
 /* ---- The whole Duniverse ---- */
 
+/* The well around the whole constellation; the inner hairline is set with the
+   bloodlines well. */
 .universe-card {
     position: relative;
     padding: 0.75rem;
@@ -1633,9 +2089,8 @@ html {
     background-size: auto, cover, cover;
     background-position: 0 0, center, center;
     background-repeat: repeat, no-repeat, no-repeat;
-    border: 1px solid var(--dune-border);
-    border-radius: 8px;
-    box-shadow: var(--plate-shadow);
+    border: var(--rule-hair) solid var(--dune-border);
+    border-radius: var(--r-sharp);
 }
 
 .universe-graph {
@@ -1647,7 +2102,7 @@ html {
        scrolls normally everywhere outside it. */
     touch-action: none;
     cursor: grab;
-    border-radius: 6px;
+    border-radius: var(--r-sharp);
 }
 
     .universe-graph:active {
@@ -1758,8 +2213,8 @@ html {
         width: 36px;
         height: 36px;
         background: rgba(23, 19, 16, 0.82);
-        border: 1px solid var(--dune-border);
-        border-radius: 6px;
+        border: var(--rule-hair) solid var(--dune-border);
+        border-radius: var(--r-sharp);
         color: var(--dune-text);
         font-size: 1.05rem;
         line-height: 1;
@@ -1783,10 +2238,10 @@ html {
     margin: 0;
     padding: 0.35rem 0.9rem;
     background: rgba(23, 19, 16, 0.88);
-    border: 1px solid var(--dune-border);
-    border-radius: 999px;
+    border: var(--rule-hair) solid var(--dune-border);
+    border-radius: var(--r-sharp);
     color: var(--dune-text);
-    font-size: 0.78rem;
+    font-size: 0.82rem;
     letter-spacing: 0.04em;
     white-space: nowrap;
     pointer-events: none;
@@ -1862,8 +2317,8 @@ html {
     width: 100%;
     padding: 0.6rem 0.8rem;
     background: var(--dune-panel);
-    border: 1px solid var(--dune-border-strong);
-    border-radius: 4px;
+    border: var(--rule-hair) solid var(--dune-border-strong);
+    border-radius: var(--r-sharp);
     color: var(--dune-text);
     font-size: 1rem;
 }
@@ -1873,13 +2328,19 @@ html {
         border-color: var(--dune-accent);
     }
 
+    /* A mouse click keeps the quiet spice edge; a keyboard gets the ring back. */
+    .endpoint-picker input:focus-visible {
+        outline: 2px solid var(--dune-accent);
+        outline-offset: 2px;
+    }
+
 .endpoint-suggestions {
     list-style: none;
     margin: 0.4rem 0 0;
     padding: 0.25rem;
     background: var(--dune-panel);
-    border: 1px solid var(--dune-border);
-    border-radius: 6px;
+    border: var(--rule-hair) solid var(--dune-border);
+    border-radius: var(--r-sharp);
 }
 
     .endpoint-suggestions button {
@@ -1890,7 +2351,7 @@ html {
         padding: 0.45rem 0.6rem;
         background: transparent;
         border: none;
-        border-radius: 4px;
+        border-radius: var(--r-sharp);
         color: var(--dune-text);
         font-size: 0.9rem;
         text-align: left;
@@ -1912,20 +2373,21 @@ html {
     flex: none;
     width: 10px;
     height: 10px;
-    border-radius: 50%;
+    border-radius: var(--r-dot);
     background: currentColor;
     box-shadow: 0 0 6px currentColor;
 }
 
+/* A chosen value is a tag with its category dot. The bar that used to sit on its left
+   edge meant quoted text elsewhere, so the dot carries the color alone now. */
 .endpoint-chosen {
     display: flex;
     align-items: center;
     gap: 0.55rem;
     padding: 0.5rem 0.8rem;
     background: var(--dune-panel);
-    border: 1px solid var(--dune-border);
-    border-left: 3px solid currentColor;
-    border-radius: 4px;
+    border: var(--rule-hair) solid var(--dune-border-strong);
+    border-radius: var(--r-sharp);
 }
 
 .endpoint-name {
@@ -2049,19 +2511,10 @@ html {
         font-size: 13px;
     }
 
-.trace-note {
-    margin-top: 1.4rem;
-    padding: 1rem 1.1rem;
-    background: var(--dune-panel);
-    border: 1px solid var(--dune-border);
-    border-left: 3px solid var(--dune-accent);
-    border-radius: 6px;
-    max-width: 42rem;
+/* The trace messages take the note setting defined with the results ledger. */
+.trace-note p {
+    margin: 0;
 }
-
-    .trace-note p {
-        margin: 0;
-    }
 
 button.chip {
     color: var(--dune-text);
@@ -2125,8 +2578,8 @@ button.chip {
     background-image: var(--scrim-mid), url('/images/main-menu-background.webp');
     background-size: cover;
     background-position: center;
-    border: 1px solid var(--dune-border);
-    border-radius: 10px;
+    border: var(--rule-hair) solid var(--dune-border);
+    border-radius: var(--r-sharp);
     text-align: center;
     outline: none;
     animation: ritual-rise 0.45s ease-out;
@@ -2196,8 +2649,8 @@ button.chip {
     /* A raised hinge down the left edge, so the bar reads as a spine instead of a
    button. */
     box-shadow: inset 3px 0 0 rgba(var(--dune-accent-rgb), 0.28), inset -2px 0 4px rgba(0, 0, 0, 0.45);
-    border: 1px solid var(--dune-border);
-    border-radius: 4px 6px 6px 4px;
+    border: var(--rule-hair) solid var(--dune-border);
+    border-radius: var(--r-sharp);
     color: var(--dune-text);
     cursor: pointer;
     animation: spine-shelve var(--dur-settle) ease-out backwards;
@@ -2328,11 +2781,21 @@ button.chip {
 
 .entity-card h1 {
     margin-top: 0;
+    font-size: var(--fs-display);
+    line-height: 1.08;
 }
 
+/* The deck, and the prose under it at a reading measure. */
 .short-desc {
     color: var(--dune-accent-bright);
     font-style: italic;
+    font-size: 1.1rem;
+    max-width: var(--measure-deck);
+}
+
+.detailed-history {
+    max-width: var(--measure-prose);
+    line-height: var(--lh-body);
 }
 
 .rivalries {
@@ -2341,10 +2804,14 @@ button.chip {
     border-top: 1px solid var(--dune-border);
 }
 
+/* ---- The ledger of facts ----
+   A label in the margin runs a leader to its value, the device the running head, the
+   glossary and the epigraph attributions already use. Brass, not bronze: it sits over
+   the plate art and should be seen. */
 .entity-meta {
     margin: 1.1rem 0 0;
     display: grid;
-    gap: 0.4rem;
+    gap: 0.5rem;
 }
 
     .entity-meta .meta-row {
@@ -2354,15 +2821,26 @@ button.chip {
     }
 
     /* Wide enough that the longest label in the archive ("Foundational Texts") fits on
-       one line, so every record's facts line up in the same column. */
+       one line with room for its leader, so every record's facts line up in one column. */
     .entity-meta dt {
-        flex: 0 0 9rem;
+        flex: 0 0 11rem;
+        display: flex;
+        align-items: baseline;
         margin: 0;
-        color: var(--dune-muted);
+        color: var(--dune-muted-lit);
         text-transform: uppercase;
-        letter-spacing: 0.06em;
-        font-size: 0.72rem;
+        letter-spacing: var(--track-label);
+        font-size: var(--fs-label);
     }
+
+        .entity-meta dt::after {
+            content: "";
+            flex: 1;
+            min-width: 1.2em;
+            height: var(--rule-hair);
+            margin: 0 0 0.3em 0.55em;
+            background: var(--dune-border-strong);
+        }
 
     .entity-meta dd {
         margin: 0;
@@ -2387,7 +2865,8 @@ button.chip {
         }
 
 /* Narrow screens don't have room for a fixed label column, so the label sits above
-   its fact instead of beside it. */
+   its fact instead of beside it. Stacked like that a leader would run to nothing, so
+   it goes; the same for the results count and the trial's clue labels. */
 @media (max-width: 600px) {
     .entity-meta .meta-row {
         display: block;
@@ -2396,22 +2875,36 @@ button.chip {
     .entity-meta dt {
         margin-bottom: 0.15rem;
     }
+
+    .entity-meta dt::after,
+    .candidates > p::after,
+    .trial-clue-label::after {
+        display: none;
+    }
+
+    .related-role {
+        white-space: normal;
+    }
 }
 
+/* A record's own lines take the epigraph setting: hairlines above and below, italic,
+   at the deck measure. No hung mark, since these carry their own quotation marks.
+   The left bar means an excerpt elsewhere on the site, so it goes here. */
 .entity-quotes {
     margin-top: 1.25rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--dune-border);
+    padding: 1rem 1.25rem 0.9rem;
+    max-width: var(--measure-deck);
+    border-top: var(--rule-hair) solid var(--dune-border);
+    border-bottom: var(--rule-hair) solid var(--dune-border);
     display: grid;
-    gap: 0.75rem;
+    gap: 0.6rem;
 }
 
 .entity-quote {
     margin: 0;
-    padding-left: 0.9rem;
-    border-left: 3px solid var(--dune-accent);
     font-style: italic;
-    color: var(--dune-accent-bright);
+    line-height: 1.65;
+    color: var(--dune-text);
 }
 
 .connections-divider {
@@ -2444,14 +2937,16 @@ button.chip {
         transform: scaleX(-1);
     }
 
+/* Related records: groups headed by a name and a fading rule, rows left quiet. The
+   heading's flex and rule are set with the sayings source above. */
 .related-section {
-    margin-bottom: 1.25rem;
+    margin-bottom: var(--sp-5);
 }
 
     .related-section h3 {
-        font-size: 1rem;
+        font-size: var(--fs-h3);
         color: var(--dune-accent-bright);
-        margin-bottom: 0.4rem;
+        margin: 0 0 0.45rem;
     }
 
     .related-section ul {
@@ -2461,7 +2956,7 @@ button.chip {
     }
 
     .related-section li {
-        padding: 0.2rem 0;
+        padding: 0.25rem 0;
     }
 
 .muted {
@@ -2507,9 +3002,9 @@ button.chip {
         position: relative;
         text-decoration: none;
         color: var(--dune-text);
-        font-size: 0.925rem;
+        font-size: 0.975rem;
         padding: 0.2rem 0;
-        border-radius: 999px;
+        border-radius: var(--r-sharp);
         transition: color var(--dur-open) ease;
     }
 
@@ -2679,15 +3174,15 @@ button.chip {
 }
 
 /* The Index is the one nav item that opens instead of navigating, so unlike the
-   plain text links it gets a body: a quiet pill in the site's chip language that
+   plain text links it gets a body: a quiet tag in the site's control language that
    reads as a control at a glance. */
 .index-trigger {
     background: rgba(23, 19, 16, 0.45);
-    border: 1px solid var(--dune-border);
-    border-radius: 999px;
+    border: var(--rule-hair) solid var(--dune-border-strong);
+    border-radius: var(--r-sharp);
     cursor: pointer;
     font: inherit;
-    font-size: 0.925rem;
+    font-size: 0.975rem;
     color: var(--dune-text);
     display: inline-flex;
     align-items: center;
@@ -2733,8 +3228,8 @@ button.chip {
     background: rgba(36, 28, 22, 0.92);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
-    border: 1px solid var(--dune-border);
-    border-radius: 8px;
+    border: var(--rule-hair) solid var(--dune-border);
+    border-radius: var(--r-sharp);
     padding: 0.85rem 0.7rem 0.7rem;
     overflow: hidden;
     animation: index-open 0.22s ease;
@@ -2803,7 +3298,7 @@ button.chip {
     justify-content: center;
     gap: 0.45rem;
     padding: 0.42rem 0.55rem;
-    border-radius: 6px;
+    border-radius: var(--r-sharp);
     transition: color var(--dur-touch) ease, background var(--dur-touch) ease;
 }
 
@@ -2825,12 +3320,19 @@ button.chip {
     margin: 2rem 0;
 }
 
-/* About Dune is the site's one long-read page. On ordinary desktops its prose
-   fills the box like every other page; only on extra-wide monitors do the columns
-   stop growing, so the lines stay readable on a 27-inch display. */
+/* About is the key reading page and it reads wide: the essays fill the column edge
+   to edge, the way they did before the redesign. The prose measure stands down here
+   on purpose. Only past 1720px do the columns stop growing. */
+.about-hero .home-section,
+.about-hero .home-section p {
+    max-width: none;
+}
+
 @media (min-width: 1720px) {
     .about-hero .home-section {
         max-width: 60rem;
+        margin-left: auto;
+        margin-right: auto;
     }
 }
 
@@ -2840,44 +3342,52 @@ button.chip {
     max-width: 34rem;
     margin-top: 1.5rem;
 }
+    /* The heading's flex and fading rule are set with the sayings source. */
     .home-section h2 {
         color: var(--dune-accent-bright);
-        border-bottom: 1px solid var(--dune-border);
-        padding-bottom: 0.4rem;
         margin-bottom: 0.8rem;
     }
 
     .home-section p {
-        line-height: 1.6;
+        line-height: var(--lh-body);
+        max-width: var(--measure-prose);
     }
 
+/* Herbert's own words on About take the epigraph setting, three abreast: hairlines
+   above and below, italic, the source in letterspaced caps. No hung mark, since the
+   text carries its own quotation marks. */
 .quote-grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: 1.25rem 2rem;
 }
 
 .quote-card {
     display: block;
-    flex: 1 1 220px;
-    max-width: 320px;
-    background: rgba(36, 28, 22, 0.45);
-    border: 1px solid var(--dune-border);
-    border-radius: 6px;
-    padding: 1rem;
+    position: relative;
+    background: none;
+    border: 0;
+    border-top: var(--rule-hair) solid var(--dune-border);
+    border-bottom: var(--rule-hair) solid var(--dune-border);
+    border-radius: var(--r-sharp);
+    padding: 1.1rem 1rem 1rem 1.25rem;
     text-decoration: none;
     color: var(--dune-text);
 }
 
 .quote-text {
     font-style: italic;
+    line-height: 1.65;
     margin: 0 0 0.5rem;
 }
 
 .quote-author {
+    display: block;
+    text-align: right;
     color: var(--dune-muted);
-    font-size: 0.85rem;
+    font-size: var(--fs-label);
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
 }
 
 .cta {
@@ -2886,55 +3396,61 @@ button.chip {
 
 /* ---- Category browse ---- */
 
+/* ---- The catalog card ----
+   A thing you can open, listed as an object: the nine doors on Home, every record on
+   a browse page. Rock fill, one hairline, square, the name inscribed in Marcellus the
+   same way it is on the record's plate. A grid, so every row is the same width; the
+   nine doors make a square on a desktop. */
 .category-grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+    gap: var(--sp-4);
     margin-top: 1.25rem;
+}
+
+@media (min-width: 900px) {
+    .home-doors .category-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
 .category-tile {
     display: flex;
     flex-direction: column;
-    flex: 1 1 220px;
-    max-width: 320px;
     gap: 0.3rem;
     background: var(--dune-panel);
-    border: 1px solid var(--dune-border);
-    border-radius: 6px;
+    border: var(--rule-hair) solid var(--dune-border);
+    border-radius: var(--r-sharp);
     padding: 1rem;
     text-decoration: none;
     color: var(--dune-text);
     transition: border-color 0.3s ease, box-shadow 0.3s ease, transform var(--dur-open) ease;
 }
 
+    /* Hover: the frame lights and catches the spice once, the card lifts, the fill stays
+       opaque and the text stays light. The old spice wash turned the text dark and
+       measured under AA over the busiest gradient. */
     .category-tile:hover {
         transform: translateY(-2px);
         border-color: transparent;
         background:
-            linear-gradient(135deg, rgba(var(--dune-accent-rgb), 0.32), rgba(199, 107, 63, 0.2)) padding-box,
+            linear-gradient(#2e241b, #291f17) padding-box,
             var(--spice-border-gradient) border-box;
         background-size: 100% 100%, 300% 300%;
         box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35), 0 0 16px rgba(var(--dune-accent-rgb), 0.35);
         animation: spice-shimmer 1.4s ease-in-out;
     }
 
-        .category-tile:hover strong {
-            color: #2a1810;
-        }
-
-        .category-tile:hover .muted {
-            color: rgba(42, 24, 16, 0.85);
-        }
-
     .category-tile strong {
         color: var(--dune-accent-bright);
-        transition: color 0.3s ease;
+        font-family: var(--font-display);
+        font-weight: 400;
+        font-size: 1.125rem;
+        letter-spacing: 0.01em;
     }
 
     .category-tile .muted {
-        transition: color 0.3s ease;
+        font-size: var(--fs-small);
     }
 
 /* One pass of light along the rim, out and back, then done. I had it looping forever,
@@ -2998,7 +3514,7 @@ button.chip {
     top: 0.4rem;
     width: 14px;
     height: 14px;
-    border-radius: 50%;
+    border-radius: var(--r-dot);
     background: var(--dune-accent);
     box-shadow: 0 0 0 4px var(--dune-bg), 0 0 10px rgba(var(--dune-accent-rgb), 0.6);
     transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
@@ -3028,12 +3544,15 @@ button.chip {
         transform: scale(1.25);
     }
 
+/* An event is a catalog card too: square, one hairline, the same calm hover. Relative,
+   so its date can sit in the margin across the spine. */
 .timeline-card {
     display: inline-block;
+    position: relative;
     max-width: 100%;
-    background-color: rgba(36, 28, 22, 0.75);
-    border: 1px solid var(--dune-border);
-    border-radius: 8px;
+    background-color: var(--dune-panel);
+    border: var(--rule-hair) solid var(--dune-border);
+    border-radius: var(--r-sharp);
     padding: 1rem 1.25rem;
     text-decoration: none;
     color: var(--dune-text);
@@ -3046,7 +3565,7 @@ button.chip {
         transform: translateY(-2px);
         border-color: transparent;
         background:
-            linear-gradient(rgba(36, 28, 22, 0.75), rgba(36, 28, 22, 0.75)) padding-box,
+            linear-gradient(#2e241b, #291f17) padding-box,
             var(--spice-border-gradient) border-box;
         background-size: 100% 100%, 300% 300%;
         box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35), 0 0 16px rgba(var(--dune-accent-rgb), 0.35);
@@ -3057,46 +3576,93 @@ button.chip {
         margin: 0 0 0.4rem;
     }
 
+    .timeline-card .muted {
+        font-size: var(--fs-small);
+    }
+
 .timeline-era {
     display: block;
     color: var(--dune-accent-bright);
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     font-style: italic;
     margin-bottom: 0.3rem;
 }
 
-/* Era headers spanning the timeline spine. The solid pill background hides the
-   spine line passing behind it. */
+/* Era headers across the spine, set as dividers: caps between two hairlines that die
+   toward the edges. The solid ground behind the words hides the spine passing through. */
 .timeline-era-band {
     position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
     width: 100%;
     text-align: center;
     padding: 0.5rem 0 2rem;
 }
 
+    .timeline-era-band::before,
+    .timeline-era-band::after {
+        content: "";
+        flex: 1;
+        height: var(--rule-hair);
+    }
+
+    .timeline-era-band::before {
+        background: linear-gradient(to right, transparent, var(--dune-border) 15%);
+    }
+
+    .timeline-era-band::after {
+        background: linear-gradient(to right, var(--dune-border) 85%, transparent);
+    }
+
     .timeline-era-band span {
         display: inline-block;
-        padding: 0.35rem 1.2rem;
+        padding: 0.35rem 0.75rem;
         background: var(--dune-bg);
-        border: 1px solid var(--dune-accent);
-        border-radius: 999px;
         color: var(--dune-accent-bright);
         font-size: 0.85rem;
         text-transform: uppercase;
         letter-spacing: 0.12em;
     }
 
+/* The year. On a phone it is a small tag inside the card. Above that it sits in the
+   margin across the spine, level with the dot, so reading down gives year, spine,
+   event: a printed chronology. Body face, not Marcellus, whose numerals read 10156
+   as IOI56. */
 .timeline-date {
     display: inline-block;
     padding: 0.15rem 0.6rem;
     margin-bottom: 0.35rem;
     background: rgba(var(--dune-accent-rgb), 0.12);
-    border: 1px solid var(--dune-accent);
-    border-radius: 4px;
+    border: var(--rule-hair) solid var(--dune-accent);
+    border-radius: var(--r-sharp);
     color: var(--dune-accent-bright);
     font-size: 0.8rem;
     font-weight: 700;
     letter-spacing: 0.05em;
+}
+
+@media (min-width: 601px) {
+    .timeline-date {
+        position: absolute;
+        top: 0.7rem;
+        margin: 0;
+        padding: 0;
+        background: none;
+        border: 0;
+        font-size: 0.85rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .timeline-item.left .timeline-date {
+        left: calc(100% + 5rem);
+    }
+
+    .timeline-item.right .timeline-date {
+        right: calc(100% + 5rem);
+    }
 }
 
 .timeline-footnote {
@@ -3157,7 +3723,12 @@ button.chip {
         animation: none;
     }
 
+    /* The .left and .right selectors are named here on purpose: the @supports block
+       sets the scrub on them, and a plain .timeline-item loses to them, so the cards
+       kept scrubbing for readers who asked for still pages. */
     .timeline-item,
+    .timeline-item.left,
+    .timeline-item.right,
     .timeline-era-band {
         animation: none;
     }
@@ -3176,10 +3747,19 @@ button.chip {
     justify-content: center;
     align-items: center;
     text-align: center;
+    /* No plate rule and no art layer: the desert paints its own sky, so it keeps the
+       normal background size the plate turns off. */
+    border-top: 0;
+    background-size: auto;
     background-image:
         radial-gradient(ellipse 120% 55% at 50% 108%, rgba(var(--dune-accent-rgb), 0.13), transparent 65%),
         linear-gradient(rgba(23, 19, 16, 0.3), rgba(23, 19, 16, 0.75));
 }
+
+    .lost-desert::before,
+    .lost-desert::after {
+        display: none;
+    }
 
     .lost-desert .tagline {
         max-width: 34rem;
@@ -3206,7 +3786,7 @@ button.chip {
 
 @media (max-width: 600px) {
     .site-body {
-        padding: 1.25rem 1rem 2rem;
+        padding: var(--sp-5) var(--gutter) var(--sp-6);
     }
 
     .site-header {
@@ -3237,23 +3817,9 @@ button.chip {
         padding: 0.6rem 1rem;
     }
 
-    .hero {
-        padding: 1.25rem;
-    }
-
+    .hero,
     .search-hero {
-        padding: 1.75rem 1.25rem;
-        min-height: 60vh;
-    }
-
-        .search-hero h1 {
-            font-size: 2.2rem;
-        }
-
-    .category-tile,
-    .quote-card {
-        flex-basis: 100%;
-        max-width: 100%;
+        padding: var(--sp-5) 0 0;
     }
 
     .timeline::before {
@@ -3339,26 +3905,36 @@ button.chip {
     gap: 0.5rem;
 }
 
+/* A clue is a ledger line: the label runs a leader to its text, rows part on a
+   hairline. No box and no bar; the bar means quoted text elsewhere. */
 .trial-clue {
     display: flex;
     align-items: baseline;
     gap: 0.8rem;
-    padding: 0.6rem 0.8rem;
-    background: rgba(36, 28, 22, 0.72);
-    border: 1px solid var(--dune-border);
-    border-left: 3px solid var(--dune-accent);
-    border-radius: 4px;
+    padding: 0.6rem 0;
+    border-bottom: var(--rule-hair) solid var(--dune-border);
 }
 
 .trial-clue-label {
     flex: none;
-    width: 3.6rem;
-    color: var(--dune-muted);
-    font-size: 0.72rem;
+    display: flex;
+    align-items: baseline;
+    width: 5.5rem;
+    color: var(--dune-muted-lit);
+    font-size: var(--fs-label);
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: var(--track-label);
 }
+
+    .trial-clue-label::after {
+        content: "";
+        flex: 1;
+        min-width: 1em;
+        height: var(--rule-hair);
+        margin: 0 0 0.3em 0.5em;
+        background: var(--dune-border-strong);
+    }
 
 .trial-clue-text {
     line-height: 1.5;
@@ -3391,8 +3967,8 @@ button.chip {
     max-width: 34rem;
 }
 
-/* Guess history rows borrow the endpoint chip's anatomy: the category dot and tinted
-   left edge come from the connection-cat color, the verdict rides along as plain prose. */
+/* Guess history rows are ledger lines too: the category dot carries the color, the
+   verdict rides along as plain prose, a hairline parts the rows. */
 .trial-history {
     margin-top: 1.1rem;
     display: grid;
@@ -3404,18 +3980,14 @@ button.chip {
     align-items: baseline;
     flex-wrap: wrap;
     gap: 0.55rem;
-    padding: 0.5rem 0.8rem;
-    background: var(--dune-panel);
-    border: 1px solid var(--dune-border);
-    border-left: 3px solid currentColor;
-    border-radius: 4px;
+    padding: 0.5rem 0;
+    border-bottom: var(--rule-hair) solid var(--dune-border);
     animation: trial-clue-settle 0.3s ease-out backwards;
     animation-delay: calc(var(--i, 0) * 0.12s);
 }
 
     .trial-guess-row.is-correct {
-        border-color: var(--dune-accent);
-        box-shadow: 0 0 12px rgba(var(--dune-accent-rgb), 0.25);
+        border-bottom-color: var(--dune-accent);
     }
 
 .trial-guess-name {
@@ -3427,18 +3999,15 @@ button.chip {
     font-size: 0.85rem;
 }
 
-/* The end of the trial: the record laid open, tinted along the top edge by
-   category like the entity cards. It's the moon's sky too, relative for the
-   anchor and clipped so the moon stays hidden until it rises. */
+/* The end of the trial: the record laid open as a small plate, the heavy rule in its
+   drawer's color. It's the moon's sky too, relative for the anchor and clipped so the
+   moon stays hidden until it rises. */
 .trial-reveal {
     position: relative;
     overflow: clip;
     margin-top: 1.5rem;
-    padding: 1.1rem 1.25rem;
-    background: var(--dune-panel);
-    border: 1px solid var(--dune-border);
-    border-top: 2px solid var(--cat-color, var(--dune-border));
-    border-radius: 8px;
+    padding: 1.1rem 0;
+    border-top: var(--rule-heavy) solid var(--cat-color, var(--dune-accent));
     animation: trial-clue-settle 0.45s ease-out backwards;
     animation-delay: calc(var(--i, 0) * 0.12s);
 }
