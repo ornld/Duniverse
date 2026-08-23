@@ -18,8 +18,10 @@
     }
     else
     {
+        @* The label above is a plain span, so nothing tied it to this box. Reusing its text
+           names the input on every page that mounts a picker. *@
         <input @bind="query" @bind:event="oninput" @bind:after="UpdateSuggestions"
-               @onkeyup="HandleKeyUp" placeholder="@Placeholder" />
+               @onkeyup="HandleKeyUp" aria-label="@Label" placeholder="@Placeholder" />
 
         @if (suggestions.Count > 0)
         {

@@ -917,7 +917,11 @@ namespace Duniverse.Data.Seeders
                     Id = "char_BronsoOfIx",
                     Name = "Bronso of Ix",
                     ShortDescription = "A rival historian who challenged the official legend of Muad'Dib.",
-                    DetailedHistory = "Bronso of Ix grew up alongside Paul Atreides, close enough to watch the man behind the myth, and the jihad fought in Paul's name disillusioned him more with every year. He used his education and his standing to research and write a history of Muad'Dib's rule that broke sharply from the official line. His account cut against both the Qizarate's managed propaganda and Princess Irulan's gentler chronicles, weighing the jihad's devastation heavier than its religious justification. Publishing it was dangerous. The Qizarate held near-total authority over what could be said about Muad'Dib, and Bronso's willingness to defy that authority took real courage. What he left behind gave later generations something rare: a firsthand account written against the myth, not for it.",
+                    DetailedHistory = "Bronso of Ix grew up alongside Paul Atreides, close enough to watch the man behind the myth. He used his education and his standing to research and write a history of Paul's rule that broke sharply from the official line. Publishing it took real courage, and it cost him. What he left behind gave later generations something rare: a firsthand account written against the legend, not for it.",
+                    HistoryLayers = new List<HistorySegment>
+                    {
+                        new(SpoilerTier.DuneMessiah, "The holy war fought in Paul's name disillusioned Bronso more with every year. His account cut against both the Qizarate's managed propaganda and Princess Irulan's gentler chronicles, weighing the devastation heavier than the religious justification. The Qizarate held near-total authority over what could be said about Muad'Dib, and defying it was the dangerous part."),
+                    },
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_PaulAtreides", "char_PrincessIrulan", "theo_ChurchOfMuadDib", "org_Qizarate" },
                     Affiliation = "Ix",

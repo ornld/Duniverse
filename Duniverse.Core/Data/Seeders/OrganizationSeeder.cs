@@ -77,7 +77,11 @@ namespace Duniverse.Data.Seeders
                     Id = "org_Qizarate",
                     Name = "Qizarate",
                     ShortDescription = "The priesthood-bureaucracy running the Church of Muad'Dib's day-to-day affairs.",
-                    DetailedHistory = "The Qizarate started small, a lean administrative wing built to give Paul Atreides' new religion some structure once the jihad had run its course. It did not stay small. Within a few years the church had grown into a sprawling, deeply rooted bureaucracy with fingers in nearly every world under Atreides rule. Its priests, the Qizara, treated religious authority as a lever of governance. They read Muad'Dib's teachings in whatever way happened to grow their own power and fill their own coffers. Korba stands as the clearest case of how fast that zeal turned to rot. He bent the machinery of faith toward ambitions that had nothing to do with what Paul actually intended. Alia's regency found the Qizarate strong enough to stand toe to toe with the Great Houses themselves. A religion built for political convenience can grow well past the man who built it.",
+                    DetailedHistory = "The Qizarate started small, a lean administrative wing built to give Paul Atreides' new religion some structure once the jihad had run its course. It did not stay small. Within a few years the church had grown into a sprawling, deeply rooted bureaucracy with fingers in nearly every world under Atreides rule. Its priests, the Qizara, treated religious authority as a lever of governance. They read Muad'Dib's teachings in whatever way happened to grow their own power and fill their own coffers. Korba stands as the clearest case of how fast that zeal turned to rot. He bent the machinery of faith toward ambitions that had nothing to do with what Paul actually intended. A religion built for political convenience can grow well past the man who built it.",
+                    HistoryLayers = new List<HistorySegment>
+                    {
+                        new(SpoilerTier.ChildrenOfDune, "Alia's regency found the Qizarate strong enough to stand toe to toe with the Great Houses themselves. The church had become a power the throne answered to, rather than the other way about."),
+                    },
                     ImagePath = "images/organizations/qizarate.jpg",
                     RelatedEntityIds = new List<string> { "theo_ChurchOfMuadDib", "char_PaulAtreides", "char_Korba", "loc_Onn", "char_BronsoOfIx" },
                     Headquarters = "Arrakis",

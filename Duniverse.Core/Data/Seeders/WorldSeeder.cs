@@ -89,7 +89,9 @@ namespace Duniverse.Data.Seeders
                     ImagePath = "images/worlds/ix.jpg",
                     RelatedEntityIds = new List<string> { "house_Vernius", "theo_ButlerianDoctrine", "org_SpacingGuild" },
                     EnvironmentalData = "Underground cavern cities beneath a cold, unwelcoming surface.",
-                    RulingHouse = "House Vernius",
+                    // The prequels name the family and the layer above says so. At book one this
+                    // ledger row would hand a first-time reader a record that is still sealed.
+                    RulingHouse = "An Ixian noble house",
                     LocalCustoms = new List<string> { "Guild-like secrecy around technological research", "Closely guarded export contracts for manufactured machinery" }
                 },
                 new World

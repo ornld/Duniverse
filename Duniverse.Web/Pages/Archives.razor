@@ -12,7 +12,10 @@
     </p>
 
     <div class="search-box">
+        @* A placeholder is not a name: it vanishes on the first keystroke and screen readers
+           are not obliged to read it. The search box is the whole point of this page. *@
         <input @bind="query" @bind:event="oninput" @onkeyup="HandleKeyUp"
+               aria-label="Search the archive by name or ID"
                placeholder="Search a name or ID... e.g. Paul Atreides, Arrakis, Bene Gesserit" />
         <button @onclick="HandleSearch">Search</button>
     </div>

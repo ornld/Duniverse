@@ -67,7 +67,7 @@ namespace Duniverse.Data.Seeders
                     SortOrder = 80,
                     DateAG = "10193 AG",
                     Era = "The Rise of Muad'Dib",
-                    LastingImpact = "Overthrew Shaddam IV, installed Paul Atreides as Emperor, and began the Jihad of Muad'Dib"
+                    LastingImpact = "Overthrew Shaddam IV and installed Paul Atreides as Emperor of the Known Universe"
                 },
                 new HistoricalEvent
                 {
@@ -109,7 +109,7 @@ namespace Duniverse.Data.Seeders
                     SortOrder = 110,
                     DateAG = "c. 10205 AG",
                     Era = "The Atreides Empire",
-                    LastingImpact = "Blinded Paul Atreides and precipitated his eventual disappearance into the desert, paving the way for Alia's regency"
+                    LastingImpact = "Blinded Paul Atreides and precipitated his eventual disappearance into the desert, leaving his sister to rule in his place"
                 },
                 new HistoricalEvent
                 {

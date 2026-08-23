@@ -66,9 +66,14 @@ namespace Duniverse.Web.Services
                     var stored = JsonSerializer.Deserialize<StoredState>(raw);
                     if (stored is not null)
                     {
-                        Enabled = stored.Enabled;
-                        NovelProgress = stored.NovelProgress;
-                        IncludeExpandedUniverse = stored.IncludeExpandedUniverse;
+                        // Every fallback here seals rather than opens. A half-written value used
+                        // to read Enabled as false, which switched protection off and unsealed
+                        // the archive, and a progress outside the six novels let everything past.
+                        Enabled = stored.Enabled ?? true;
+                        NovelProgress = stored.NovelProgress is >= SpoilerTier.Dune and <= SpoilerTier.Chapterhouse
+                            ? stored.NovelProgress.Value
+                            : SpoilerTier.Dune;
+                        IncludeExpandedUniverse = stored.IncludeExpandedUniverse ?? false;
                         HasStoredChoice = true;
                     }
                 }
@@ -126,6 +131,8 @@ namespace Duniverse.Web.Services
         /// <summary>Whether the given entity should currently be shown to the reader.</summary>
         public bool IsVisible(DuneEntity entity) => IsVisible(entity.SpoilerTier);
 
-        private record StoredState(bool Enabled, SpoilerTier NovelProgress, bool IncludeExpandedUniverse);
+        // Nullable on purpose. A missing field has to stay distinguishable from false, or the
+        // read above cannot tell "nothing saved yet" from "the reader turned protection off".
+        private record StoredState(bool? Enabled, SpoilerTier? NovelProgress, bool? IncludeExpandedUniverse);
     }
 }

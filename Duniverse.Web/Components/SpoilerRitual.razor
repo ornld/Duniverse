@@ -9,9 +9,10 @@
 
 @if (ShouldShow)
 {
-    <div class="ritual-backdrop @(closing ? "closing" : "")" @onkeydown="HandleKeyDown">
+    <div class="ritual-backdrop @(closing ? "closing" : "")" @onkeydown="HandleKeyDown"
+         @onclick="DismissAsync">
         <div class="ritual-panel" role="dialog" aria-modal="true" aria-labelledby="ritual-title"
-             tabindex="-1" @ref="panel">
+             tabindex="-1" @ref="panel" @onclick:stopPropagation="true">
             <canvas class="ritual-sand" @ref="sandCanvas"></canvas>
 
             <h2 id="ritual-title">How deep into the saga have you read?</h2>
@@ -150,6 +151,17 @@
     private async Task HandleKeyDown(KeyboardEventArgs e)
     {
         if (e.Key == "Escape" && !closing)
+        {
+            await SkipAsync();
+        }
+    }
+
+    // Escape has always been the quiet way out, and a phone has no Escape key. A tap on the
+    // dark surround does the same job. The panel stops its own clicks here, and I am not
+    // putting the skip button back to solve this.
+    private async Task DismissAsync()
+    {
+        if (!closing)
         {
             await SkipAsync();
         }
