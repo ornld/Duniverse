@@ -1,9 +1,9 @@
-// The blowing sand in the Index dropdown. I size the canvas by devicePixelRatio and scale
+// Blowing sand for the Index dropdown. I size the canvas by devicePixelRatio and scale
 // grain speed and size by it, so grains stay sharp on retina. The loop quits when Blazor
-// drops the panel. Reduced motion skips it.
+// drops the panel. I ignore reduced motion on purpose.
 window.duneNav = {
     sandSettle: function (canvas) {
-        if (!canvas || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        if (!canvas) {
             return;
         }
 
@@ -139,7 +139,7 @@ window.duneNav = {
             stop: function () { }
         };
 
-        if (!canvas || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        if (!canvas) {
             return inert;
         }
         if (typeof Worker !== "function" || typeof canvas.transferControlToOffscreen !== "function") {

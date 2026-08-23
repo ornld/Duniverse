@@ -219,7 +219,8 @@
 
         // ---- The boot storm ------------------------------------------------------------
         // Sand drifts as the runtime downloads, thickens as it lands, breaks once the app is
-        // up. Full run on a first visit, otherwise just enough to cover a real wait.
+        // up. Full run on a first visit, otherwise just enough to cover a real wait. I run it
+        // under reduced motion too, by choice.
         const STORM_KEY = 'duniverse.storm.v1';
         const bootScreen = document.getElementById('boot-screen');
         const bootBegan = performance.now();
@@ -232,13 +233,12 @@
             // ceremony is the harmless direction; erring away from it hides the feature.
         }
 
-        const wantsCalm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         const inertStorm = {
             setIntensity: function () { },
             clear: function () { return Promise.resolve(); },
             stop: function () { }
         };
-        const storm = (!wantsCalm && window.duneNav && window.duneNav.sandStorm)
+        const storm = (window.duneNav && window.duneNav.sandStorm)
             ? window.duneNav.sandStorm(document.getElementById('boot-sand'))
             : inertStorm;
 
@@ -251,9 +251,7 @@
             return Number.isFinite(n) ? n / 100 : 0;
         }
 
-        const stormPump = wantsCalm
-            ? 0
-            : setInterval(function () { storm.setIntensity(loadFraction()); }, 100);
+        const stormPump = setInterval(function () { storm.setIntensity(loadFraction()); }, 100);
 
         let bootScreenDown = false;
         function takeDownBootScreen() {
@@ -333,7 +331,7 @@
             // A first visit is worth a moment even on a fast connection. A return visit is
             // not, so the floor drops to nothing and the storm only ever covers a real wait.
             const held = performance.now() - bootBegan;
-            const floor = (firstEver && !wantsCalm) ? 2000 : 0;
+            const floor = firstEver ? 2000 : 0;
             if (held < floor) {
                 await new Promise(function (r) { setTimeout(r, floor - held); });
             }
