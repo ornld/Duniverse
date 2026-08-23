@@ -327,6 +327,13 @@ a {
         color: var(--dune-accent-bright);
     }
 
+/* Fields and keys don't inherit the page font; the browser hands them its own, so a
+   Mac showed one face and Windows another. Family only: each control keeps the size
+   it sets for itself. */
+input, button, select, textarea {
+    font-family: inherit;
+}
+
 /* Keyboard focus gets a spice-gold ring. The browser default is a blue outline,
    and blue is saved for the Eyes of Ibad on the active tab. Inputs with their own
    focus look (search boxes, pickers) override this locally. */
@@ -824,6 +831,9 @@ html {
         border: none;
         border-radius: var(--r-sharp);
         color: var(--dune-ink);
+        /* Same size as the field's text, so field and key read as one instrument. The
+           browser's default left the key a size smaller than its own field. */
+        font-size: 1rem;
         font-weight: 600;
         letter-spacing: 0.03em;
         cursor: pointer;
@@ -933,7 +943,9 @@ html {
 @media (min-width: 900px) {
     .spoiler-options {
         grid-template-columns: auto 1fr auto;
-        align-items: baseline;
+        /* The books and the Expanded Universe box stand the same height now, so I center
+           the row rather than chase baselines through a checkbox. */
+        align-items: center;
         column-gap: 1.25rem;
     }
 
@@ -995,16 +1007,38 @@ html {
         font-weight: 600;
     }
 
+/* I frame this like a book chip: same padding, hairline, panel fill and sans at the
+   same size. The checkbox stays inside so it still reads as a yes or no, not a
+   seventh book. */
 .spoiler-eu {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    padding: 0.35rem 0.8rem;
+    background: var(--dune-panel);
+    border: var(--rule-hair) solid var(--dune-border-strong);
+    border-radius: var(--r-sharp);
     cursor: pointer;
     color: var(--dune-text);
     font-size: 0.9rem;
+    /* The chips run on normal too, so the two boxes come out the same height. */
+    line-height: normal;
+    /* Stacked on a small screen the grid would stretch this into a bar. A chip hugs its
+       words, so this does too. */
+    justify-self: start;
+    transition: border-color var(--dur-touch) ease;
 }
 
+    .spoiler-eu:hover {
+        border-color: var(--dune-accent);
+    }
+
     .spoiler-eu input {
+        /* I size it like the Hide spoilers box above; the browser's default came out a
+           size smaller. */
+        width: 1.05rem;
+        height: 1.05rem;
+        margin: 0;
         accent-color: var(--dune-accent);
         cursor: pointer;
     }
