@@ -1,6 +1,7 @@
 @inherits LayoutComponentBase
 @inject SpoilerSettings Spoiler
 @inject NavigationManager Nav
+@inject IJSRuntime JS
 
 <div class="page">
     @* The running head. A rule crosses to a register naming which part of the volume
@@ -126,6 +127,29 @@
     protected override async Task OnInitializedAsync()
     {
         await Spoiler.LoadAsync();
+    }
+
+    private bool announced;
+
+    // Blazor resolves start() before Main runs, so the boot screen can't tell a booted
+    // runtime from a rendered page. I tell it here, once the body is on screen, and the
+    // storm lifts onto a page that is there.
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (announced || !Spoiler.Loaded)
+        {
+            return;
+        }
+
+        announced = true;
+        try
+        {
+            await JS.InvokeVoidAsync("duneBoot.ready");
+        }
+        catch
+        {
+            // No boot screen listening (a host page without the hook). Its own timer lifts it.
+        }
     }
 
     private void OnRitualApplied()

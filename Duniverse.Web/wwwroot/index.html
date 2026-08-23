@@ -204,6 +204,19 @@
             }
         }
 
+        // ---- The page's own all-clear --------------------------------------------------
+        // Blazor resolves start() when it calls Main, before the registry seeds and the first
+        // page renders. The app tells me when the body is truly on screen, so the storm breaks
+        // onto a page that is there.
+        let pageReady;
+        const pageRendered = new Promise(function (resolve) { pageReady = resolve; });
+        window.duneBoot = {
+            ready: function () {
+                performance.mark('duniverse.page-ready');
+                pageReady();
+            }
+        };
+
         // ---- The boot storm ------------------------------------------------------------
         // Sand drifts as the runtime downloads, thickens as it lands, breaks once the app is
         // up. Full run on a first visit, otherwise just enough to cover a real wait.
@@ -253,6 +266,8 @@
             if (bootScreen && bootScreen.parentNode) {
                 bootScreen.parentNode.removeChild(bootScreen);
             }
+            // Marks for the Performance panel, so I can read the boot's beats after the fact.
+            performance.mark('duniverse.boot-lifted');
         }
 
         // The guarantee. Whatever else happens above, the screen comes down. Twenty seconds
@@ -305,6 +320,15 @@
                 // A reader whose storage is closed sees the full storm every time. That is a
                 // worse outcome than remembering, and still a working site.
             }
+
+            // The runtime is up; the page may not be. Held for the app's all-clear, capped so a
+            // page that never reports (a thrown Main, say) still gets its lift. The twenty-second
+            // timer stays the last word.
+            performance.mark('duniverse.runtime-started');
+            await Promise.race([
+                pageRendered,
+                new Promise(function (r) { setTimeout(r, 10000); })
+            ]);
 
             // A first visit is worth a moment even on a fast connection. A return visit is
             // not, so the floor drops to nothing and the storm only ever covers a real wait.
