@@ -2868,9 +2868,9 @@ button.chip {
     line-height: 1.08;
 }
 
-/* The deck, and the prose under it at a reading measure. */
- /* No measure on the record's own text: an entry reads wide, like About and the
-   Terminology, by the owner's standing ruling. */
+/* The deck runs free. The record's own text takes the prose measure now: it ran the
+   whole column before, 172 characters a line at 1440, and that is too far to read.
+   About and the Terminology still read wide. */
 .short-desc {
     color: var(--dune-accent-bright);
     font-style: italic;
@@ -2879,6 +2879,7 @@ button.chip {
 
 .detailed-history {
     line-height: var(--lh-body);
+    max-width: var(--measure-prose);
 }
 
 .rivalries {

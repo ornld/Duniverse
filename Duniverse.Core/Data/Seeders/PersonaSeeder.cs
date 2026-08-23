@@ -33,7 +33,11 @@ namespace Duniverse.Data.Seeders
                     // revelation in its own right and is deliberately not listed here.
                     Aliases = new List<string> { "Muad'Dib", "Usul", "Lisan al-Gaib", "Kwisatz Haderach" },
                     ShortDescription = "The prophesied Kwisatz Haderach who became Emperor of the Known Universe.",
-                    DetailedHistory = "Paul was the son of Duke Leto Atreides and Lady Jessica, who trained him in secret in the Bene Gesserit arts. On the surface he was a Great House heir. Underneath, he was a boy drilled in Mentat logic, sword work, and the Sisterhood's harsh mental discipline. House Atreides fell within weeks of taking Arrakis. The Harkonnens and Sardaukar struck together, and Paul and his mother fled into the deep desert. The Fremen took them in. Skill, prescience, and a prophecy planted generations before his birth carried him up through their ranks until he led them as Muad'Dib. He took Arrakeen, broke Emperor Shaddam IV, and claimed the Golden Lion Throne. But the jihad fought in his name spread across the galaxy and swallowed billions of lives. He saw the slaughter coming and could never quite stop it. He was the Kwisatz Haderach the Bene Gesserit had bred toward for generations. He was the first mind able to hold both male and female ancestral memory, and to see further than any prescient being before him. That gift made him the most powerful man in the Imperium. It made him its prisoner too. In the end he chose the desert and exile over ruling as the mask for a faith that had slipped from his hands.",
+                    DetailedHistory = "Paul was the son of Duke Leto Atreides and Lady Jessica, who trained him in secret in the Bene Gesserit arts. On the surface he was a Great House heir. Underneath, he was a boy drilled in Mentat logic, sword work, and the Sisterhood's harsh mental discipline. House Atreides fell within weeks of taking Arrakis. The Harkonnens and Sardaukar struck together, and Paul and his mother fled into the deep desert. The Fremen took them in. Skill, prescience, and a prophecy planted generations before his birth carried him up through their ranks until he led them as Muad'Dib. He took Arrakeen, broke Emperor Shaddam IV, and claimed the Golden Lion Throne. He was the Kwisatz Haderach the Bene Gesserit had bred toward for generations. He was the first mind able to hold both male and female ancestral memory, and to see further than any prescient being before him. That gift made him the most powerful man in the Imperium. It made him its prisoner too. From his first visions in the desert he saw a holy war fought in his name. He searched every future he could reach for a path around it and found none.",
+                    HistoryLayers = new List<HistorySegment>
+                    {
+                        new(SpoilerTier.DuneMessiah, "The jihad he had seen coming came anyway. Fought in his name, it spread across the galaxy and swallowed billions of lives, and he could never quite stop it. In the end he chose the desert and exile over ruling as the mask for a faith that had slipped from his hands."),
+                    },
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_LadyJessica", "char_DukeLetoAtreides", "char_Chani", "char_Stilgar", "char_GurneyHalleck", "char_ThufirHawat", "char_DuncanIdaho", "char_AliaAtreides", "char_PrincessIrulan", "char_FeydRautha", "char_HasimirFenring" },
                     Affiliation = "House Atreides",
@@ -205,7 +209,11 @@ namespace Duniverse.Data.Seeders
                     Id = "char_ShaddamIV",
                     Name = "Shaddam IV",
                     ShortDescription = "The 81st Padishah Emperor of House Corrino.",
-                    DetailedHistory = "Shaddam IV was the 81st Padishah Emperor of House Corrino. He came to the throne after quietly arranging the death of his own father, Elrood IX. He ruled with growing anxiety over any Great House whose popularity or military strength might threaten Corrino supremacy. He feared Duke Leto Atreides' rising influence and formidable fighting corps. So he conspired in secret with Baron Harkonnen to destroy House Atreides once it took the Arrakis fief. He deployed his elite Sardaukar troops disguised as Harkonnen reinforcements, in direct violation of the Great Convention. The gambit backfired badly. Paul Atreides, the very heir he had tried to eliminate, survived to lead a Fremen army. That army shattered his supposedly invincible legions and toppled him from the Golden Lion Throne. Deposed and exiled to the harsh prison world of Salusa Secundus, Shaddam lived out his years as a humbled reminder. Ten thousand years of unbroken Corrino rule could end in a single, badly miscalculated betrayal.",
+                    DetailedHistory = "Shaddam IV was the 81st Padishah Emperor of House Corrino. He succeeded his father, Elrood IX. He ruled with growing anxiety over any Great House whose popularity or military strength might threaten Corrino supremacy. He feared Duke Leto Atreides' rising influence and formidable fighting corps. So he conspired in secret with Baron Harkonnen to destroy House Atreides once it took the Arrakis fief. He deployed his elite Sardaukar troops disguised as Harkonnen reinforcements, in direct violation of the Great Convention. The gambit backfired badly. Paul Atreides, the very heir he had tried to eliminate, survived to lead a Fremen army. That army shattered his supposedly invincible legions and toppled him from the Golden Lion Throne. Deposed and exiled to the harsh prison world of Salusa Secundus, Shaddam lived out his years as a humbled reminder. Ten thousand years of unbroken Corrino rule could end in a single, badly miscalculated betrayal.",
+                    HistoryLayers = new List<HistorySegment>
+                    {
+                        new(SpoilerTier.ExpandedUniverse, "The prequel chronicles add that he did not wait for the throne to come to him. In those accounts Shaddam had his father poisoned, with Hasimir Fenring's quiet help, and took the seat years before nature would have handed it over. The Imperium he gained early was the one he then spent his whole reign afraid of losing."),
+                    },
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_PrincessIrulan", "char_BaronHarkonnen", "char_PaulAtreides", "char_FaradnCorrino", "char_HasimirFenring", "char_ElroodIX" },
                     Affiliation = "House Corrino",
@@ -237,7 +245,11 @@ namespace Duniverse.Data.Seeders
                     Id = "char_GaiusHelenMohiam",
                     Name = "Gaius Helen Mohiam",
                     ShortDescription = "Bene Gesserit Reverend Mother and Imperial Truthsayer.",
-                    DetailedHistory = "Gaius Helen Mohiam was a senior Bene Gesserit Reverend Mother and the Emperor's own Imperial Truthsayer. She administered the harrowing gom jabbar test to young Paul Atreides at Castle Caladan. It was one of the pivotal early moments that confirmed his extraordinary potential to the Sisterhood. As a key architect and enforcer of the breeding program, she maneuvered constantly across the Imperium's political landscape to protect the Sisterhood's plans. She had served as Lady Jessica's proctor herself. Her ambitions and manipulations ran well into Paul's reign as Emperor, when she became entangled in the conspiracy chronicled in Dune Messiah that sought to destabilize his rule. Mohiam's long career of cold, calculated service ended when Stilgar executed her after that plot was exposed. It was a stark end for one of the Bene Gesserit's most formidable operatives.",
+                    DetailedHistory = "Gaius Helen Mohiam was a senior Bene Gesserit Reverend Mother and the Emperor's own Imperial Truthsayer. She administered the harrowing gom jabbar test to young Paul Atreides at Castle Caladan. It was one of the pivotal early moments that confirmed his extraordinary potential to the Sisterhood. As a key architect and enforcer of the breeding program, she maneuvered constantly across the Imperium's political landscape to protect the Sisterhood's plans. She had served as Lady Jessica's proctor herself. She stood with the Emperor's party at Arrakeen when Paul took the throne. The Kwisatz Haderach her order had bred toward over so many generations had come one generation early, and he answered to nobody in the Sisterhood.",
+                    HistoryLayers = new List<HistorySegment>
+                    {
+                        new(SpoilerTier.DuneMessiah, "Her ambitions and manipulations ran well into Paul's reign as Emperor, when she became entangled in the conspiracy that sought to destabilize his rule. Mohiam's long career of cold, calculated service ended when Stilgar executed her after that plot was exposed. It was a stark end for one of the Bene Gesserit's most formidable operatives."),
+                    },
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_LadyJessica", "char_PaulAtreides", "char_Stilgar", "char_PrincessIrulan" },
                     Affiliation = "Bene Gesserit",
@@ -336,14 +348,21 @@ namespace Duniverse.Data.Seeders
                 {
                     Id = "char_Korba",
                     Name = "Korba",
-                    ShortDescription = "Former Fedaykin who became a high priest of the Qizarate.",
-                    DetailedHistory = "Korba was once a devoted Fedaykin who fought at Paul's side during the desert years. He rose within the Qizarate as Paul's religion hardened into a sprawling bureaucratic empire. He traded the simplicity of desert loyalty for the ambition and intrigue of religious administration. In time he decided that Paul's death as a martyr would serve the faith, and his own position within it, better than Paul's continued rule. So he became entangled in a plot to assassinate the Emperor he had once served without question. His scheme was exposed before it could succeed. It revealed how far the religious machinery built around Muad'Dib had already begun to outgrow, and even threaten, the man it was meant to honor. Korba's execution was a pointed reminder. The Qizarate's growing power made it as dangerous to Paul as any foreign enemy.",
+                    ShortDescription = "A Fremen Fedaykin who fought at Paul's side through the desert war.",
+                    DetailedHistory = "Korba was a devoted Fedaykin who fought at Paul's side during the desert years. He belonged to the death commandos who swore their lives to Muad'Dib and carried the Fremen war from the sietches to the walls of Arrakeen. Loyalty of that kind asks no questions, and in the desert none needed asking.",
+                    HistoryLayers = new List<HistorySegment>
+                    {
+                        new(SpoilerTier.DuneMessiah, "He rose within the Qizarate, Korba the Panegyrist now, as Paul's religion hardened into a sprawling bureaucratic empire. He traded the simplicity of desert loyalty for the ambition and intrigue of religious administration. In time he decided that Paul's death as a martyr would serve the faith, and his own position within it, better than Paul's continued rule. So he became entangled in a plot to assassinate the Emperor he had once served without question. His scheme was exposed before it could succeed. It revealed how far the religious machinery built around Muad'Dib had already begun to outgrow, and even threaten, the man it was meant to honor. Korba's execution was a pointed reminder. The Qizarate's growing power made it as dangerous to Paul as any foreign enemy."),
+                    },
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_PaulAtreides", "char_Stilgar" },
-                    Affiliation = "Qizarate",
+                    // I keep this line at Fremen, since a first-book reader sees it. The Qizarate is
+                    // Messiah and its record is sealed; the roster id below and the layer above carry
+                    // it for anyone who has read that far.
+                    Affiliation = "Fremen",
                     // A Fremen Fedaykin long before he was a priest, and he never stopped being one.
                     AffiliationIds = new List<string> { "org_Qizarate", "org_Fremen" },
-                    Role = "Panegyrist",
+                    Role = "Fedaykin",
                     NotableQuotes = new List<string>()
                 },
                 new Persona
@@ -351,7 +370,11 @@ namespace Duniverse.Data.Seeders
                     Id = "char_Otheym",
                     Name = "Otheym",
                     ShortDescription = "A trusted Fremen Fedaykin.",
-                    DetailedHistory = "Otheym was a trusted Fremen Fedaykin who served Paul faithfully through the desert years and the jihad that followed. He embodied the fierce loyalty that bound Paul's original desert companions to him long after his rise to Emperor. In the events chronicled in Dune Messiah, Otheym contracted a debilitating disease the Tleilaxu had engineered on purpose, part of the wider conspiracy against Paul's rule. His suffering was meant as one more pressure point against the Emperor he served. His health was failing fast. Even so, Otheym still passed Paul crucial information through his Tleilaxu-conditioned dwarf, Bijaz, whose coded riddles helped expose key parts of the plot. He endured suffering and betrayal from his own body to help uncover the conspiracy. It showed how deep the devotion of Paul's original Fremen companions ran, even as his empire grew more perilous.",
+                    DetailedHistory = "Otheym was a trusted Fremen Fedaykin who served Paul faithfully through the desert years. He had pledged his life to Muad'Dib with the rest of the death commandos, and he embodied the fierce loyalty that bound Paul's original desert companions to him. That loyalty carried the Fremen from the deep sietches to the taking of Arrakeen.",
+                    HistoryLayers = new List<HistorySegment>
+                    {
+                        new(SpoilerTier.DuneMessiah, "The devotion outlasted the war and held long after Paul's rise to Emperor. In the years of the jihad, Otheym contracted a debilitating disease the Tleilaxu had engineered on purpose, part of the wider conspiracy against Paul's rule. His suffering was meant as one more pressure point against the Emperor he served. His health was failing fast. Even so, Otheym still passed Paul crucial information through his Tleilaxu-conditioned dwarf, Bijaz, whose coded riddles helped expose key parts of the plot. He endured suffering and betrayal from his own body to help uncover the conspiracy. It showed how deep the devotion of Paul's original Fremen companions ran, even as his empire grew more perilous."),
+                    },
                     ImagePath = "",
                     RelatedEntityIds = new List<string> { "char_Stilgar", "char_PaulAtreides" },
                     Affiliation = "Fremen",
