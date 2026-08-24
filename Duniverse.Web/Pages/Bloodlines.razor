@@ -25,6 +25,11 @@
     @if (placed.Count > 0)
     {
         <div class="bloodline-wrapper">
+            @* A focusable well, since a region that scrolls has to answer the arrow keys
+               too. The frame stays on the wrapper outside it, so the hairline holds still
+               as the chart moves. *@
+            <div class="bloodline-scroll" tabindex="0" role="group"
+                 aria-label="Bloodline chart, scrolls sideways">
             <svg class="bloodline-chart" viewBox="0 0 @W @((int)chartHeight)" preserveAspectRatio="xMidYMid meet">
                 @* Every element carries its generation's row index (--row), and I stagger
                    the entrance by it in CSS. Solid lines draw themselves in, since
@@ -76,7 +81,10 @@
                     }
                 </g>
             </svg>
+            </div>
         </div>
+
+        <p class="bloodline-scroll-hint muted">Drag the chart sideways to follow a line.</p>
 
         <p class="bloodline-note muted">
             The chart honors your spoiler settings. Set your reading progress on the

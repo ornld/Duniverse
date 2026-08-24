@@ -1376,9 +1376,33 @@ html {
     pointer-events: none;
 }
 
+/* The chart is a thousand units wide and short. Squeezed onto a phone it drew the names
+   at four pixels, so it holds its own width and the well scrolls sideways instead. */
+.bloodline-scroll {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+}
+
 .bloodline-chart {
     width: 100%;
     height: auto;
+    /* 62.5rem matches the 1000-unit viewBox, so the chart never draws below its natural
+       size. In rem, so a reader who scales their text scales the chart with it. */
+    min-width: 62.5rem;
+}
+
+/* The sideways hint only earns its place where the well actually overflows. */
+.bloodline-scroll-hint {
+    display: none;
+}
+
+@media (max-width: 68rem) {
+    .bloodline-scroll-hint {
+        display: block;
+        margin-top: 0.75rem;
+        font-size: var(--fs-small);
+        text-align: center;
+    }
 }
 
 .bloodline-bands line {
