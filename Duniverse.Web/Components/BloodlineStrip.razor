@@ -1,0 +1,257 @@
+@inject EntityRegistry Registry
+@inject SpoilerSettings Spoiler
+@inject NavigationManager Nav
+
+@* Three generations around one person, in the chart's own language. The full chart sits on
+   its own page and most readers never go looking, so the record carries a piece of it. *@
+
+@if (rows.Count > 1)
+{
+    <div class="entity-card roster-card dossier-item" style="--i: 1">
+        <div class="related-section">
+            <h3>In the bloodline</h3>
+
+            @* role="img" with a written description, the same call the constellation makes.
+               Every person drawn here is a link in the connections below as well. *@
+            <svg class="bloodline-strip" viewBox="0 0 @Width @Height"
+                 style="max-width: @Cap" preserveAspectRatio="xMidYMid meet"
+                 role="img" aria-label="@Description">
+                <g class="bloodline-edges">
+                    @foreach (var edge in edges)
+                    {
+                        <path d="@edge.Path" class="@(edge.Dashed ? "dashed" : "draw")"
+                              pathLength="@(edge.Dashed ? null : "1")" style="--row: @edge.Row">
+                            @if (edge.Label is not null)
+                            {
+                                <title>@edge.Label</title>
+                            }
+                        </path>
+                    }
+                </g>
+                <g class="bloodline-nodes">
+                    @foreach (var person in drawn)
+                    {
+                        <g class="bloodline-node lineage-@person.Fill @(person.Ring is not null ? $"ring-{person.Ring}" : "") @(person.IsSelf ? "is-self" : null)"
+                           transform="translate(@person.X.ToString(Inv), @person.Y.ToString(Inv))"
+                           style="--row: @person.Row"
+                           @onclick="() => GoTo(person.Id)">
+                            <circle r="11" />
+                            <text y="26">@person.Name</text>
+                            <title>@person.Name: @person.Description</title>
+                        </g>
+                    }
+                </g>
+            </svg>
+
+            <p class="bloodline-strip-more">
+                <a href="@($"/bloodlines?focus={CenterId}")">See the whole chart</a>
+            </p>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public string CenterId { get; set; } = "";
+
+    private static readonly System.Globalization.CultureInfo Inv =
+        System.Globalization.CultureInfo.InvariantCulture;
+
+    // A column is wide enough for a long name at this size, and a row leaves room for the
+    // name under the circle. The strip stays near 1:1 by capping its own rendered width.
+    private const double ColumnWidth = 150;
+    private const double RowHeight = 88;
+    private const double TopPad = 26;
+
+    private sealed record Person(string Id, string Name, string Description, string Fill,
+        string? Ring, bool IsSelf)
+    {
+        public double X { get; set; }
+        public double Y { get; set; }
+        public int Row { get; set; }
+    }
+
+    private sealed record Edge(string Path, string? Label, bool Dashed, int Row);
+
+    private List<List<Person>> rows = new();
+    private List<Person> drawn = new();
+    private List<Edge> edges = new();
+
+    private double Width => Math.Max(2, rows.Count == 0 ? 2 : rows.Max(row => row.Count)) * ColumnWidth;
+    private double Height => TopPad + Math.Max(0, rows.Count - 1) * RowHeight + 44;
+
+    // Rendered at its drawn size, so the names hold the size the chart page gives them
+    // instead of stretching across a wide card or shrinking into a narrow one.
+    private string Cap => $"{(Width / 16.0).ToString("0.##", Inv)}rem";
+
+    private string Description =>
+        $"A bloodline strip of {drawn.Count} people around {SelfName}. The connections below reach every person drawn here.";
+
+    private string SelfName => drawn.FirstOrDefault(person => person.IsSelf)?.Name ?? "this record";
+
+    protected override void OnParametersSet()
+    {
+        Build();
+    }
+
+    private void Build()
+    {
+        rows = new List<List<Person>>();
+        drawn = new List<Person>();
+        edges = new List<Edge>();
+
+        var self = Look(CenterId);
+        if (self is null)
+        {
+            return;
+        }
+
+        // Both ends of a line have to be visible. A parent held back for spoilers takes the
+        // line with them, the way the full chart does, since a dangling line gives it away.
+        var parentIds = BloodlineMap.Descents
+            .Where(descent => Same(descent.ChildId, CenterId))
+            .SelectMany(descent => new[] { descent.ParentAId, descent.ParentBId })
+            .OfType<string>()
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        var partnerIds = BloodlineMap.Unions
+            .Where(union => Spoiler.IsVisible(union.Tier)
+                && (Same(union.PartnerAId, CenterId) || Same(union.PartnerBId, CenterId)))
+            .Select(union => Same(union.PartnerAId, CenterId) ? union.PartnerBId : union.PartnerAId)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        var childIds = BloodlineMap.Descents
+            .Where(descent => Same(descent.ParentAId, CenterId) || Same(descent.ParentBId, CenterId))
+            .Select(descent => descent.ChildId)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        var parents = parentIds.Select(Look).OfType<Person>().ToList();
+        var partners = partnerIds.Select(Look).OfType<Person>().ToList();
+        var children = childIds.Select(Look).OfType<Person>().ToList();
+
+        if (parents.Count > 0)
+        {
+            rows.Add(parents);
+        }
+
+        // The record sits in the middle of its own row with partners to either side. Put it on
+        // the end instead and the line out to a second partner cuts straight through the first.
+        int before = partners.Count / 2;
+        var middle = partners.Take(before)
+            .Append(self)
+            .Concat(partners.Skip(before))
+            .ToList();
+
+        rows.Add(middle);
+
+        if (children.Count > 0)
+        {
+            rows.Add(children);
+        }
+
+        // One row and nobody else on it means a person the chart holds but nothing joins.
+        // Drawing a lone dot under a heading says less than leaving the section out.
+        if (rows.Count == 1 && middle.Count == 1)
+        {
+            rows = new List<List<Person>>();
+            return;
+        }
+
+        Place();
+        Connect(self, parents, partners, children);
+    }
+
+    private void Place()
+    {
+        for (int index = 0; index < rows.Count; index++)
+        {
+            var row = rows[index];
+            double y = TopPad + index * RowHeight;
+
+            for (int slot = 0; slot < row.Count; slot++)
+            {
+                row[slot].X = Width / 2 + (slot - (row.Count - 1) / 2.0) * ColumnWidth;
+                row[slot].Y = y;
+                row[slot].Row = index;
+                drawn.Add(row[slot]);
+            }
+        }
+    }
+
+    private void Connect(Person self, List<Person> parents, List<Person> partners, List<Person> children)
+    {
+        foreach (var partner in partners)
+        {
+            var union = BloodlineMap.Unions.First(candidate =>
+                (Same(candidate.PartnerAId, self.Id) && Same(candidate.PartnerBId, partner.Id))
+                || (Same(candidate.PartnerBId, self.Id) && Same(candidate.PartnerAId, partner.Id)));
+
+            edges.Add(new Edge(
+                $"M {N(self.X)} {N(self.Y)} H {N(partner.X)}",
+                union.Label, union.Dashed, self.Row));
+        }
+
+        if (parents.Count > 0)
+        {
+            var descent = BloodlineMap.Descents.First(candidate => Same(candidate.ChildId, self.Id));
+            edges.Add(new Edge(Elbow(parents.Average(parent => parent.X), parents[0].Y, self.X, self.Y),
+                descent.Label, descent.Dashed, self.Row));
+        }
+
+        foreach (var child in children)
+        {
+            var descent = BloodlineMap.Descents.First(candidate => Same(candidate.ChildId, child.Id)
+                && (Same(candidate.ParentAId, self.Id) || Same(candidate.ParentBId, self.Id)));
+
+            // A child of both partners drops from between them, not off one shoulder.
+            var fromIds = new[] { descent.ParentAId, descent.ParentBId }.OfType<string>();
+            var from = new[] { self }.Concat(partners)
+                .Where(person => fromIds.Contains(person.Id, StringComparer.OrdinalIgnoreCase))
+                .ToList();
+
+            edges.Add(new Edge(Elbow(from.Average(person => person.X), self.Y, child.X, child.Y),
+                descent.Label, descent.Dashed, child.Row));
+        }
+    }
+
+    // A drop, a run across, then a drop into the child, so the strip reads as the same
+    // drawing as the chart page rather than a spray of diagonals.
+    private static string Elbow(double x1, double y1, double x2, double y2)
+    {
+        double middle = (y1 + y2) / 2;
+        return $"M {N(x1)} {N(y1)} V {N(middle)} H {N(x2)} V {N(y2)}";
+    }
+
+    private static string N(double value) => value.ToString("0.##", Inv);
+
+    private static bool Same(string? left, string? right) =>
+        string.Equals(left, right, StringComparison.OrdinalIgnoreCase);
+
+    // The chart's own test, kept identical here: the person has to stand in the map, and both
+    // the record and the node's own tier have to be open to this reader.
+    private Person? Look(string id)
+    {
+        var node = BloodlineMap.Nodes.FirstOrDefault(candidate => Same(candidate.EntityId, id));
+        if (node is null)
+        {
+            return null;
+        }
+
+        var found = Registry.GetEntity(id);
+        if (found is null || !Spoiler.IsVisible(found) || !Spoiler.IsVisible(node.Tier))
+        {
+            return null;
+        }
+
+        return new Person(found.Id, found.Name, found.ShortDescription ?? "",
+            node.Fill, node.Ring, Same(id, CenterId));
+    }
+
+    private void GoTo(string id)
+    {
+        Nav.NavigateTo($"/entity/{id}");
+    }
+}

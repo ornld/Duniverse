@@ -1391,6 +1391,32 @@ html {
     min-width: 62.5rem;
 }
 
+/* The strip on a record borrows the chart's node and edge language, never its sizing: the
+   min-width above is for a page of its own and would burst a card. It centers instead, and
+   caps at its drawn width so the names hold their size. */
+.bloodline-strip {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 0.75rem auto 0;
+}
+
+    /* A touch larger than the chart page uses, since the strip renders smaller. */
+    .bloodline-strip .bloodline-node text {
+        font-size: 15px;
+    }
+
+    /* Which one of these is the record you are reading. */
+    .bloodline-strip .bloodline-node.is-self text {
+        fill: var(--dune-accent-bright);
+    }
+
+.bloodline-strip-more {
+    margin-top: 0.5rem;
+    text-align: center;
+    font-size: var(--fs-small);
+}
+
 /* The sideways hint only earns its place where the well actually overflows. */
 .bloodline-scroll-hint {
     display: none;

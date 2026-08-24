@@ -149,6 +149,13 @@ else if (entity is not null)
         </div>
     }
 
+    @* Where a person stands in the line. The component draws nothing for anyone the chart
+       does not hold, so it costs a record outside the Houses nothing. *@
+    @if (entity is Persona)
+    {
+        <BloodlineStrip CenterId="@entity.Id" />
+    }
+
     <div class="connections-divider dossier-item" style="--i: 2">
         <span>Connected relationships throughout the Duniverse</span>
     </div>
