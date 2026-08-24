@@ -11,6 +11,8 @@
 @if (entity is not null && isGated && !revealed)
 {
     <div class="entity-card front spoiler-gate dossier-item category-@GraphLayoutService.CategorySlug(entity)" style="--i: 0" @key="entity.Id">
+        @* The record's seal, worn in its category's mineral. Breaking it is the reveal. *@
+        <GateSeal Breaking="sealBreaking" />
         <h1>A spoiler lies ahead</h1>
         <p class="short-desc">This entry draws on @BookName(entity.SpoilerTier).</p>
         <p>
@@ -19,7 +21,7 @@
             what's safe for you.
         </p>
         <div class="gate-actions">
-            <button class="surprise-btn" @onclick="Reveal">Reveal this entry</button>
+            <button class="surprise-btn" @onclick="RevealAsync">Reveal this entry</button>
             <a class="chip" href="/archives">Back to search</a>
         </div>
     </div>
@@ -402,8 +404,21 @@ else
             : new List<GlossaryTerm>();
     }
 
-    private void Reveal()
+    private bool sealBreaking;
+
+    // The seal parts first, then the record. The wait matches the CSS run with a beat to
+    // spare. A repeat click mid-break does nothing rather than cutting the parting short.
+    private async Task RevealAsync()
     {
+        if (sealBreaking)
+        {
+            return;
+        }
+
+        sealBreaking = true;
+        StateHasChanged();
+        await Task.Delay(700);
+        sealBreaking = false;
         revealed = true;
     }
 

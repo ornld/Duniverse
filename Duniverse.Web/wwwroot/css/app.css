@@ -1053,6 +1053,60 @@ html {
     --plate-rule: var(--dune-muted);
 }
 
+/* ---- The gate's seal ----
+   The archive's hawk over a sealed record, in the drawer's own mineral. My drawing,
+   not the film's mark. It parts down the crack when the reader chooses to break it. */
+
+.gate-seal {
+    display: block;
+    width: clamp(104px, 14vw, 132px);
+    height: auto;
+    margin: 0 auto 1.25rem;
+    color: var(--cat-color, var(--dune-accent));
+}
+
+    /* The device paints itself through attributes in the component; only currentColor
+       crosses into the use clones from here. Origin low and central, so the halves fall
+       open like a snapped wafer instead of spinning in place. */
+    .gate-seal .seal-half {
+        transform-origin: 60px 118px;
+    }
+
+    .gate-seal.is-breaking .seal-half.left {
+        animation: gate-seal-part-left var(--dur-rite) ease-in forwards;
+    }
+
+    .gate-seal.is-breaking .seal-half.right {
+        animation: gate-seal-part-right var(--dur-rite) ease-in forwards;
+    }
+
+@keyframes gate-seal-part-left {
+    to {
+        transform: translate(-13px, 7px) rotate(-8deg);
+        opacity: 0;
+    }
+}
+
+@keyframes gate-seal-part-right {
+    to {
+        transform: translate(13px, 7px) rotate(8deg);
+        opacity: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gate-seal.is-breaking .seal-half.left,
+    .gate-seal.is-breaking .seal-half.right {
+        animation: gate-seal-fade var(--dur-open) ease forwards;
+    }
+}
+
+@keyframes gate-seal-fade {
+    to {
+        opacity: 0;
+    }
+}
+
 /* ---- Under Imperial Seal ----
    How much of a drawer is still shut. Reads as a footnote the archive is admitting rather
    than a feature announcing itself, so it sits quiet: small, muted, one hairline above it. */

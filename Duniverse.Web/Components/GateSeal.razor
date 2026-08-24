@@ -1,0 +1,42 @@
+@* The seal on a sealed record: an angular hawk of my own drawing, held in one bold ring.
+   Two copies clipped along a zigzag crack, overlapped a hair so no seam shows: breaking
+   is two halves parting, not a swap. *@
+
+<svg class="gate-seal @(Breaking ? "is-breaking" : "")" viewBox="0 0 120 120"
+     aria-hidden="true" focusable="false">
+    <defs>
+        @* Ids carry a Guid the way TwinMoons' gradients do, so a second seal on the same
+           page never captures this one's clips. *@
+        <clipPath id="seal-left-@uid">
+            <polygon points="0,0 63.3,0 57.3,20 63.3,40 57.3,60 63.3,82 57.3,102 63.3,120 0,120" />
+        </clipPath>
+        <clipPath id="seal-right-@uid">
+            <polygon points="120,0 62.7,0 56.7,20 62.7,40 56.7,60 62.7,82 56.7,102 62.7,120 120,120" />
+        </clipPath>
+
+        @* Drawn once, stamped twice: wings closing the V, the head floating in the crook,
+           the tail dropping straight from the fork. Paint rides on the elements as
+           attributes, since a use clone sits in a shadow tree styles cannot reach. *@
+        <g id="seal-device-@uid" fill="currentColor">
+            <circle cx="60" cy="60" r="56" fill="none" stroke="currentColor" stroke-width="2.5" opacity="0.9" />
+            <polygon points="17,29 58,76 58,90 46,77 46,72 33,58 33,53 21,45" />
+            <polygon points="103,29 62,76 62,90 74,77 74,72 87,58 87,53 99,45" />
+            <polygon points="60,53.5 67.5,59.5 70.5,63 64,65.5 60,72.5 52.5,63" />
+            <polygon points="54,84 66,84 66,100 60,107 54,100" />
+        </g>
+    </defs>
+
+    <g class="seal-half left" clip-path="url(#seal-left-@uid)">
+        <use href="#seal-device-@uid" />
+    </g>
+    <g class="seal-half right" clip-path="url(#seal-right-@uid)">
+        <use href="#seal-device-@uid" />
+    </g>
+</svg>
+
+@code {
+    [Parameter]
+    public bool Breaking { get; set; }
+
+    private readonly string uid = Guid.NewGuid().ToString("N")[..8];
+}
