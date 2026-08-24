@@ -44,7 +44,21 @@ else if (entity is not null)
                     <div class="meta-row">
                         <dt>@row.Label</dt>
                         <dd>
-                            @if (row.Items is not null)
+                            @if (row.Parts is not null)
+                            {
+                                @foreach (var part in row.Parts)
+                                {
+                                    if (part.Href is null)
+                                    {
+                                        @part.Text
+                                    }
+                                    else
+                                    {
+                                        <a href="@part.Href">@part.Text</a>
+                                    }
+                                }
+                            }
+                            else if (row.Items is not null)
                             {
                                 <ul class="meta-list">
                                     @foreach (var item in row.Items)
@@ -110,10 +124,17 @@ else if (entity is not null)
             </div>
         }
 
+        @* Every rival is a record the reader can open. These were a joined string before,
+           which named the enemy and then refused to take you there. *@
         @if (entity is House && rivals.Count > 0)
         {
             <p class="rivalries">
-                <strong>Historical Rivalries:</strong> @string.Join(", ", rivals.Select(rival => rival.Name))
+                <strong>Historical Rivalries:</strong>
+                @for (int i = 0; i < rivals.Count; i++)
+                {
+                    var rival = rivals[i];
+                    @(i > 0 ? ", " : " ")<a href="@($"/entity/{rival.Id}")">@rival.Name</a>
+                }
             </p>
         }
     </div>
@@ -124,7 +145,7 @@ else if (entity is not null)
     @if (members.Count > 0)
     {
         <div class="entity-card roster-card dossier-item" style="--i: 1">
-            <RelatedSection Title="Known Members" Items="members" />
+            <RelatedSection Title="Known Members" Items="members" RoleFor="MemberRoleFor" />
         </div>
     }
 
@@ -167,6 +188,26 @@ else if (entity is not null)
             <p class="muted">No connected records found.</p>
         }
     </div>
+
+    @* The words the Terminology defines against this record. That link ran one way only, so
+       the glossary knew about the record and the record never knew about the glossary. *@
+    @if (glossary.Count > 0)
+    {
+        <div class="entity-card roster-card dossier-item" style="--i: 6">
+            <div class="related-section">
+                <h3>In the Terminology</h3>
+                <dl class="glossary">
+                    @foreach (var term in glossary)
+                    {
+                        <div class="glossary-entry">
+                            <dt>@term.Term</dt>
+                            <dd>@term.Definition</dd>
+                        </div>
+                    }
+                </dl>
+            </div>
+        </div>
+    }
     </div>
 }
 else if (candidates.Count > 0)
@@ -254,6 +295,7 @@ else
     private List<DuneEntity> members = new();
     private List<DuneEntity> candidates = new();
     private List<DuneEntity> related = new();
+    private List<GlossaryTerm> glossary = new();
     private bool hasAnyConnections;
 
     // The display order of the "connected records" sections. Every entity category
@@ -345,6 +387,12 @@ else
 
         related = Registry.GetDirectlyRelated(entity.Id, Spoiler.IsVisible).Where(Spoiler.IsVisible).ToList();
         hasAnyConnections = related.Count > 0;
+
+        // A term carries its own tier, so a word coined in a later book stays out even on a
+        // record the reader already holds.
+        glossary = GlossarySeeder.TermsByEntity.TryGetValue(entity.Id, out var terms)
+            ? terms.Where(term => Spoiler.IsVisible(term.Tier)).ToList()
+            : new List<GlossaryTerm>();
     }
 
     private void Reveal()
@@ -370,13 +418,80 @@ else
     // One labeled fact from a record. Value carries a single string; Items carries a
     // list field (a world's customs, a faith's texts), which renders as a list
     // instead of prose.
-    private sealed record MetaRow(string Label, string? Value = null, IReadOnlyList<string>? Items = null);
+    private sealed record MetaRow(string Label, string? Value = null, IReadOnlyList<string>? Items = null,
+        IReadOnlyList<MetaPart>? Parts = null);
+
+    // One piece of a fact line: plain words, or words that open a record. Affiliation runs on
+    // these so the prose keeps its own shape and still carries links.
+    private sealed record MetaPart(string Text, string? Href);
+
+    // Affiliation is written for a reader and the ids cannot match it: "Fremen (secretly House
+    // Corrino)" says something no roster holds. So I link each roster where its name already
+    // sits in the sentence, and add the rest.
+    private IReadOnlyList<MetaPart> AffiliationParts(Persona persona)
+    {
+        var rosters = persona.AffiliationIds
+            .Select(Registry.GetEntity)
+            .OfType<DuneEntity>()
+            .Where(Spoiler.IsVisible)
+            .ToList();
+
+        var prose = persona.Affiliation ?? string.Empty;
+        var parts = new List<MetaPart>();
+        var placed = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        int at = 0;
+        while (at < prose.Length)
+        {
+            // Longest name first, so "House Corrino" wins over a bare "Corrino" sitting inside it.
+            var next = rosters
+                .Select(roster => (Roster: roster, At: prose.IndexOf(roster.Name, at, StringComparison.OrdinalIgnoreCase)))
+                .Where(found => found.At >= 0)
+                .OrderBy(found => found.At)
+                .ThenByDescending(found => found.Roster.Name.Length)
+                .FirstOrDefault();
+
+            if (next.Roster is null)
+            {
+                break;
+            }
+
+            if (next.At > at)
+            {
+                parts.Add(new MetaPart(prose[at..next.At], null));
+            }
+
+            parts.Add(new MetaPart(prose.Substring(next.At, next.Roster.Name.Length), $"/entity/{next.Roster.Id}"));
+            placed.Add(next.Roster.Id);
+            at = next.At + next.Roster.Name.Length;
+        }
+
+        if (at < prose.Length)
+        {
+            parts.Add(new MetaPart(prose[at..], null));
+        }
+
+        foreach (var missing in rosters.Where(roster => !placed.Contains(roster.Id)))
+        {
+            parts.Add(new MetaPart(parts.Count > 0 ? ", " : string.Empty, null));
+            parts.Add(new MetaPart(missing.Name, $"/entity/{missing.Id}"));
+        }
+
+        return parts;
+    }
+
+    // A roster reads better saying what each person was. Role belongs to them rather than to
+    // this house, so it skips the relationship lookup the connection lists use.
+    private string? MemberRoleFor(string memberId) =>
+        Registry.GetEntity(memberId) is Persona person && !string.IsNullOrWhiteSpace(person.Role)
+            ? person.Role
+            : null;
 
     // The per-category fields each record type carries, mapped to the labels a
     // reader sees. Rows with nothing in them drop out, so a record never shows an
     // empty line. Labels are for readers, not field names: EnvironmentalData shows
     // as "Environment".
-    private static IReadOnlyList<MetaRow> MetaRowsFor(DuneEntity entity)
+    private IReadOnlyList<MetaRow> MetaRowsFor(DuneEntity entity)
     {
         // Other names come first and apply to every kind of record, so someone who
         // arrived knowing one name learns the others before reading anything else.
@@ -391,7 +506,7 @@ else
             Persona persona => new[]
             {
                 new MetaRow("Role", persona.Role),
-                new MetaRow("Affiliation", persona.Affiliation),
+                new MetaRow("Affiliation", persona.Affiliation, Parts: AffiliationParts(persona)),
             },
             World world => new[]
             {
@@ -445,7 +560,7 @@ else
 
         return aliasRow
             .Concat(rows)
-            .Where(row => row.Items is { Count: > 0 } || HasFact(row.Value))
+            .Where(row => row.Items is { Count: > 0 } || row.Parts is { Count: > 0 } || HasFact(row.Value))
             .ToList();
     }
 

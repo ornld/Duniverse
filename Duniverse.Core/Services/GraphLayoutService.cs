@@ -60,7 +60,10 @@ namespace Duniverse.Services
                             edges.Add(new GraphEdge(entity.Id, neighbor.Id));
                         }
 
-                        if (!visited.ContainsKey(neighbor.Id) && visited.Count < MaxNodes)
+                        // Depth 0 is the record's own neighbours and they all come in, which is
+                        // what the summary promises. The cap ran here too, so a busy record
+                        // silently lost real connections. Deeper rings still get trimmed.
+                        if (!visited.ContainsKey(neighbor.Id) && (depth == 0 || visited.Count < MaxNodes))
                         {
                             visited[neighbor.Id] = neighbor;
                             nextFrontier.Add(neighbor);

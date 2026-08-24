@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Duniverse.Data.Seeders;
 using Duniverse.Models;
 using Duniverse.Services;
 
@@ -27,12 +28,20 @@ namespace Duniverse.Data
 
             foreach (var source in all)
             {
-                Scan(source, source.SpoilerTier, DisplayedText(source), "its own entry");
+                Scan(source.Id, source.Id, source.SpoilerTier, DisplayedText(source), "its own entry");
 
                 foreach (var layer in source.HistoryLayers)
                 {
-                    Scan(source, layer.Tier, layer.Text, $"its {layer.Tier} layer");
+                    Scan(source.Id, source.Id, layer.Tier, layer.Text, $"its {layer.Tier} layer");
                 }
+            }
+
+            // Terminology entries print on their own page, and the ones carrying SeeEntityId
+            // print on that record as well. Same rule applies to a definition as to prose.
+            foreach (var term in GlossarySeeder.GetTerms())
+            {
+                Scan($"the term '{term.Term}'", term.SeeEntityId, term.Tier,
+                    term.Term + " " + term.Definition, "its definition");
             }
 
             if (breaches.Count > 0)
@@ -44,7 +53,7 @@ namespace Duniverse.Data
                     + "Move the sentence into a HistoryLayer at the right tier, or raise the record's own tier.");
             }
 
-            void Scan(DuneEntity source, SpoilerTier readAt, string? text, string where)
+            void Scan(string owner, string? selfId, SpoilerTier readAt, string? text, string where)
             {
                 if (string.IsNullOrWhiteSpace(text))
                 {
@@ -53,7 +62,8 @@ namespace Duniverse.Data
 
                 foreach (var target in all)
                 {
-                    if (ReferenceEquals(target, source) || Admits(readAt, target.SpoilerTier))
+                    if (string.Equals(target.Id, selfId, StringComparison.OrdinalIgnoreCase)
+                        || Admits(readAt, target.SpoilerTier))
                     {
                         continue;
                     }
@@ -64,7 +74,7 @@ namespace Duniverse.Data
                     if (hit is not null)
                     {
                         breaches.Add(
-                            $"  {source.Id} ({readAt}) names '{hit}' in {where}, and {target.Id} is sealed until {target.SpoilerTier}.");
+                            $"  {owner} ({readAt}) names '{hit}' in {where}, and {target.Id} is sealed until {target.SpoilerTier}.");
                     }
                 }
             }

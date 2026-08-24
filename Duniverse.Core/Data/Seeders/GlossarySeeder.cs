@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Duniverse.Models;
 
 namespace Duniverse.Data.Seeders
@@ -10,6 +12,22 @@ namespace Duniverse.Data.Seeders
     /// </summary>
     public static class GlossarySeeder
     {
+        /// <summary>
+        /// Every term that points at a record, gathered under that record's id. The dictionary
+        /// runs the other way from SeeEntityId, so a record can show the words defined against
+        /// it. Built once, since a record page asks on every view.
+        /// </summary>
+        public static IReadOnlyDictionary<string, IReadOnlyList<GlossaryTerm>> TermsByEntity { get; } =
+            GetTerms()
+                .Where(term => !string.IsNullOrWhiteSpace(term.SeeEntityId))
+                .GroupBy(term => term.SeeEntityId!, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(
+                    group => group.Key,
+                    group => (IReadOnlyList<GlossaryTerm>)group
+                        .OrderBy(term => term.Term, StringComparer.OrdinalIgnoreCase)
+                        .ToList(),
+                    StringComparer.OrdinalIgnoreCase);
+
         public static List<GlossaryTerm> GetTerms()
         {
             return new List<GlossaryTerm>
