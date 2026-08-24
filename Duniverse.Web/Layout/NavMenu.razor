@@ -2,7 +2,7 @@
 @inject NavigationManager Nav
 @implements IDisposable
 
-<nav class="top-nav tab-glow">
+<nav class="top-nav tab-glow" inert="@Inert">
     <NavLink href="/about">About Dune</NavLink>
     <NavLink href="/archives">Archives</NavLink>
     <NavLink href="/timeline">Timeline</NavLink>
@@ -59,6 +59,10 @@
 </nav>
 
 @code {
+    // Sealed off whenever the first-visit ritual holds the screen. A component tag cannot pass
+    // a plain attribute down to my own nav element, so the layout hands it over as a parameter.
+    [Parameter] public bool Inert { get; set; }
+
     private bool open;
     private bool runSand;
     private ElementReference sandCanvas;

@@ -7,7 +7,10 @@
     @* The running head. A rule crosses to a register naming which part of the volume
        you're in, the way a bound book prints one. That gives location a signal that
        isn't color. The blue tab was doing it alone. *@
-    <header class="site-header">
+    @* Everything outside the ritual seals whenever it is up. inert drops a subtree out of the
+       tab order, out of hit testing and out of the accessibility tree at once. aria-modal
+       promised that and never touched Tab. *@
+    <header class="site-header" inert="@ritualOpen">
         <a href="/" class="site-title">Duniverse</a>
         <span class="head-rule" aria-hidden="true"></span>
         @if (Register is string register)
@@ -16,9 +19,9 @@
         }
     </header>
 
-    <NavMenu />
+    <NavMenu Inert="@ritualOpen" />
 
-    <main class="site-body">
+    <main class="site-body" inert="@ritualOpen">
         @* I hold the body until spoiler preferences load from storage, so a protected
            reader never sees hidden content flash. The @key re-mounts on a ritual choice,
            re-filtering the page they landed on, and on route changes, replaying the
@@ -31,9 +34,9 @@
         }
     </main>
 
-    <SpoilerRitual OnApplied="OnRitualApplied" />
+    <SpoilerRitual OnApplied="OnRitualApplied" OnOpenChanged="OnRitualOpenChanged" />
 
-    <footer class="site-footer">
+    <footer class="site-footer" inert="@ritualOpen">
         @* A horizon, not a straight line: twin moons over three dune crests. Moons
            render before the dunes so their glow melts into the crests. The near
            crest takes the content fill, so the footer reads as the closest dune. *@
@@ -136,6 +139,26 @@
     // storm lifts onto a page that is there.
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        // Focus first. The ritual let go and the seal came off in the same batch, so the
+        // heading can take it now. Calling this from the ritual ran too early, and focus on a
+        // sealed element does nothing.
+        if (ritualWasOpen && !ritualOpen)
+        {
+            // A choice re-mounts the page under me, so the heading I focus can be replaced a
+            // beat later. I keep asking until focus has stuck, then give up rather than spin.
+            try
+            {
+                if (await JS.InvokeAsync<bool>("duneNav.focusHeading") || ++ritualFocusTries >= 4)
+                {
+                    ritualWasOpen = false;
+                }
+            }
+            catch
+            {
+                ritualWasOpen = false;
+            }
+        }
+
         if (announced || !Spoiler.Loaded)
         {
             return;
@@ -155,5 +178,23 @@
     private void OnRitualApplied()
     {
         spoilerEpoch++;
+    }
+
+    // One flag off the ritual itself, never a second copy of its rules. Get this wrong in the
+    // closed direction and the whole site stops answering the mouse and the keyboard both.
+    private bool ritualOpen;
+
+    private bool ritualWasOpen;
+    private int ritualFocusTries;
+
+    private void OnRitualOpenChanged(bool open)
+    {
+        ritualOpen = open;
+
+        if (open)
+        {
+            ritualWasOpen = true;
+            ritualFocusTries = 0;
+        }
     }
 }

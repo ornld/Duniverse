@@ -45,9 +45,14 @@
     // underneath and re-filter it against the new progress.
     [Parameter] public EventCallback OnApplied { get; set; }
 
+    // MainLayout seals the page behind this panel. A component cannot reach its own siblings,
+    // so the layout owns the sealing and I only tell it when to start and stop.
+    [Parameter] public EventCallback<bool> OnOpenChanged { get; set; }
+
     private bool dismissed;
     private bool closing;
     private bool activated;
+    private bool reportedOpen;
     private ElementReference panel;
     private ElementReference sandCanvas;
 
@@ -125,6 +130,17 @@
         {
             activated = false;
         }
+
+        if (reportedOpen == ShouldShow)
+        {
+            return;
+        }
+
+        // I report from here since ShouldShow turns on a route change and a storage read, not
+        // only on a choice. Moving focus afterwards belongs to the layout, which knows when
+        // its own seal comes off.
+        reportedOpen = ShouldShow;
+        await OnOpenChanged.InvokeAsync(reportedOpen);
     }
 
     private async Task ChooseAsync(SpoilerTier tier)

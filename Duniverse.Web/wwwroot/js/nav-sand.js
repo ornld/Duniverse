@@ -227,5 +227,23 @@ window.duneNav = {
                 }, 60);
             }
         };
+    },
+
+    // Where focus belongs once the ritual lets go, matching the router's own target. A heading
+    // takes no focus without a tabindex, so I lend it one. True only once focus sticks, since
+    // a choice re-mounts the page under it.
+    focusHeading: function () {
+        const heading = document.querySelector("main h1");
+        if (!heading) {
+            return false;
+        }
+        if (document.activeElement === heading) {
+            return true;
+        }
+        if (!heading.hasAttribute("tabindex")) {
+            heading.setAttribute("tabindex", "-1");
+        }
+        heading.focus({ preventScroll: true });
+        return false;
     }
 };
