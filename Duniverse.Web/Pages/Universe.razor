@@ -35,7 +35,7 @@
         @* role="img" with a real description, deliberately. Archives, the drawers and the
            find box all reach these records in plain markup, so a screen reader gets told
            what this is instead of 122 unlabelled dots it can't use. *@
-        <svg class="universe-graph @(hoveredNodeId is null ? null : "has-hover")" viewBox="0 0 1600 1200" xmlns="http://www.w3.org/2000/svg"
+        <svg class="universe-graph @(hoveredNodeId is null ? null : "has-hover")" viewBox="0 0 @Width @Height" xmlns="http://www.w3.org/2000/svg"
              role="img" aria-label="@($"A constellation of {graph.Nodes.Count} records and {graph.Edges.Count} connections. Every record here can also be reached from the Archives, the category drawers, or the find box above.")">
             <g class="universe-world">
                 @* The birth of the universe: each node's delay grows with its distance from
@@ -48,16 +48,22 @@
                     {
                         var source = nodesById[edge.SourceId];
                         var target = nodesById[edge.TargetId];
+                        var tip = EdgeTip(edge);
                         <line x1="@source.X.ToString(Inv)" y1="@source.Y.ToString(Inv)"
                               x2="@target.X.ToString(Inv)" y2="@target.Y.ToString(Inv)"
-                              class="@(TouchesHovered(edge) ? "touches-hovered" : null)"
-                              style="--birth: @EdgeBirthDelay(edge)" />
+                              class="@EdgeClasses(edge, tip)"
+                              style="--birth: @EdgeBirthDelay(edge)">
+                            @if (tip is not null)
+                            {
+                                <title>@tip</title>
+                            }
+                        </line>
                     }
                 </g>
                 <g class="graph-nodes">
                     @foreach (var node in graph.Nodes)
                     {
-                        <g class="graph-node category-@node.Category @(node.Id == found?.Id ? "is-found" : null) @(IsNearHovered(node) ? "near-hovered" : null) @(IsActive(node) ? "is-active" : null)"
+                        <g class="graph-node category-@node.Category @(node.Id == found?.Id ? "is-found" : null) @(IsNearHovered(node) ? "near-hovered" : null) @(IsActive(node) ? "is-active" : null) @(landmarks.Contains(node.Id) ? "is-landmark" : null)"
                            transform="translate(@node.X.ToString(Inv), @node.Y.ToString(Inv))"
                            style="--birth: @NodeBirthDelay(node)"
                            @onpointerdown="e => RememberPointer(e)"
@@ -102,7 +108,10 @@
     private static readonly System.Globalization.CultureInfo Inv = System.Globalization.CultureInfo.InvariantCulture;
 
     private const double Width = 1600;
-    private const double Height = 1200;
+
+    // The canvas was 4:3 inside a box that is nearly 2:1, so the constellation sat in a
+    // column with a fifth of the width blank down each side. This matches the well.
+    private const double Height = 850;
 
     // An entity page can hand off a record via /universe?focus={id}. You land with
     // that star already selected and the camera gliding to it once the graph
@@ -166,8 +175,47 @@
             g => LayoutService.ApplyForceDirectedLayout(g, Width, Height, iterations: 220, gravity: 0.08, repulsionRange: 240));
         nodesById = graph.Nodes.ToDictionary(n => n.Id, StringComparer.OrdinalIgnoreCase);
         neighborsById = BuildNeighbors(graph);
+
+        landmarks = ChooseLandmarks();
+
         hoveredNodeId = null;
         birthEpoch++;
+    }
+
+    private HashSet<string> landmarks = new(StringComparer.OrdinalIgnoreCase);
+
+    private const int LandmarkCount = 12;
+
+    // Roughly a name's width on the canvas. The hubs of Dune sit close together, so taking
+    // the top dozen by connections alone stacked Paul's name on the Sisterhood's.
+    private const double LandmarkGap = 150;
+
+    // The busiest stars keep their names on at rest, picked for spread too: richest first,
+    // and a star sits out where a chosen one holds that ground. Otherwise the map opens as
+    // identical dots.
+    private HashSet<string> ChooseLandmarks()
+    {
+        var chosen = new List<GraphNode>();
+
+        foreach (var node in graph.Nodes
+            .OrderByDescending(n => neighborsById.TryGetValue(n.Id, out var near) ? near.Count : 0)
+            .ThenBy(n => n.Name, StringComparer.OrdinalIgnoreCase))
+        {
+            if (chosen.Count == LandmarkCount)
+            {
+                break;
+            }
+
+            bool crowded = chosen.Any(taken =>
+                Math.Abs(taken.X - node.X) < LandmarkGap && Math.Abs(taken.Y - node.Y) < LandmarkGap / 3);
+
+            if (!crowded)
+            {
+                chosen.Add(node);
+            }
+        }
+
+        return chosen.Select(node => node.Id).ToHashSet(StringComparer.OrdinalIgnoreCase);
     }
 
     private static Dictionary<string, HashSet<string>> BuildNeighbors(EntityGraph graph)
@@ -189,6 +237,46 @@
         return hoveredNodeId is not null
             && (string.Equals(edge.SourceId, hoveredNodeId, StringComparison.OrdinalIgnoreCase)
                 || string.Equals(edge.TargetId, hoveredNodeId, StringComparison.OrdinalIgnoreCase));
+    }
+
+    // The two marks the ego graph uses: has-label for a pair whose relationship has a name,
+    // touches-hovered for every line into the hovered star. Every line drew alike before,
+    // so a named one vanished among them.
+    private string? EdgeClasses(GraphEdge edge, string? tip)
+    {
+        return (tip, TouchesHovered(edge)) switch
+        {
+            (null, false) => null,
+            (null, true) => "touches-hovered",
+            (_, false) => "has-label",
+            (_, true) => "has-label touches-hovered"
+        };
+    }
+
+    private string? VisibleRole(string viewedId, string otherId)
+    {
+        return Registry.GetRelationshipLabel(viewedId, otherId) is { } label && Spoiler.IsVisible(label.Tier)
+            ? label.Role
+            : null;
+    }
+
+    // Both sides of the relationship, collapsed to one phrase where it reads the same from
+    // either end. Null leaves the line bare, which is the fact that nothing is recorded.
+    private string? EdgeTip(GraphEdge edge)
+    {
+        var roleOfTarget = VisibleRole(edge.SourceId, edge.TargetId);
+        var roleOfSource = VisibleRole(edge.TargetId, edge.SourceId);
+        if (roleOfSource is null || roleOfTarget is null)
+        {
+            return null;
+        }
+
+        var source = nodesById[edge.SourceId];
+        var target = nodesById[edge.TargetId];
+
+        return roleOfSource == roleOfTarget
+            ? $"{source.Name} & {target.Name}: {roleOfSource}"
+            : $"{source.Name}: {roleOfSource} / {target.Name}: {roleOfTarget}";
     }
 
     // The hovered star and its direct neighbors keep full presence as the rest of the
