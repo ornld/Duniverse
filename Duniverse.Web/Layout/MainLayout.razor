@@ -110,6 +110,12 @@
                 return "The Record";
             }
 
+            // One head for all six shelves of the sayings.
+            if (path.StartsWith("/sayings", StringComparison.OrdinalIgnoreCase))
+            {
+                return "The Epigraphs";
+            }
+
             return path switch
             {
                 "/" => null,
@@ -122,7 +128,6 @@
                 "/connections" => "Cross-References",
                 "/universe" => "The Whole Record",
                 "/terminology" => "Terminology of the Imperium",
-                "/sayings" => "The Epigraphs",
                 "/trial" => "The Mentat Trial",
                 _ => "No Such Record",
             };
