@@ -27,9 +27,7 @@ else
            lives at the bare address so the nav tab and old links land somewhere real. *@
         <nav class="sayings-shelf" aria-label="Choose a book">
             @{ var slotIndex = System.Array.IndexOf(Books, book); }
-            @* The flight starts in this book's own gap, so the stylesheet needs to know
-               which slot it left. Farther books cross more shelf in the same beat. *@
-            <a class="shelf-laid" href="@book.Href" aria-current="page" style="--slot-i: @slotIndex">
+            <a class="shelf-laid" href="@book.Href" aria-current="page">
                 <span class="spine-num">@Roman(slotIndex + 1)</span>
                 <span class="spine-title">@book.ShortTitle</span>
             </a>

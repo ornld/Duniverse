@@ -1833,13 +1833,9 @@ html {
 }
 
 /* The open book, lying on its back at the end of the shelf: the spine's box turned
-   on its side, hinge now the top edge. On arrival it tells the whole pull: it
-   stands in its own gap, lifts clear of the row, swings left leaning into the
-   travel, and lands flat with one small settle. Turned upright it reads exactly
-   as a spine, numeral up, so the illusion holds from the first frame. */
+   on its side, hinge now the top edge. No entrance, the way a shelf simply holds a
+   book already set down. The empty slot says where it came from. */
 .shelf-laid {
-    position: relative;
-    z-index: 1;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1852,89 +1848,12 @@ html {
     border: var(--rule-hair) solid var(--dune-accent);
     border-radius: var(--r-sharp);
     text-decoration: none;
-    /* From my center to the center of slot N: the lying width, my right margin, the
-       row gap, half a spine minus half of me, then one spine-and-gap per slot. */
-    --pull-dx: calc(103px + 1.1rem + var(--slot-i, 0) * (42px + 0.5rem));
-    animation: book-pull 1.05s cubic-bezier(0.45, 0, 0.25, 1) 0.25s backwards;
 }
 
     .shelf-laid .spine-title {
         writing-mode: horizontal-tb;
         color: var(--dune-accent-bright);
     }
-
-    /* A breath of contact shadow at touchdown, gone once the book rests. */
-    .shelf-laid::after {
-        content: "";
-        position: absolute;
-        left: 10%;
-        right: 10%;
-        bottom: -5px;
-        height: 7px;
-        border-radius: 50%;
-        background: radial-gradient(closest-side, rgba(0, 0, 0, 0.45), transparent);
-        opacity: 0;
-        pointer-events: none;
-        animation: book-land 1.05s linear 0.25s backwards;
-    }
-
-/* Held standing through the page fade, plucked straight up, carried on a shallow
-   arc while tipping, then gravity for the last few degrees and a hair of overshoot
-   as the cover meets the shelf. Position and angle only: nothing fades mid-air. */
-@keyframes book-pull {
-    0% {
-        transform: translate(var(--pull-dx), -61px) rotate(90deg);
-        animation-timing-function: cubic-bezier(0.5, 0, 0.3, 1);
-    }
-
-    18% {
-        transform: translate(var(--pull-dx), -79px) rotate(90deg);
-        animation-timing-function: cubic-bezier(0.42, 0, 0.58, 1);
-    }
-
-    55% {
-        transform: translate(calc(var(--pull-dx) * 0.42), -88px) rotate(52deg);
-        animation-timing-function: cubic-bezier(0.25, 0.5, 0.35, 1);
-    }
-
-    85% {
-        transform: translate(0, -7px) rotate(5deg);
-        animation-timing-function: cubic-bezier(0.55, 0, 0.85, 0.55);
-    }
-
-    92% {
-        transform: translate(0, 0) rotate(-1.2deg);
-        animation-timing-function: ease-out;
-    }
-
-    100% {
-        transform: none;
-    }
-}
-
-@keyframes book-land {
-    0%, 82% {
-        opacity: 0;
-        transform: scaleX(0.7);
-    }
-
-    91% {
-        opacity: 0.3;
-        transform: scaleX(1.05);
-    }
-
-    100% {
-        opacity: 0;
-        transform: scaleX(1);
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .shelf-laid,
-    .shelf-laid::after {
-        animation: none;
-    }
-}
 
 /* Phones: the books shrink a step and nobody leaves the row. The lying book and
    its gap retire; the open book stays standing in place, marked in the accent. */
