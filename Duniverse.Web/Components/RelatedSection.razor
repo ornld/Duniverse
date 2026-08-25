@@ -1,7 +1,13 @@
 @if (Items is not null && Items.Any())
 {
     <div class="related-section">
-        <h3>@Title</h3>
+        <h3>
+            @if (MarkName is not null)
+            {
+                <Mark Name="@MarkName" CssClass="@($"related-mark connection-cat category-{MarkName}")" />
+            }
+            @Title
+        </h3>
         <ul>
             @foreach (var item in Items)
             {
@@ -28,4 +34,11 @@
     /// </summary>
     [Parameter]
     public Func<string, string?>? RoleFor { get; set; }
+
+    /// <summary>
+    /// The drawer this section lists, as its category slug, so the heading carries the
+    /// drawer's mark in its mineral. Null keeps the heading bare.
+    /// </summary>
+    [Parameter]
+    public string? MarkName { get; set; }
 }

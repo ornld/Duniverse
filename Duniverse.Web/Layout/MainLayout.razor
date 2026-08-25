@@ -84,11 +84,13 @@
     // I take Herbert's appendix titles where he gave one, mine where he didn't, cased here
     // since CSS uppercases them. Home returns null: a bound book prints no running head on
     // its title page, and the wordmark does that job. The rule still crosses the bar.
-    private string? Register
+    private string? Register =>
+        RegisterFor("/" + Nav.ToBaseRelativePath(Nav.Uri).Split('?', '#')[0].TrimEnd('/'));
+
+    // Static and public, since the home doors print each destination's register as an
+    // eyebrow. One table serves both, so a renamed register renames the door with it.
+    public static string? RegisterFor(string path)
     {
-        get
-        {
-            var path = "/" + Nav.ToBaseRelativePath(Nav.Uri).Split('?', '#')[0].TrimEnd('/');
 
             // Two drawers have a real appendix behind them. Appendix I is the ecology, most
             // of Flora & Fauna. II is the older half of Theological Systems, looser since
@@ -124,7 +126,6 @@
                 "/trial" => "The Mentat Trial",
                 _ => "No Such Record",
             };
-        }
     }
 
     protected override async Task OnInitializedAsync()

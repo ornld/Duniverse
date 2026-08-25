@@ -32,7 +32,11 @@
             <ul>
                 @foreach (var candidate in candidates)
                 {
+                    var slug = GraphLayoutService.CategorySlug(candidate);
                     <li>
+                        @* Which drawer each match comes out of. A mixed list of names read
+                           as one kind of thing without it. *@
+                        <Mark Name="@slug" CssClass="@($"candidate-mark connection-cat category-{slug}")" />
                         <a href="@($"/entity/{candidate.Id}")">@candidate.Name</a>
                         <span class="muted">@candidate.ShortDescription</span>
                     </li>

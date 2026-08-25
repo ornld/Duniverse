@@ -1683,6 +1683,15 @@ html {
     gap: 0.75rem;
 }
 
+    /* The section's drawer, said with its mark and mineral instead of the title alone.
+       Centered by hand: the flex line aligns on baselines and an svg has none. */
+    .related-section h3 .related-mark {
+        width: 16px;
+        height: 16px;
+        align-self: center;
+        flex: none;
+    }
+
     .sayings-source::after,
     .home-section h2::after,
     .related-section h3::after {
@@ -1805,6 +1814,14 @@ html {
    Name matches as ruled rows, the count line running a leader to the edge. They sit
    on the plate's lightest art, so a soft wash with no edge keeps the descriptions
    over AA the way the old opaque panel did. */
+/* The drawer mark on a "did you mean" row, sized down and seated on the text line. */
+.candidate-mark {
+    width: 15px;
+    height: 15px;
+    vertical-align: -3px;
+    margin-right: 0.15rem;
+}
+
 .candidates {
     margin-top: 1.5rem;
     margin-inline: -1rem;
@@ -3651,6 +3668,15 @@ button.chip {
     }
 }
 
+/* The door's running head, in the letterspaced caps the site header prints it in.
+   It names the volume the door opens onto, so nine boxes stop reading as one box. */
+.door-register {
+    font-size: var(--fs-caption);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--dune-muted);
+}
+
 .category-tile {
     display: flex;
     flex-direction: column;
@@ -4029,16 +4055,36 @@ button.chip {
     justify-content: center;
     align-items: center;
     text-align: center;
-    /* No plate rule and no art layer: the desert paints its own sky, so it keeps the
-       normal background size the plate turns off. */
+    /* No plate rule: the desert paints its own night. The sky lives in ::before so it
+       reaches the screen edges, and the foot drops its margin so the night runs into
+       the footer's horizon, whose dunes and moons finish the scene. Two moon pairs on
+       one screen would put four moons over Arrakis. */
     border-top: 0;
-    background-size: auto;
-    background-image:
-        radial-gradient(ellipse 120% 55% at 50% 108%, rgba(var(--dune-accent-rgb), 0.13), transparent 65%),
-        linear-gradient(rgba(23, 19, 16, 0.3), rgba(23, 19, 16, 0.75));
+    margin-bottom: 0;
+    background: none;
 }
 
-    .lost-desert::before,
+    /* The night itself: the horizon glow, three drifts of stars on offset tiles so no
+       grid shows, a rare gold glint among them, and the dark settling toward the foot. */
+    .lost-desert::before {
+        content: "";
+        position: absolute;
+        inset: 0 calc(50% - 50vw);
+        z-index: 0;
+        pointer-events: none;
+        mask-image: none;
+        -webkit-mask-image: none;
+        background-image:
+            radial-gradient(ellipse 120% 55% at 50% 108%, rgba(var(--dune-accent-rgb), 0.13), transparent 65%),
+            radial-gradient(1px 1px at 31px 47px, rgba(241, 230, 214, 0.55), transparent 1.5px),
+            radial-gradient(1px 1px at 127px 109px, rgba(241, 230, 214, 0.32), transparent 1.5px),
+            radial-gradient(1.5px 1.5px at 73px 23px, rgba(var(--dune-accent-bright-rgb), 0.35), transparent 2px),
+            linear-gradient(rgba(23, 19, 16, 0.3), rgba(23, 19, 16, 0.75));
+        background-size: auto, 197px 173px, 251px 211px, 331px 283px, auto;
+        background-position: center bottom, 0 0, 37px 61px, 149px 101px, 0 0;
+        background-repeat: no-repeat, repeat, repeat, repeat, no-repeat;
+    }
+
     .lost-desert::after {
         display: none;
     }
