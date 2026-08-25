@@ -25,7 +25,7 @@
 
             var side = cardIndex % 2 == 0 ? "left" : "right";
             cardIndex++;
-            <div class="timeline-item @side">
+            <div class="timeline-item @side" style="--gap: @GapBefore(evt)">
                 @* The dot is a second door to the same record as its card, for the mouse
                    only: hidden from assistive tech and skipped in the tab order, so
                    the event isn't announced or focused twice. *@
@@ -39,6 +39,32 @@
                     <h3>@evt.Name</h3>
                     <p class="muted">@evt.ShortDescription</p>
                 </a>
+
+                @* Who was there. These sit outside the card, since the card is itself a link
+                   and a link inside a link is not markup a browser will honour. *@
+                @if (Cast(evt) is { Count: > 0 } company)
+                {
+                    <ul class="timeline-cast">
+                        @foreach (var member in company.Take(MaxCast))
+                        {
+                            <li>
+                                <a class="connection-cat category-@GraphLayoutService.CategorySlug(member)"
+                                   href="@($"/entity/{member.Id}")">@member.Name</a>
+                            </li>
+                        }
+                        @* The Jihad alone touches seventeen records, which is more chips than
+                           card. The rest are named on the event's own page, and the count says
+                           so rather than trailing off. *@
+                        @if (company.Count > MaxCast)
+                        {
+                            <li>
+                                <a class="cast-more" href="@($"/entity/{evt.Id}")">
+                                    @(company.Count - MaxCast) more
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                }
             </div>
         }
     </div>
@@ -50,6 +76,12 @@
     </p>
 
     <p class="timeline-footnote muted">
+        Spacing within an era follows the years between events, so a season reads shorter than
+        a century. Each era heading stands for time the chart does not draw: ten thousand years
+        pass under the first one alone.
+    </p>
+
+    <p class="timeline-footnote muted">
         The timeline honors your spoiler settings. Set your reading progress on the
         <a href="/archives">Archives page</a> and the later events reveal themselves
         as you read.
@@ -58,6 +90,15 @@
 
 @code {
     private List<HistoricalEvent> events = new();
+    private Dictionary<string, List<DuneEntity>> cast = new(StringComparer.OrdinalIgnoreCase);
+
+    // A year is worth its square root in space, so two years still part two cards and three
+    // millennia do not run off the page. Capped, since the era headings carry the long gaps.
+    private const double GapPerYear = 0.32;
+    private const double MaxGapRem = 8;
+
+    // Enough to show the shape of an event's company without burying the card under it.
+    private const int MaxCast = 8;
 
     protected override void OnInitialized()
     {
@@ -65,5 +106,38 @@
             .Where(Spoiler.IsVisible)
             .OrderBy(e => e.SortOrder)
             .ToList();
+
+        // Everyone who stood in an event, gated the same way the record page gates them. The
+        // chronology knew these all along and printed none of them.
+        cast = events.ToDictionary(
+            evt => evt.Id,
+            evt => Registry.GetDirectlyRelated(evt.Id, Spoiler.IsVisible)
+                .Where(Spoiler.IsVisible)
+                .OrderBy(entity => entity.Name, StringComparer.OrdinalIgnoreCase)
+                .ToList(),
+            StringComparer.OrdinalIgnoreCase);
+    }
+
+    private List<DuneEntity> Cast(HistoricalEvent evt) =>
+        cast.TryGetValue(evt.Id, out var found) ? found : new List<DuneEntity>();
+
+    // The space above a card, measured from the years since the one before it. Only inside an
+    // era: the first card of one opens a new stretch of time and starts level.
+    private string GapBefore(HistoricalEvent evt)
+    {
+        int index = events.IndexOf(evt);
+        if (index <= 0)
+        {
+            return "0rem";
+        }
+
+        var previous = events[index - 1];
+        if (previous.Era != evt.Era || previous.YearAG is not { } before || evt.YearAG is not { } now)
+        {
+            return "0rem";
+        }
+
+        double gap = Math.Min(MaxGapRem, Math.Sqrt(Math.Max(0, now - before)) * GapPerYear);
+        return gap.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) + "rem";
     }
 }

@@ -34,5 +34,16 @@ namespace Duniverse.Models
         /// groups its entries under these as section headings, in SortOrder sequence.
         /// </summary>
         public string? Era { get; set; }
+
+        /// <summary>
+        /// The date as a number the timeline can measure with, so a year's gap sits closer than
+        /// a century's. Negative counts BG. A range or a circa takes its opening year, and
+        /// <see cref="DateAG"/> still carries what the reader sees.
+        /// </summary>
+        /// <remarks>
+        /// Null leaves an event evenly spaced instead of placed, which is the honest answer for
+        /// a date the chronicles never fixed.
+        /// </remarks>
+        public int? YearAG { get; set; }
     }
 }

@@ -24,6 +24,7 @@ namespace Duniverse.Data.Seeders
                     Timeframe = "Roughly 10,000 years before the birth of Paul Atreides",
                     SortOrder = 10,
                     DateAG = "201 to 108 BG",
+                    YearAG = -201,
                     Era = "The Butlerian Age",
                     LastingImpact = "Permanent ban on thinking machines; rise of Mentats, Guild Navigators, and the Bene Gesserit"
                 },
@@ -38,6 +39,7 @@ namespace Duniverse.Data.Seeders
                     Timeframe = "Approximately 15 years before the fall of House Atreides",
                     SortOrder = 60,
                     DateAG = "10175 AG",
+                    YearAG = 10175,
                     Era = "The Corrino Imperium",
                     LastingImpact = "Produced a male capable of prescience and access to both male and female ancestral memory, disrupting Bene Gesserit control"
                 },
@@ -52,6 +54,7 @@ namespace Duniverse.Data.Seeders
                     Timeframe = "Year of the Atreides' arrival on Arrakis",
                     SortOrder = 70,
                     DateAG = "10191 AG",
+                    YearAG = 10191,
                     Era = "The Rise of Muad'Dib",
                     LastingImpact = "Ended House Atreides' open rule of Arrakis and drove Paul into the Fremen, setting his rise into motion"
                 },
@@ -66,6 +69,7 @@ namespace Duniverse.Data.Seeders
                     Timeframe = "Culmination of Paul's desert campaign",
                     SortOrder = 80,
                     DateAG = "10193 AG",
+                    YearAG = 10193,
                     Era = "The Rise of Muad'Dib",
                     LastingImpact = "Overthrew Shaddam IV and installed Paul Atreides as Emperor of the Known Universe"
                 },
@@ -80,6 +84,7 @@ namespace Duniverse.Data.Seeders
                     Timeframe = "Immediately following the Battle of Arrakeen",
                     SortOrder = 90,
                     DateAG = "10193 AG",
+                    YearAG = 10193,
                     Era = "The Rise of Muad'Dib",
                     LastingImpact = "Ended the Harkonnen line of succession and secured Paul's ascension to Emperor"
                 },
@@ -94,6 +99,7 @@ namespace Duniverse.Data.Seeders
                     Timeframe = "The first decade of Paul Atreides' reign",
                     SortOrder = 100,
                     DateAG = "10193 to 10205 AG",
+                    YearAG = 10193,
                     Era = "The Atreides Empire",
                     LastingImpact = "Spread the Church of Muad'Dib across the Imperium at immense human cost; cemented Fremen military dominance"
                 },
@@ -108,6 +114,7 @@ namespace Duniverse.Data.Seeders
                     Timeframe = "Roughly twelve years into Paul's reign",
                     SortOrder = 110,
                     DateAG = "c. 10205 AG",
+                    YearAG = 10205,
                     Era = "The Atreides Empire",
                     LastingImpact = "Blinded Paul Atreides and precipitated his eventual disappearance into the desert, leaving his sister to rule in his place"
                 },
@@ -122,6 +129,7 @@ namespace Duniverse.Data.Seeders
                     Timeframe = "The years following Paul Atreides' disappearance",
                     SortOrder = 120,
                     DateAG = "10205 to 10218 AG",
+                    YearAG = 10205,
                     Era = "The Atreides Empire",
                     LastingImpact = "Exposed the danger of Abomination among pre-born Atreides children and set the stage for Leto II's transformation"
                 },
@@ -141,6 +149,7 @@ namespace Duniverse.Data.Seeders
                     Timeframe = "Following Alia's regency",
                     SortOrder = 140,
                     DateAG = "10218 AG",
+                    YearAG = 10218,
                     Era = "The Long Peace",
                     LastingImpact = "Began a reign meant to last millennia, and set the shape of everything that followed it"
                 },
@@ -155,6 +164,7 @@ namespace Duniverse.Data.Seeders
                     Timeframe = "In the aftermath of the Butlerian Jihad",
                     SortOrder = 30,
                     DateAG = "c. 1 AG",
+                    YearAG = 1,
                     Era = "The Butlerian Age",
                     LastingImpact = "Created the Spacing Guild's enduring monopoly on space travel and cemented melange as the most valuable substance in the universe"
                 },
@@ -171,6 +181,7 @@ namespace Duniverse.Data.Seeders
                     Timeframe = "During the Atreides twins' childhood",
                     SortOrder = 130,
                     DateAG = "10218 AG",
+                    YearAG = 10218,
                     Era = "The Atreides Empire",
                     LastingImpact = "Exposed the Corrino restoration conspiracy and hardened Leto II's resolve toward the Golden Path"
                 },
@@ -189,6 +200,7 @@ namespace Duniverse.Data.Seeders
                     Timeframe = "The end of the God Emperor's reign",
                     SortOrder = 150,
                     DateAG = "13728 AG",
+                    YearAG = 13728,
                     Era = "The Long Peace",
                     LastingImpact = "Ended the Golden Path's enforced peace, triggered the desert's return, and set the stage for the Scattering"
                 },
@@ -208,6 +220,7 @@ namespace Duniverse.Data.Seeders
                     Timeframe = "Following the death of the God Emperor",
                     SortOrder = 160,
                     DateAG = "after 13728 AG",
+                    YearAG = 13728,
                     Era = "The Scattering and the Return",
                     LastingImpact = "Seeded uncounted civilizations past the reach of any Imperial map or oracle"
                 },
@@ -222,6 +235,7 @@ namespace Duniverse.Data.Seeders
                     Timeframe = "During the Bene Gesserit-Honored Matre war",
                     SortOrder = 170,
                     DateAG = "c. 15230 AG",
+                    YearAG = 15230,
                     Era = "The Scattering and the Return",
                     LastingImpact = "Ended Rakis as the source of melange and forced the transplantation of sandworms to Chapterhouse"
                 },
@@ -238,6 +252,7 @@ namespace Duniverse.Data.Seeders
                     Timeframe = "Prior to the events of Dune",
                     SortOrder = 40,
                     DateAG = "c. 10156 AG",
+                    YearAG = 10156,
                     Era = "The Corrino Imperium",
                     LastingImpact = "Exiled House Vernius, placed Ix under Tleilaxu-linked control, and forged Rhombur's lifelong bond with House Atreides"
                 },
@@ -252,6 +267,7 @@ namespace Duniverse.Data.Seeders
                     Timeframe = "Years before Duke Leto's arrival on Arrakis",
                     SortOrder = 50,
                     DateAG = "c. 10156 AG",
+                    YearAG = 10156,
                     Era = "The Corrino Imperium",
                     LastingImpact = "Placed Leto Atreides in command of House Atreides and deepened the Atreides-Harkonnen blood feud"
                 },
@@ -266,6 +282,7 @@ namespace Duniverse.Data.Seeders
                     Timeframe = "In the founding decades of the Bene Gesserit, following the Butlerian Jihad",
                     SortOrder = 20,
                     DateAG = "c. 88 BG",
+                    YearAG = -88,
                     Era = "The Butlerian Age",
                     LastingImpact = "Established the Reverend Mother transformation as the core rite of the Bene Gesserit Sisterhood"
                 }

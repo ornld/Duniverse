@@ -3730,10 +3730,14 @@ button.chip {
         transform: translateX(-50%);
     }
 
+/* --gap is the years since the card above, so the run of a single reign opens up and two
+   events in one season stay shoulder to shoulder. The page sets it; 0 when a new era
+   starts, since the heading there stands for time nobody drew. */
 .timeline-item {
     position: relative;
     width: 50%;
     padding: 0 2.5rem 2.5rem;
+    margin-top: var(--gap, 0);
 }
 
     .timeline-item.left {
@@ -3827,6 +3831,47 @@ button.chip {
 
 /* Era headers across the spine, set as dividers: caps between two hairlines that die
    toward the edges. The solid ground behind the words hides the spine passing through. */
+/* ---- Who stood in the event ----
+   The chronology held these connections all along and printed none of them, so an event
+   named a battle and never the army. Chips take the drawer's mineral, like the graph. */
+.timeline-cast {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin: 0.5rem 0 0;
+    padding: 0;
+}
+
+    .timeline-item.left .timeline-cast {
+        justify-content: flex-end;
+    }
+
+    .timeline-cast a {
+        display: inline-block;
+        padding: 0.1rem 0.45rem;
+        border: var(--rule-hair) solid var(--dune-border);
+        color: var(--dune-muted);
+        font-size: var(--fs-caption);
+        text-decoration: none;
+        transition: color var(--dur-touch) ease, border-color var(--dur-touch) ease;
+    }
+
+    /* The mineral waits for a hover, so a card reads as one thing at rest and the chips
+       do not turn the chronology into a colour chart. */
+    .timeline-cast a:hover,
+    .timeline-cast a:focus-visible {
+        color: var(--cat-color, var(--dune-accent));
+        border-color: var(--cat-color, var(--dune-accent));
+    }
+
+    /* The overflow count is a door to the record, not a record itself, so it wears no
+       mineral and no frame. */
+    .timeline-cast a.cast-more {
+        border-color: transparent;
+        font-style: italic;
+    }
+
 .timeline-era-band {
     position: relative;
     display: flex;
@@ -4076,6 +4121,12 @@ button.chip {
     .timeline-item.right .timeline-dot {
         left: 13px;
         right: auto;
+    }
+
+    /* One column reads left, so the company follows its card instead of hugging the far
+       edge the way it does either side of the spine. */
+    .timeline-item.left .timeline-cast {
+        justify-content: flex-start;
     }
 
     /* Stacked in one column, the side-drift stops meaning anything. Everything just
