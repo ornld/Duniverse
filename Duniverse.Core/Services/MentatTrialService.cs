@@ -21,8 +21,9 @@ namespace Duniverse.Services
         public const int ClueCount = 5;
 
         // Every redacted word becomes this same bar regardless of its length, so the bars
-        // reveal nothing about how long the hidden words are.
-        private const string RedactionBar = "█████";
+        // reveal nothing about how long the hidden words are. Public so the trial page can
+        // swap each bar for a drawn seal instead of printing the characters.
+        public const string RedactionBar = "█████";
 
         private readonly EntityRegistry _registry;
         private readonly PathFinderService _pathFinder;
@@ -133,30 +134,37 @@ namespace Duniverse.Services
                 return "The archive keeps no summary line for this record. Even the archivists found nothing safe to say.";
             }
 
-            return RedactName(answer.ShortDescription, answer.Name);
+            return RedactName(answer.ShortDescription, answer);
         }
 
         /// <summary>
-        /// Blacks out the record's name: the full name, every word over three characters, and
-        /// their fragments. Longer tokens go first so a fragment can't bite a hole in a bigger
-        /// one. Short words survive, since a bar draws more attention.
+        /// Blacks out every name, display and alias alike: full forms, words over three
+        /// characters, and their fragments. Longer tokens go first so a fragment can't bite
+        /// a bigger one. Short words survive; a bar draws more attention.
         /// </summary>
-        private static string RedactName(string text, string name)
+        /// <remarks>
+        /// Aliases matter more than the name here. Paul's own summary never says Paul; it says
+        /// Kwisatz Haderach, and unsealed that line simply hands the answer over.
+        /// </remarks>
+        private static string RedactName(string text, DuneEntity answer)
         {
             var tokens = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-            foreach (var word in name.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+            foreach (var knownAs in new[] { answer.Name }.Concat(answer.Aliases))
             {
-                if (word.Length > 3)
+                foreach (var word in knownAs.Split(' ', StringSplitOptions.RemoveEmptyEntries))
                 {
-                    tokens.Add(word.Trim('.', ',', '\''));
-                }
-
-                foreach (var fragment in word.Split('-', '\'', '’'))
-                {
-                    if (fragment.Length > 3)
+                    if (word.Length > 3)
                     {
-                        tokens.Add(fragment);
+                        tokens.Add(word.Trim('.', ',', '\''));
+                    }
+
+                    foreach (var fragment in word.Split('-', '\'', '’'))
+                    {
+                        if (fragment.Length > 3)
+                        {
+                            tokens.Add(fragment);
+                        }
                     }
                 }
             }
@@ -175,7 +183,9 @@ namespace Duniverse.Services
                     RegexOptions.IgnoreCase);
             }
 
-            return redacted;
+            // Neighbouring bars fuse into one, so a two-word name and a one-word name seal
+            // the same and the bar count stops whispering the answer's shape.
+            return Regex.Replace(redacted, $@"{RedactionBar}(?:[\s,]+{RedactionBar})+", RedactionBar);
         }
 
         // ---- Clue two: the category ----

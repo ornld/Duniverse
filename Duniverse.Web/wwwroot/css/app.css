@@ -4274,6 +4274,17 @@ button.chip {
     line-height: 1.5;
 }
 
+/* The censor's mark: a fixed width of ink whatever hides beneath, edged in spice so it
+   reads as sealed rather than missing. Pale block glyphs here looked like highlighter. */
+.redacted {
+    display: inline-block;
+    width: 4.2em;
+    height: 0.95em;
+    vertical-align: -0.1em;
+    background: var(--dune-ink);
+    border: var(--rule-hair) solid rgba(var(--dune-accent-rgb), 0.4);
+}
+
 /* Trial elements stage their arrival like the dossier: the page-enter fade stands
    down in the :has rule beside the dossier's, and each clue, guess row, and reveal
    settles on its own --i beat, set from the page's loop indexes. */

@@ -29,7 +29,20 @@
                 var clue = clues[i];
                 <li class="trial-clue" style="--i: @i" @key="i">
                     <span class="trial-clue-label">Clue @(i + 1)</span>
-                    <span class="trial-clue-text">@clue</span>
+                    @* A bar in the text renders as a drawn seal, not a run of block characters:
+                       ink, not highlighter, and a screen reader hears one "sealed" instead of
+                       five glyph names. *@
+                    <span class="trial-clue-text">
+                        @{ var parts = clue.Split(MentatTrialService.RedactionBar); }
+                        @for (int part = 0; part < parts.Length; part++)
+                        {
+                            @parts[part]
+                            @if (part < parts.Length - 1)
+                            {
+                                <span class="redacted" role="img" aria-label="sealed"></span>
+                            }
+                        }
+                    </span>
                 </li>
             }
         </ol>
