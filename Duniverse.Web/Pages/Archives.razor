@@ -28,7 +28,7 @@
     @if (candidates.Count > 0)
     {
         <div class="candidates">
-            <p>@candidates.Count records match "@lastQuery" - did you mean:</p>
+            <p>@candidates.Count records match "@lastQuery". Did you mean:</p>
             <ul>
                 @foreach (var candidate in candidates)
                 {
