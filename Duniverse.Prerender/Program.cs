@@ -66,13 +66,34 @@ var fixedRoutes = new (string Route, string Title, string Description)[]
     ("connections", "Trace a Connection", "Pick any two records and follow the shortest chain of relationships between them."),
     ("universe", "The Whole Duniverse", "Every record and every connection in one map you can pan and zoom."),
     ("terminology", "Terminology of the Imperium", "A glossary of the Imperium in the voice of Herbert's own appendices."),
-    ("sayings", "Collected Sayings", "Epigraphs and sayings gathered from across the saga, by source."),
+    ("sayings", "Collected Sayings", "The chapter introductions, in the order Frank Herbert wrote them."),
     ("trial", "The Mentat Trial", "A daily puzzle: five clues, six guesses, one record from the archive."),
 };
 
 foreach (var (route, title, description) in fixedRoutes)
 {
     pages.Add((route, title, description, $"<h1>{Esc(title)}</h1><p>{Esc(description)}</p>", true));
+}
+
+// ---- the later sayings shelves ----------------------------------------------------------
+// Book one reads in the open through the sayings route above. The five later shelves answer
+// with a withholding shell like a sealed record's, so every in-app link lands while the
+// public face stays book-one safe. The titles themselves are covers, not spoilers.
+var laterShelves = new (string Route, string Title)[]
+{
+    ("sayings/dune-messiah", "Dune Messiah"),
+    ("sayings/children-of-dune", "Children of Dune"),
+    ("sayings/god-emperor", "God Emperor of Dune"),
+    ("sayings/heretics", "Heretics of Dune"),
+    ("sayings/chapterhouse", "Chapterhouse: Dune"),
+};
+
+foreach (var (route, title) in laterShelves)
+{
+    pages.Add((route, $"Sayings of {title}",
+        "The chapter headings of a later book in the saga. Open it on the site to decide for yourself.",
+        $"<h1>A spoiler lies ahead</h1><p>The sayings of {Esc(title)} sit past the book-one face "
+        + "this archive shows by default.</p>", false));
 }
 
 // ---- category browse pages --------------------------------------------------------------
