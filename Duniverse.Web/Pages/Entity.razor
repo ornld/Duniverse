@@ -580,7 +580,15 @@ else
             _ => Array.Empty<MetaRow>(),
         };
 
+        // Only where it says something. Every record a book-one reader can open is a Dune
+        // record, so this would read alike on all of them. Above that it names the book, and
+        // never sits past its reader.
+        var editionRow = entity.SpoilerTier != SpoilerTier.Dune
+            ? new[] { new MetaRow("Drawn From", EditionLabel(entity.SpoilerTier)) }
+            : Array.Empty<MetaRow>();
+
         return aliasRow
+            .Concat(editionRow)
             .Concat(rows)
             .Where(row => row.Items is { Count: > 0 } || row.Parts is { Count: > 0 } || HasFact(row.Value))
             .ToList();
@@ -593,6 +601,11 @@ else
     private static bool HasFact(string? value) =>
         !string.IsNullOrWhiteSpace(value)
         && !string.Equals(value.Trim(), "Not widely recorded", StringComparison.OrdinalIgnoreCase);
+
+    // The ledger wants a title, not the tail of a sentence, so the Expanded Universe leaves
+    // behind the parenthetical the gate notice carries.
+    private static string EditionLabel(SpoilerTier tier) =>
+        tier == SpoilerTier.ExpandedUniverse ? "The Expanded Universe" : BookName(tier);
 
     // The reader-facing name of the book a gated entry draws on, for the spoiler
     // notice.
