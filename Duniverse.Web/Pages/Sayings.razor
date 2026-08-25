@@ -1,39 +1,197 @@
 @page "/sayings"
+@page "/sayings/{Slug}"
 @inject SpoilerSettings Spoiler
 
-<PageTitle>Sayings - Duniverse</PageTitle>
+<PageTitle>@pageTitle - Duniverse</PageTitle>
 
-<div class="hero" style="background-image: var(--scrim-mid), url('/images/sayingsbackground.webp');">
-    <h1>Collected Sayings</h1>
-    <p class="tagline">
-        The epigraphs and famous lines of the saga from Frank Herbert.
-    </p>
+@if (book is null)
+{
+    <h1>Unknown book</h1>
+    <p>"@Slug" doesn't match one of the six novels.</p>
+}
+else
+{
+    <div class="hero" style="background-image: var(--scrim-mid), url('/images/sayingsbackground.webp');">
+        @* The header is a spread: words on the left, the shelf standing on the right,
+           bottoms level. On narrow screens the shelf drops back under the words. *@
+        <div class="sayings-head">
+        <div class="sayings-head-words">
+            <h1>Collected Sayings</h1>
+            <p class="tagline">
+                The chapter introductions, in the order Frank Herbert wrote them.
+            </p>
+        </div>
 
-    @foreach (var group in groups)
-    {
-        <section class="sayings-group">
-            <h2 class="sayings-source">@group.Key</h2>
-            @foreach (var epigraph in group)
+        @* The ritual's spines return as the picker. The open book is pulled from the
+           row and lies flat at the shelf's end; its slot stays empty behind it. Dune
+           lives at the bare address so the nav tab and old links land somewhere real. *@
+        <nav class="sayings-shelf" aria-label="Choose a book">
+            <a class="shelf-laid" href="@book.Href" aria-current="page">
+                <span class="spine-num">@Roman(System.Array.IndexOf(Books, book) + 1)</span>
+                <span class="spine-title">@book.ShortTitle</span>
+            </a>
+            @for (var i = 0; i < Books.Length; i++)
             {
-                <blockquote class="epigraph">
-                    <p class="epigraph-text">@epigraph.Text</p>
-                </blockquote>
+                var shelf = Books[i];
+                if (shelf == book)
+                {
+                    @* Desktop shows the gap the pulled book left. Phones have no room for
+                       the lying book, so there the open book stays standing, marked in
+                       the accent; the two swap through the stylesheet, never both shown. *@
+                    <span class="shelf-slot" aria-hidden="true"></span>
+                    <a class="shelf-spine shelf-standing" href="@shelf.Href">
+                        <span class="spine-num">@Roman(i + 1)</span>
+                        <span class="spine-title">@shelf.ShortTitle</span>
+                    </a>
+                }
+                else
+                {
+                    <a class="shelf-spine" href="@shelf.Href">
+                        <span class="spine-num">@Roman(i + 1)</span>
+                        <span class="spine-title">@shelf.ShortTitle</span>
+                    </a>
+                }
             }
-        </section>
-    }
-</div>
+        </nav>
+        </div>
+
+        @if (!Spoiler.IsVisible(book.Tier) && !revealed)
+        {
+            @* A whole book seals as one, same hawk and same choice a gated record offers.
+               The reveal is per visit on purpose: leaving the page lets the seal reform. *@
+            <div class="sayings-gate">
+                <GateSeal Breaking="sealBreaking" />
+                <h2>A spoiler lies ahead</h2>
+                <p>
+                    These sayings come from @book.Title, past where your reading progress is
+                    set to stop. You can reveal them anyway, adjust your progress on the
+                    Archives page, or stay with the books you've finished.
+                </p>
+                <div class="gate-actions">
+                    <button class="surprise-btn" @onclick="RevealAsync">Reveal these sayings</button>
+                    <a class="chip" href="/archives">Adjust my progress</a>
+                </div>
+            </div>
+        }
+        else
+        {
+            <section class="sayings-group">
+                <h2 class="sayings-source">@book.Title</h2>
+                @for (var i = 0; i < epigraphs.Count; i++)
+                {
+                    var epigraph = epigraphs[i];
+                    <blockquote class="epigraph">
+                        @* Herbert never numbered his chapters; the tally is ours, one count
+                           per book, so a reader can find their place on the shelf. *@
+                        <span class="epigraph-number">@Roman(i + 1)</span>
+                        <p class="epigraph-text">@epigraph.Text</p>
+                        <footer class="epigraph-source">@epigraph.Work</footer>
+                    </blockquote>
+                }
+            </section>
+
+            @* The lines that never headed a chapter close the shelf they belong to. Today
+               that is one group on Dune: the Litany, kept when the spoken lines went. *@
+            @foreach (var group in spokenGroups)
+            {
+                <section class="sayings-group">
+                    <h2 class="sayings-source">@group.Key</h2>
+                    @foreach (var epigraph in group)
+                    {
+                        <blockquote class="epigraph">
+                            <p class="epigraph-text">@epigraph.Text</p>
+                        </blockquote>
+                    }
+                </section>
+            }
+        }
+    </div>
+}
 
 @code {
-    private List<IGrouping<string, Epigraph>> groups = new();
+    [Parameter]
+    public string? Slug { get; set; }
 
-    protected override void OnInitialized()
+    private sealed record BookShelf(string Slug, string Title, string ShortTitle, SpoilerTier Tier)
     {
-        // Group order follows the seeder: Irulan's histories first, then the Sisterhood,
-        // scripture, spoken lines, and the later books. Spoiler-gated sayings drop out, and a
-        // source heading with nothing left under it disappears with them.
-        groups = EpigraphSeeder.GetEpigraphs()
-            .Where(epigraph => Spoiler.IsVisible(epigraph.Tier))
-            .GroupBy(epigraph => epigraph.Work)
+        public string Href => Slug == "dune" ? "/sayings" : $"/sayings/{Slug}";
+    }
+
+    private static readonly BookShelf[] Books =
+    {
+        new("dune", "Dune", "Dune", SpoilerTier.Dune),
+        new("dune-messiah", "Dune Messiah", "Dune Messiah", SpoilerTier.DuneMessiah),
+        new("children-of-dune", "Children of Dune", "Children of Dune", SpoilerTier.ChildrenOfDune),
+        new("god-emperor", "God Emperor of Dune", "God Emperor", SpoilerTier.GodEmperorOfDune),
+        new("heretics", "Heretics of Dune", "Heretics", SpoilerTier.HereticsOfDune),
+        new("chapterhouse", "Chapterhouse: Dune", "Chapterhouse", SpoilerTier.Chapterhouse),
+    };
+
+    private BookShelf? book;
+    private string pageTitle = "Sayings";
+    private List<Epigraph> epigraphs = new();
+    private List<IGrouping<string, Epigraph>> spokenGroups = new();
+    private bool revealed;
+    private bool sealBreaking;
+
+    protected override void OnParametersSet()
+    {
+        book = Books.FirstOrDefault(b => b.Slug == (string.IsNullOrEmpty(Slug) ? "dune" : Slug));
+        revealed = false;
+        sealBreaking = false;
+
+        if (book is null)
+        {
+            pageTitle = "Sayings";
+            epigraphs = new List<Epigraph>();
+            spokenGroups = new List<IGrouping<string, Epigraph>>();
+            return;
+        }
+
+        pageTitle = $"Sayings of {book.Title}";
+
+        // A book's whole run shares one tier, so the gate above decides everything at once;
+        // no quote-by-quote sieve like the old page ran.
+        var all = EpigraphSeeder.GetEpigraphs();
+        epigraphs = all.Where(e => !e.Spoken && e.Tier == book.Tier).ToList();
+        spokenGroups = all.Where(e => e.Spoken && e.Tier == book.Tier)
+            .GroupBy(e => e.Work)
             .ToList();
+    }
+
+    // Longest run is Children of Dune at LXIII, so the map stops at fifty.
+    private static string Roman(int number)
+    {
+        var map = new (int Value, string Numeral)[]
+        {
+            (50, "L"), (40, "XL"), (10, "X"), (9, "IX"), (5, "V"), (4, "IV"), (1, "I"),
+        };
+
+        var result = "";
+        foreach (var (value, numeral) in map)
+        {
+            while (number >= value)
+            {
+                result += numeral;
+                number -= value;
+            }
+        }
+        return result;
+    }
+
+    // The seal parts first, then the shelf. Same beat as a record's gate; a repeat click
+    // mid-break does nothing rather than cutting the parting short.
+    private async Task RevealAsync()
+    {
+        if (sealBreaking)
+        {
+            return;
+        }
+
+        sealBreaking = true;
+        StateHasChanged();
+        await Task.Delay(700);
+        sealBreaking = false;
+        revealed = true;
     }
 }

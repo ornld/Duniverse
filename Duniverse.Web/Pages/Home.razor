@@ -71,7 +71,7 @@
             <a class="category-tile" href="/sayings">
                 <span class="door-register">@MainLayout.RegisterFor("/sayings")</span>
                 <strong>Sayings</strong>
-                <span class="muted">Read the epigraphs and famous lines of the saga.</span>
+                <span class="muted">Read the chapter introductions, in the order Frank Herbert wrote them.</span>
             </a>
             <a class="category-tile" href="/trial">
                 <span class="door-register">@MainLayout.RegisterFor("/trial")</span>
@@ -89,9 +89,10 @@
     {
         // One saying per day, picked by date instead of chance, so everyone visiting
         // on the same day sees the same line. Only spoiler-safe sayings enter the
-        // rotation.
+        // rotation, and only ones that read at a glance: the chapter headings brought
+        // page-long entries, and the cap sits high enough to keep the Litany in.
         var pool = EpigraphSeeder.GetEpigraphs()
-            .Where(epigraph => Spoiler.IsVisible(epigraph.Tier))
+            .Where(epigraph => Spoiler.IsVisible(epigraph.Tier) && epigraph.Text.Length <= 420)
             .ToList();
 
         if (pool.Count > 0)
