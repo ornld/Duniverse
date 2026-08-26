@@ -28,11 +28,11 @@ namespace Duniverse.Data
 
             foreach (var source in all)
             {
-                Scan(source.Id, source.Id, source.SpoilerTier, DisplayedText(source), "its own entry");
+                Scan(source.Id, source.Id, Reach.AtTier(source.SpoilerTier), DisplayedText(source), "its own entry");
 
                 foreach (var layer in source.HistoryLayers)
                 {
-                    Scan(source.Id, source.Id, layer.Tier, layer.Text, $"its {layer.Tier} layer");
+                    Scan(source.Id, source.Id, Reach.AtTier(layer.Tier), layer.Text, $"its {layer.Tier} layer");
                 }
             }
 
@@ -40,8 +40,28 @@ namespace Duniverse.Data
             // print on that record as well. Same rule applies to a definition as to prose.
             foreach (var term in GlossarySeeder.GetTerms())
             {
-                Scan($"the term '{term.Term}'", term.SeeEntityId, term.Tier,
+                Scan($"the term '{term.Term}'", term.SeeEntityId, Reach.AtTier(term.Tier),
                     term.Term + " " + term.Definition, "its definition");
+            }
+
+            // A role phrase prints on both records, on both graphs, and along a connection
+            // chain, so it leaks exactly like prose. Nothing read these until now.
+            foreach (var rel in RelationshipMap.Relationships)
+            {
+                if (registry.GetEntity(rel.FromId) is not { } from || registry.GetEntity(rel.ToId) is not { } to)
+                {
+                    continue;
+                }
+
+                // Three gates stand between a reader and a label: its own book, and both of the
+                // records it joins. The weakest reader who sees it has passed all three, so
+                // naming either endpoint needs no exemption here.
+                var reach = Reach.Across(rel.Tier, from.SpoilerTier, to.SpoilerTier);
+
+                Scan($"the label on {from.Id} and {to.Id}", from.Id, reach, rel.FromRole,
+                    $"the phrase '{rel.FromRole}'");
+                Scan($"the label on {from.Id} and {to.Id}", to.Id, reach, rel.ToRole,
+                    $"the phrase '{rel.ToRole}'");
             }
 
             if (breaches.Count > 0)
@@ -53,7 +73,7 @@ namespace Duniverse.Data
                     + "Move the sentence into a HistoryLayer at the right tier, or raise the record's own tier.");
             }
 
-            void Scan(string owner, string? selfId, SpoilerTier readAt, string? text, string where)
+            void Scan(string owner, string? selfId, Reach readAt, string? text, string where)
             {
                 if (string.IsNullOrWhiteSpace(text))
                 {
@@ -63,7 +83,7 @@ namespace Duniverse.Data
                 foreach (var target in all)
                 {
                     if (string.Equals(target.Id, selfId, StringComparison.OrdinalIgnoreCase)
-                        || Admits(readAt, target.SpoilerTier))
+                        || readAt.Admits(target.SpoilerTier))
                     {
                         continue;
                     }
@@ -74,7 +94,7 @@ namespace Duniverse.Data
                     if (hit is not null)
                     {
                         breaches.Add(
-                            $"  {owner} ({readAt}) names '{hit}' in {where}, and {target.Id} is sealed until {target.SpoilerTier}.");
+                            $"  {owner} (read at {readAt.Describe()}) names '{hit}' in {where}, and {target.Id} is sealed until {target.SpoilerTier}.");
                     }
                 }
             }
@@ -82,17 +102,42 @@ namespace Duniverse.Data
         }
 
 #if DEBUG
-        // The weakest reader who can reach this text. A novel passage assumes the Expanded
-        // Universe toggle is off. An Expanded Universe passage assumes someone who opted in
-        // and has only finished Dune, since the toggle runs free of novel progress.
-        private static bool Admits(SpoilerTier readAt, SpoilerTier target)
+        /// <summary>
+        /// The weakest reader who can reach a piece of text: how far through the novels they
+        /// have read, and whether they opted into the Expanded Universe. The toggle runs free
+        /// of novel progress, so the two travel separately.
+        /// </summary>
+        private readonly record struct Reach(SpoilerTier Novels, bool ExpandedUniverse)
         {
-            if (readAt == SpoilerTier.ExpandedUniverse)
+            // One gate. An Expanded Universe passage assumes someone who opted in and has only
+            // finished Dune, since nothing about the toggle implies novel progress.
+            public static Reach AtTier(SpoilerTier tier) => tier == SpoilerTier.ExpandedUniverse
+                ? new Reach(SpoilerTier.Dune, true)
+                : new Reach(tier, false);
+
+            // Several gates at once, the way a relationship label sits behind its own book and
+            // both records it joins. The reader has to have passed every one of them.
+            public static Reach Across(params SpoilerTier[] tiers)
             {
-                return target is SpoilerTier.Dune or SpoilerTier.ExpandedUniverse;
+                var reach = new Reach(SpoilerTier.Dune, false);
+                foreach (var one in tiers)
+                {
+                    var gate = AtTier(one);
+                    reach = new Reach(
+                        gate.Novels > reach.Novels ? gate.Novels : reach.Novels,
+                        reach.ExpandedUniverse || gate.ExpandedUniverse);
+                }
+
+                return reach;
             }
 
-            return target != SpoilerTier.ExpandedUniverse && target <= readAt;
+            public bool Admits(SpoilerTier target) => target == SpoilerTier.ExpandedUniverse
+                ? ExpandedUniverse
+                : target <= Novels;
+
+            public string Describe() => ExpandedUniverse
+                ? $"{Novels} with the Expanded Universe on"
+                : Novels.ToString();
         }
 
         // Reflection so a new field on a record joins the check for free. Layers carry their
