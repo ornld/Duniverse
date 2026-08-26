@@ -328,6 +328,37 @@ namespace Duniverse.Data
             new("org_CHOAM", "bio_Melange", "The combine that sets its price", "The single commodity that moves its markets"),
             new("org_CHOAM", "char_JosefVenport", "The combine that came out of his trade", "Built the trading empire it grew out of", SpoilerTier.ExpandedUniverse),
             new("art_GoldenLionThrone", "loc_Kaitain", "The seat of empire kept here", "The capital that houses it"),
+
+            // ---- The Bene Tleilax: the gene traders and their work ----
+            new("org_BeneTleilax", "loc_Tleilax", "The closed society that holds it", "Their homeworld, shut to every outsider"),
+            new("org_BeneTleilax", "theo_TleilaxuFaith", "The people who keep it hidden", "The faith behind everything they do"),
+            // Both records sit at Dune, so an endpoint-matched tier would leave this open at
+            // book one. The ghola is a Dune Messiah reveal, so the label carries its own book.
+            new("org_BeneTleilax", "char_DuncanIdaho", "The Masters who brought him back", "The man they regrew from a single cell", SpoilerTier.DuneMessiah),
+            new("org_BeneTleilax", "char_Scytale", "The order that sent him", "Their Face Dancer in the plot against Paul", SpoilerTier.DuneMessiah),
+            new("org_BeneTleilax", "char_Bijaz", "The order that wound him up", "The dwarf they built around a trigger", SpoilerTier.DuneMessiah),
+            new("org_BeneTleilax", "disc_GholaCultivation", "The only hands that know how", "Growing the dead back in their tanks", SpoilerTier.DuneMessiah),
+            new("org_BeneTleilax", "event_MessiahConspiracy", "The gene traders who supplied its weapons", "One of three powers that moved against Muad'Dib", SpoilerTier.DuneMessiah),
+            new("org_BeneTleilax", "char_Waff", "The order he serves and quietly doubts", "A Master whose belief outran the scheme", SpoilerTier.HereticsOfDune),
+            new("org_BeneTleilax", "bio_Futar", "The gene-shapers most suspect made them", "A hunter shaped from human and cat, laid at their door", SpoilerTier.HereticsOfDune),
+            new("org_BeneTleilax", "event_IxianCoup", "The order that seized the world", "The day they took Ix for themselves", SpoilerTier.ExpandedUniverse),
+
+            // ---- The death at the Hidden Ford and what it released ----
+            new("event_DeathOfTheGodEmperor", "char_LetoIIAtreides", "The day his reign ends at the Hidden Ford", "The God Emperor who dies in it", SpoilerTier.GodEmperorOfDune),
+            new("event_DeathOfTheGodEmperor", "char_SionaAtreides", "The fall she planned and survived", "The Atreides who brought him down", SpoilerTier.GodEmperorOfDune),
+            new("event_DeathOfTheGodEmperor", "char_DuncanIdaho", "The day he helped end his master", "The ghola who stood with Siona at the end", SpoilerTier.GodEmperorOfDune),
+            new("event_DeathOfTheGodEmperor", "char_HwiNoree", "The fall that killed her too", "The bride who died on the bridge with him", SpoilerTier.GodEmperorOfDune),
+            new("event_DeathOfTheGodEmperor", "bio_Sandtrout", "The death that set them loose again", "Released back into the world when he broke apart", SpoilerTier.GodEmperorOfDune),
+            new("event_DeathOfTheGodEmperor", "event_TheScattering", "The moment it became possible", "What humanity did once he was gone", SpoilerTier.GodEmperorOfDune),
+            new("event_DeathOfTheGodEmperor", "loc_Rakis", "What let its desert come back", "The world that takes its name after him", SpoilerTier.HereticsOfDune),
+
+            // ---- House Vernius: the Earls of Ix before the Tleilaxu ----
+            new("house_Vernius", "loc_Ix", "The House that ruled it before the Tleilaxu", "The world they ruled until the Tleilaxu came", SpoilerTier.ExpandedUniverse),
+            new("house_Vernius", "house_Richese", "The rival whose machines outsold theirs", "The other House selling cleverness", SpoilerTier.ExpandedUniverse),
+            new("house_Vernius", "char_DominicVernius", "The House he ruled and outlived", "The Earl who went underground rather than kneel", SpoilerTier.ExpandedUniverse),
+            new("house_Vernius", "char_RhomburVernius", "The House he never got back", "The heir who spent his life in exile", SpoilerTier.ExpandedUniverse),
+            new("house_Vernius", "event_IxianCoup", "The House it toppled", "The night Ix was taken from them", SpoilerTier.ExpandedUniverse),
+            new("house_Vernius", "char_HwiNoree", "The House that ruled Ix in an older age", "Ixian work from long after their fall", SpoilerTier.ExpandedUniverse),
         };
 
         /// <summary>
