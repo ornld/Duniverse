@@ -20,6 +20,12 @@
         </div>
         <p class="tagline">@items.Count records. Select one to see its full entry and connections.</p>
 
+        @* Only the worlds drawer opens onto the register; the other nine have no fiefs. *@
+        @if (Slug.Equals("worlds", StringComparison.OrdinalIgnoreCase))
+        {
+            <a class="fief-door" href="/fiefs">See who holds each world &#8594;</a>
+        }
+
         <div class="category-grid">
             @foreach (var item in items)
             {

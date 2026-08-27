@@ -64,6 +64,23 @@ namespace Duniverse.Data
                     $"the phrase '{rel.ToRole}'");
             }
 
+            // A fief era prints on the register behind two gates, its own book and the
+            // world's record. The weakest reader who can reach the words passed both.
+            foreach (var line in FiefMap.Lines)
+            {
+                if (registry.GetEntity(line.WorldId) is not { } world)
+                {
+                    continue;
+                }
+
+                foreach (var era in line.Eras)
+                {
+                    var reach = Reach.Across(world.SpoilerTier, era.Tier);
+                    Scan($"the {era.Tier} era of {line.WorldId}", line.WorldId, reach,
+                        era.Holder + " " + era.Note, "its register entry");
+                }
+            }
+
             if (breaches.Count > 0)
             {
                 throw new InvalidOperationException(

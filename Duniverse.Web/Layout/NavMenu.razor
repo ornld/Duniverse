@@ -23,7 +23,7 @@
         @* aria-expanded is a string on purpose. Hand Blazor the bool and it treats it
            like a checkbox's checked: false drops the attribute, true writes it empty,
            so a screen reader never hears whether this panel is open. *@
-        <button type="button" class="index-trigger @(IsCategoryPage ? "active" : "")"
+        <button type="button" class="index-trigger @(IsIndexPage ? "active" : "")"
                 aria-haspopup="true" aria-expanded="@(open ? "true" : "false")" @onclick="Toggle">
             <span class="index-label">Index</span>
             <svg class="index-chevron" viewBox="0 0 16 16" aria-hidden="true">
@@ -52,6 +52,9 @@
                     <li style="--i: 7" class="category-theological-systems"><NavLink href="/category/theological-systems"><Mark Name="theological-systems" CssClass="index-mark" /><span class="index-label">Theological System</span></NavLink></li>
                     <li style="--i: 8" class="category-vehicles"><NavLink href="/category/vehicles"><Mark Name="vehicles" CssClass="index-mark" /><span class="index-label">Vehicle</span></NavLink></li>
                     <li style="--i: 9" class="category-worlds"><NavLink href="/category/worlds"><Mark Name="worlds" CssClass="index-mark" /><span class="index-label">World</span></NavLink></li>
+                    @* The register is an instrument, not a drawer, so it closes the list
+                       on its own row, wearing the mark of the drawer its door lives on. *@
+                    <li style="--i: 10" class="category-worlds index-register"><NavLink href="/fiefs"><Mark Name="worlds" CssClass="index-mark" /><span class="index-label">Siridar Register</span></NavLink></li>
                 </ul>
             </div>
         }
@@ -70,7 +73,8 @@
     // The trigger carries the Eyes of Ibad glow whenever you're inside any category,
     // so the "blue marks where you are" rule survives the links moving into a
     // dropdown.
-    private bool IsCategoryPage => Nav.Uri.Contains("/category/");
+    // The trigger lights for every page the panel opens onto, the register included.
+    private bool IsIndexPage => Nav.Uri.Contains("/category/") || Nav.Uri.Contains("/fiefs");
 
     protected override void OnInitialized()
     {

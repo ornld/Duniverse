@@ -65,6 +65,7 @@ var fixedRoutes = new (string Route, string Title, string Description)[]
     ("bloodlines", "Bloodlines", "The Atreides, Harkonnen and Corrino lines, drawn as one chart and gated by how far you have read."),
     ("connections", "Trace a Connection", "Pick any two records and follow the shortest chain of relationships between them."),
     ("universe", "The Whole Duniverse", "Every record and every connection in one map you can pan and zoom."),
+    ("fiefs", "Fiefs of the Imperium", "Who holds each world of the Imperium, and who held it before, book by book."),
     ("terminology", "Terminology of the Imperium", "A glossary of the Imperium in the voice of Herbert's own appendices."),
     ("sayings", "Collected Sayings", "The chapter introductions, in the order Frank Herbert wrote them."),
     ("trial", "The Mentat Trial", "A daily puzzle: five clues, six guesses, one record from the archive."),

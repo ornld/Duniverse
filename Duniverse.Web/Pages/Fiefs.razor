@@ -1,0 +1,158 @@
+@page "/fiefs"
+@inject EntityRegistry Registry
+@inject SpoilerSettings Spoiler
+
+<PageTitle>Fiefs of the Imperium - Duniverse</PageTitle>
+
+<div class="hero fiefs-hero" style="background-image: var(--scrim-deep), url('/images/categories/worlds.webp');">
+    <h1>Fiefs of the Imperium</h1>
+    <p class="tagline">
+        Every world answers to someone. The register records who holds each one, and who
+        held it before, as far as your reading has carried you.
+    </p>
+
+    <SpoilerControl OnChanged="OnSpoilerChanged" />
+
+    @if (Spoiler.Loaded)
+    {
+        <div class="fief-register">
+            @foreach (var group in Groups())
+            {
+                <section class="fief-holder">
+                    <h3>
+                        @if (group.MarkSlug is not null)
+                        {
+                            <Mark Name="@group.MarkSlug" CssClass="@($"fief-mark connection-cat category-{group.MarkSlug}")" />
+                        }
+                        @if (group.HolderId is not null)
+                        {
+                            <a href="@($"/entity/{group.HolderId}")">@group.Holder</a>
+                        }
+                        else
+                        {
+                            <span>@group.Holder</span>
+                        }
+                        <span class="fief-tally">@Tally(group.Rows.Count)</span>
+                    </h3>
+                    <ul class="fief-worlds">
+                        @foreach (var line in group.Rows)
+                        {
+                            var eras = FiefMap.VisibleEras(line, Spoiler.IsVisible).ToList();
+                            <li>
+                                <a class="fief-world category-worlds" href="@($"/entity/{line.WorldId}")">@Registry.GetEntity(line.WorldId)!.Name</a>
+                                @foreach (var later in VisibleLaterNames(line))
+                                {
+                                    <a class="fief-alias" href="@($"/entity/{later.Id}")">later called @later.Name</a>
+                                }
+                                @if (eras.Count == 1)
+                                {
+                                    @if (eras[0].Note is { } soleNote)
+                                    {
+                                        <span class="fief-note">@soleNote</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="fief-chain">
+                                        @for (int i = 0; i < eras.Count; i++)
+                                        {
+                                            var era = eras[i];
+                                            @if (i > 0)
+                                            {
+                                                <span class="fief-arrow" aria-hidden="true">&#8594;</span>
+                                            }
+                                            <span class="fief-era @(i == eras.Count - 1 ? "is-current" : null)">
+                                                @era.Holder@if (era.Note is { } note)
+                                                {<span class="fief-note"> (@note)</span>}
+                                            </span>
+                                        }
+                                    </span>
+                                }
+                            </li>
+                        }
+                    </ul>
+                </section>
+            }
+        </div>
+
+        <p class="fief-footnote muted">
+            The register honors your spoiler settings. A transfer from a book past your
+            progress stays sealed until you reach it.
+        </p>
+    }
+</div>
+
+@code {
+    // A section of the census: one holder, the worlds they hold at the reader's
+    // position. MarkSlug carries the holder's drawer so the heading wears its mineral.
+    private sealed record HolderGroup(string? HolderId, string Holder, string? MarkSlug, List<FiefLine> Rows);
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Spoiler.LoadAsync();
+    }
+
+    private void OnSpoilerChanged() => StateHasChanged();
+
+    // Grouped by the holder each world answers to right now. The heading takes the
+    // record's clean name where one exists; the era's fuller phrasing stays on the row.
+    private IEnumerable<HolderGroup> Groups()
+    {
+        var groups = new List<HolderGroup>();
+
+        foreach (var line in FiefMap.Lines)
+        {
+            var world = Registry.GetEntity(line.WorldId);
+            if (world is null || !Spoiler.IsVisible(world))
+            {
+                continue;
+            }
+
+            if (FiefMap.CurrentEra(line, Spoiler.IsVisible) is not { } current)
+            {
+                continue;
+            }
+
+            var holder = current.HolderId is not null ? Registry.GetEntity(current.HolderId) : null;
+            var name = holder?.Name ?? current.Holder;
+            var group = groups.FirstOrDefault(g =>
+                string.Equals(g.HolderId, current.HolderId, StringComparison.OrdinalIgnoreCase)
+                && (g.HolderId is not null || string.Equals(g.Holder, name, StringComparison.Ordinal)));
+
+            if (group is null)
+            {
+                group = new HolderGroup(current.HolderId, name,
+                    holder is null ? null : GraphLayoutService.CategorySlug(holder), new List<FiefLine>());
+                groups.Add(group);
+            }
+
+            group.Rows.Add(line);
+        }
+
+        return groups.OrderBy(g => FiefMap.HolderOrder(g.HolderId));
+    }
+
+    private IEnumerable<DuneEntity> VisibleLaterNames(FiefLine line) =>
+        line.LaterNames
+            .Select(Registry.GetEntity)
+            .OfType<DuneEntity>()
+            .Where(Spoiler.IsVisible);
+
+    // Spelled out, the way the site counts. Twelve covers the whole register.
+    private static string Tally(int n) => n switch
+    {
+        1 => "one world",
+        2 => "two worlds",
+        3 => "three worlds",
+        4 => "four worlds",
+        5 => "five worlds",
+        6 => "six worlds",
+        7 => "seven worlds",
+        8 => "eight worlds",
+        9 => "nine worlds",
+        10 => "ten worlds",
+        11 => "eleven worlds",
+        12 => "twelve worlds",
+        _ => $"{n} worlds",
+    };
+}

@@ -36,6 +36,9 @@ namespace Duniverse.Data
             // Debug-only id check for the Bloodlines chart, so a typo there fails at startup.
             BloodlineMap.Validate(registry);
 
+            // Same bargain for the fief register: a bad id fails loudly here, not quietly there.
+            FiefMap.Validate(registry);
+
             // The gate hides records, never sentences, so a safe entry can still name a sealed
             // one. Nothing in the build was reading prose for that until this. Debug-only too.
             SpoilerProseGuard.Validate(registry);

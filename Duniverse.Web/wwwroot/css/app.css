@@ -3738,6 +3738,15 @@ button.chip {
     animation-delay: calc(60ms + var(--i) * 30ms);
 }
 
+    /* The register is not a drawer, so it stands under the ten on its own full row,
+       parted by a hairline. */
+    .index-panel li.index-register {
+        grid-column: 1 / -1;
+        margin-top: 6px;
+        padding-top: 6px;
+        border-top: var(--rule-hair) solid var(--dune-border);
+    }
+
 @keyframes index-item {
     from {
         opacity: 0;
@@ -4320,6 +4329,122 @@ button.chip {
     gap: var(--sp-3);
     margin-top: var(--sp-5);
 }
+
+/* ---- The Siridar Register ---- */
+
+/* The census of holdings. Sections are holders, rows are worlds, and the chain on a row
+   tells the hands it passed through. All of it recomputes as the reader's progress moves. */
+.fief-register {
+    margin: var(--sp-6) 0 var(--sp-4);
+    display: grid;
+    gap: var(--sp-5);
+}
+
+.fief-holder h3 {
+    display: flex;
+    align-items: baseline;
+    gap: var(--sp-3);
+    margin: 0 0 var(--sp-2);
+}
+
+    /* Centered by hand, same trick as the related sections: the flex line aligns on
+       baselines and an svg has none. */
+    .fief-holder h3 .fief-mark {
+        width: 16px;
+        height: 16px;
+        align-self: center;
+        flex: none;
+    }
+
+.fief-tally {
+    color: var(--dune-muted);
+    font-size: var(--fs-caption);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.fief-worlds {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--sp-2);
+}
+
+    .fief-worlds li {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 0.3rem 0.6rem;
+    }
+
+    /* The world chip takes the cast-chip register: muted at rest, its drawer's mineral
+       under the hand, so the census reads as one thing before it reads as ten colors. */
+    .fief-worlds .fief-world {
+        display: inline-block;
+        padding: 0.1rem 0.45rem;
+        border: var(--rule-hair) solid var(--dune-border);
+        color: var(--dune-text);
+        font-size: var(--fs-small);
+        text-decoration: none;
+        transition: color var(--dur-touch) ease, border-color var(--dur-touch) ease;
+    }
+
+    .fief-worlds .fief-world:hover,
+    .fief-worlds .fief-world:focus-visible {
+        color: var(--cat-color, var(--dune-accent));
+        border-color: var(--cat-color, var(--dune-accent));
+    }
+
+.fief-alias {
+    color: var(--dune-muted);
+    font-size: var(--fs-caption);
+    font-style: italic;
+    text-decoration: none;
+}
+
+    .fief-alias:hover,
+    .fief-alias:focus-visible {
+        color: var(--dune-accent-bright);
+    }
+
+.fief-chain,
+.fief-worlds .fief-note {
+    color: var(--dune-muted);
+    font-size: var(--fs-small);
+}
+
+.fief-era.is-current {
+    color: var(--dune-text);
+}
+
+    .fief-era.is-current .fief-note {
+        color: var(--dune-muted);
+    }
+
+.fief-arrow {
+    color: var(--dune-border-strong);
+    padding: 0 0.35em;
+}
+
+.fief-footnote {
+    margin-top: var(--sp-5);
+    font-size: var(--fs-caption);
+}
+
+/* The door from the worlds drawer. One line under the tagline, nothing louder. */
+.fief-door {
+    display: inline-block;
+    margin: calc(-1 * var(--sp-3)) 0 var(--sp-4);
+    color: var(--dune-accent-bright);
+    font-size: var(--fs-small);
+    text-decoration: none;
+}
+
+    .fief-door:hover,
+    .fief-door:focus-visible {
+        text-decoration: underline;
+    }
 
 /* ---- Small screens ---- */
 
