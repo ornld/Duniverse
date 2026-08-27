@@ -451,6 +451,33 @@ else
     // these so the prose keeps its own shape and still carries links.
     private sealed record MetaPart(string Text, string? Href);
 
+    // The ledger reads from the register, so it stays current: Arrakis stops saying
+    // Atreides once Leto II takes it. The cities, and a record revealed past the
+    // reader's progress, keep the seeded line instead.
+    private IReadOnlyList<MetaPart>? HoldingParts(World world)
+    {
+        if (FiefMap.LineFor(world.Id) is not { } line
+            || FiefMap.CurrentEra(line, Spoiler.IsVisible) is not { } era)
+        {
+            return null;
+        }
+
+        var parts = new List<MetaPart>
+        {
+            new(era.Holder, era.HolderId is null ? null : $"/entity/{era.HolderId}"),
+        };
+
+        if (era.Note is { } note)
+        {
+            parts.Add(new MetaPart($" ({note})", null));
+        }
+
+        parts.Add(new MetaPart(", in the ", null));
+        parts.Add(new MetaPart("Siridar Register", "/fiefs"));
+
+        return parts;
+    }
+
     // Affiliation is written for a reader and the ids cannot match it: "Fremen (secretly House
     // Corrino)" says something no roster holds. So I link each roster where its name already
     // sits in the sentence, and add the rest.
@@ -537,7 +564,7 @@ else
             World world => new[]
             {
                 new MetaRow("Environment", world.EnvironmentalData),
-                new MetaRow("Ruling House", world.RulingHouse),
+                new MetaRow("Ruling House", world.RulingHouse, Parts: HoldingParts(world)),
                 new MetaRow("Local Customs", Items: world.LocalCustoms),
             },
             House house => new[]

@@ -122,6 +122,13 @@ namespace Duniverse.Data
             return VisibleEras(line, visible).LastOrDefault();
         }
 
+        /// <summary>The register's row for one world, or null for a world it does not chart.</summary>
+        public static FiefLine? LineFor(string worldId)
+        {
+            return Lines.FirstOrDefault(line =>
+                string.Equals(line.WorldId, worldId, StringComparison.OrdinalIgnoreCase));
+        }
+
         /// <summary>Where a holder's section stands on the page. Unranked ids sort last.</summary>
         public static int HolderOrder(string? holderId)
         {
