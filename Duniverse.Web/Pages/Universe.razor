@@ -1,7 +1,7 @@
 @page "/universe"
 @inject EntityRegistry Registry
 @inject GraphLayoutService LayoutService
-@inject UniverseLayoutCache LayoutCache
+@inject GraphLayoutCache LayoutCache
 @inject SpoilerSettings Spoiler
 @inject NavigationManager Nav
 @inject IJSRuntime JS
@@ -170,7 +170,7 @@
     {
         var fresh = LayoutService.BuildFullGraph(Registry, Spoiler.IsVisible, Spoiler.IsVisible);
         graph = LayoutCache.GetOrAdd(
-            UniverseLayoutCache.KeyFor(fresh),
+            GraphLayoutCache.KeyFor($"universe:{Width}x{Height}", fresh),
             fresh,
             g => LayoutService.ApplyForceDirectedLayout(g, Width, Height, iterations: 220, gravity: 0.08, repulsionRange: 240));
         nodesById = graph.Nodes.ToDictionary(n => n.Id, StringComparer.OrdinalIgnoreCase);

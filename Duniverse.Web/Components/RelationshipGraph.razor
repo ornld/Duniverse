@@ -1,5 +1,6 @@
 @inject EntityRegistry Registry
 @inject GraphLayoutService LayoutService
+@inject GraphLayoutCache LayoutCache
 @inject NavigationManager Nav
 @inject SpoilerSettings Spoiler
 
@@ -63,11 +64,17 @@
     private Dictionary<string, HashSet<string>> neighborsById = new(StringComparer.OrdinalIgnoreCase);
     private string? hoveredNodeId;
 
+    // Runs on every parameter change, so a web used to settle again on each return. The
+    // sim is deterministic and the cache keys on the records, so a reader who has opened
+    // this record already gets the picture they left.
     protected override void OnParametersSet()
     {
-        graph = LayoutService.BuildEgoGraph(Registry, CenterId, maxDepth: 2, include: Spoiler.IsVisible,
+        var fresh = LayoutService.BuildEgoGraph(Registry, CenterId, maxDepth: 2, include: Spoiler.IsVisible,
             linkVisible: Spoiler.IsVisible);
-        LayoutService.ApplyForceDirectedLayout(graph, Width, Height);
+        graph = LayoutCache.GetOrAdd(
+            GraphLayoutCache.KeyFor($"ego:{CenterId}:{Width}x{Height}", fresh),
+            fresh,
+            g => LayoutService.ApplyForceDirectedLayout(g, Width, Height));
         nodesById = graph.Nodes.ToDictionary(n => n.Id, StringComparer.OrdinalIgnoreCase);
         neighborsById = BuildNeighbors(graph);
         hoveredNodeId = null;

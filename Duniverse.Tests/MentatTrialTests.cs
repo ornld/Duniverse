@@ -60,7 +60,7 @@ namespace Duniverse.Tests
             var reader = ArchiveFixture.ReaderAt(SpoilerTier.Chapterhouse, expanded: true);
             var clue = _trial.BuildClues(_registry.GetEntity("char_PaulAtreides")!, reader)[0];
 
-            Assert.Equal(1, Regex.Matches(clue, Regex.Escape(MentatTrialService.RedactionBar)).Count);
+            Assert.Single(Regex.Matches(clue, Regex.Escape(MentatTrialService.RedactionBar)));
         }
 
         [Fact]

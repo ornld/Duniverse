@@ -13,7 +13,7 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 
 builder.Services.AddSingleton(RegistryFactory.CreateSeeded());
 builder.Services.AddSingleton<GraphLayoutService>();
-builder.Services.AddSingleton<UniverseLayoutCache>();
+builder.Services.AddSingleton<GraphLayoutCache>();
 builder.Services.AddSingleton<PathFinderService>();
 builder.Services.AddSingleton<MentatTrialService>();
 builder.Services.AddScoped<SpoilerSettings>();

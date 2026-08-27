@@ -6,28 +6,31 @@ using Duniverse.Models;
 namespace Duniverse.Web.Services
 {
     /// <summary>
-    /// I don't want the force sim rerunning on every visit, so I keep where /universe settled.
-    /// Same records settle the same way, and the records are the key, so nobody sees anyone
-    /// they haven't unlocked.
+    /// I don't want the force sim rerunning on every visit, so I keep where a graph
+    /// settled. The records are the key, so nobody sees anyone they haven't unlocked.
+    /// The constellation and the record webs both draw from here.
     /// </summary>
-    public sealed class UniverseLayoutCache
+    public sealed class GraphLayoutCache
     {
-        // A reader can only land on a handful of visible sets, so this never fills up in
-        // practice. I capped it anyway in case that ever widens, and the oldest entry goes
-        // first when it does.
-        private const int Capacity = 16;
+        // The constellation only has a handful of visible sets, but a reader can open any
+        // record, so the record webs need the deeper shelf. The oldest entry goes first.
+        private const int Capacity = 48;
 
         private readonly Dictionary<string, EntityGraph> _cache = new(StringComparer.Ordinal);
         private readonly Queue<string> _order = new();
 
         /// <summary>
-        /// Node ids in the order BuildFullGraph fixed them, then the edges. No id has a newline
-        /// in it, so nothing blurs together. I key on the edges too because a connection can be
-        /// spoiler-gated on its own.
+        /// Node ids in the order the builder fixed them, then the edges. No id has a newline
+        /// in it, so nothing blurs together. I key on the edges too because a connection can
+        /// be spoiler-gated on its own.
         /// </summary>
-        public static string KeyFor(EntityGraph graph)
+        /// <param name="scope">What drew this and at what size. A record web carries its own
+        /// center here: two records can share a node set, and the center is drawn differently,
+        /// so without it one web could hand back the other's middle.</param>
+        public static string KeyFor(string scope, EntityGraph graph)
         {
             var builder = new StringBuilder();
+            builder.Append(scope).Append('\0');
             foreach (var node in graph.Nodes)
             {
                 builder.Append(node.Id).Append('\n');
