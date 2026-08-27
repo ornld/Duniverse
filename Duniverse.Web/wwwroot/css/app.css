@@ -420,11 +420,12 @@ html {
     white-space: nowrap;
 }
 
-/* The longest register plus the wordmark collide near 495px, so below 620px the rule
-   stands down and the register takes its own right-set line under the wordmark. */
+/* Below 620px the drawn rule stands down and the register keeps the wordmark's line,
+   set right by its own auto margin. It buys the room by giving up tracking first: the
+   longest head runs 228px at full setting and only 165px is free on a 320px screen. */
 @media (max-width: 620px) {
     .site-header {
-        flex-wrap: wrap;
+        gap: var(--sp-3);
         border-bottom: 1px solid var(--dune-border);
     }
 
@@ -433,10 +434,18 @@ html {
     }
 
     .head-register {
-        display: block;
-        width: 100%;
-        margin-top: 0.15rem;
-        text-align: right;
+        margin-left: auto;
+        font-size: 0.58rem;
+        letter-spacing: 0.1em;
+    }
+}
+
+/* The smallest phones still run the longest head 15px past the edge at the setting
+   above, so it gives up the rest of its tracking rather than the line. */
+@media (max-width: 360px) {
+    .head-register {
+        font-size: 0.52rem;
+        letter-spacing: 0.04em;
     }
 }
 
@@ -4469,8 +4478,9 @@ button.chip {
         padding: var(--sp-5) var(--gutter) var(--sp-6);
     }
 
+    /* One line means the band can sit shallower too, so the page starts higher. */
     .site-header {
-        padding: var(--sp-4);
+        padding: var(--sp-3) var(--sp-4);
     }
 
     /* A shallower sky and smaller moons: at phone widths the stretched dune paths
