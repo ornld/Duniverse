@@ -7,7 +7,7 @@
     <!-- This project file sits at the repo root, so its globs reach into every sibling folder
          unless told otherwise. Each new project has to be named here or the console app tries to
          compile it as part of itself and the build dies on duplicate assembly attributes. -->
-    <DefaultItemExcludes>$(DefaultItemExcludes);Duniverse.Core/**;Duniverse.Web/**;Duniverse.Prerender/**</DefaultItemExcludes>
+    <DefaultItemExcludes>$(DefaultItemExcludes);Duniverse.Core/**;Duniverse.Web/**;Duniverse.Prerender/**;Duniverse.Tests/**</DefaultItemExcludes>
   </PropertyGroup>
 
   <ItemGroup>

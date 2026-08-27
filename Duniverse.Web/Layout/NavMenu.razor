@@ -3,21 +3,52 @@
 @implements IDisposable
 
 <nav class="top-nav tab-glow" inert="@Inert">
-    <NavLink href="/about">About Dune</NavLink>
-    <NavLink href="/archives">Archives</NavLink>
-    <NavLink href="/timeline">Timeline</NavLink>
-    @* I break the rows by hand instead of letting text run out. These spans sleep at
-       desktop and wake under 920px, where tabs land in threes with Index closing the
-       last. Under 600px Index drops to a row alone. *@
-    <span class="nav-break" aria-hidden="true"></span>
-    <NavLink href="/bloodlines">Bloodlines</NavLink>
-    <NavLink href="/connections">Connections</NavLink>
-    <NavLink href="/universe">Universe</NavLink>
-    <span class="nav-break" aria-hidden="true"></span>
-    <NavLink href="/terminology">Terminology</NavLink>
-    <NavLink href="/sayings">Sayings</NavLink>
-    <NavLink href="/trial">Mentat Trial</NavLink>
-    <span class="nav-break-phone" aria-hidden="true"></span>
+    @* One table behind both faces of the nav: these render as tabs at width and as
+       the Contents panel on a phone, so a renamed page renames itself in both. *@
+    @for (int i = 0; i < Pages.Length; i++)
+    {
+        var tab = Pages[i];
+        <NavLink href="@tab.Path">@tab.Label</NavLink>
+
+        @* I break the rows by hand instead of letting text run out. These spans sleep
+           at desktop and wake under 920px, where tabs land in threes. *@
+        @if (i is 2 or 5)
+        {
+            <span class="nav-break" aria-hidden="true"></span>
+        }
+    }
+
+    @* A book carries a contents at the front and an index at the back. Phones show
+       both, since nine tabs cost four rows there; wider screens keep the tabs. *@
+    <div class="nav-contents @(contentsOpen ? "open" : "")" @onkeydown="OnKeyDown">
+        <button type="button" class="index-trigger @(IsContentsPage ? "active" : "")"
+                aria-haspopup="true" aria-expanded="@(contentsOpen ? "true" : "false")" @onclick="ToggleContents">
+            <span class="index-label">Contents</span>
+            <svg class="index-chevron" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.5"
+                      stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+        </button>
+        @if (contentsOpen)
+        {
+            <div class="index-backdrop" @onclick="Close"></div>
+            <div class="index-panel">
+                <canvas class="index-sand" @ref="contentsCanvas"></canvas>
+                <div class="index-seam"></div>
+                <ul>
+                    @* Each row takes its own copy. A link's inner content renders after
+                       the loop has moved on, so reading the counter there runs off the end. *@
+                    @for (int i = 0; i < Pages.Length; i++)
+                    {
+                        var tab = Pages[i];
+                        var order = i;
+                        <li style="--i: @order"><NavLink href="@tab.Path"><span class="index-label">@tab.Label</span></NavLink></li>
+                    }
+                </ul>
+            </div>
+        }
+    </div>
+
     <span class="nav-divider"></span>
     <div class="nav-index @(open ? "open" : "")" @onkeydown="OnKeyDown">
         @* aria-expanded is a string on purpose. Hand Blazor the bool and it treats it
@@ -66,15 +97,41 @@
     // a plain attribute down to my own nav element, so the layout hands it over as a parameter.
     [Parameter] public bool Inert { get; set; }
 
+    // The nine pages, in bar order. Rendered twice from here, so the tabs and the
+    // Contents panel can never drift apart.
+    private static readonly (string Path, string Label)[] Pages =
+    {
+        ("/about", "About Dune"),
+        ("/archives", "Archives"),
+        ("/timeline", "Timeline"),
+        ("/bloodlines", "Bloodlines"),
+        ("/connections", "Connections"),
+        ("/universe", "Universe"),
+        ("/terminology", "Terminology"),
+        ("/sayings", "Sayings"),
+        ("/trial", "Mentat Trial"),
+    };
+
     private bool open;
+    private bool contentsOpen;
     private bool runSand;
     private ElementReference sandCanvas;
+    private ElementReference contentsCanvas;
 
-    // The trigger carries the Eyes of Ibad glow whenever you're inside any category,
-    // so the "blue marks where you are" rule survives the links moving into a
-    // dropdown.
-    // The trigger lights for every page the panel opens onto, the register included.
+    // Each trigger carries the Eyes of Ibad glow whenever you stand on a page its own
+    // panel opens onto, so the "blue marks where you are" rule survives the links
+    // moving into a dropdown.
     private bool IsIndexPage => Nav.Uri.Contains("/category/") || Nav.Uri.Contains("/fiefs");
+
+    // Matched on the path alone, since a query or hash still leaves you on the page.
+    private bool IsContentsPage
+    {
+        get
+        {
+            var path = "/" + Nav.ToBaseRelativePath(Nav.Uri).Split('?', '#')[0].TrimEnd('/');
+            return Pages.Any(page => path.StartsWith(page.Path, StringComparison.OrdinalIgnoreCase));
+        }
+    }
 
     protected override void OnInitialized()
     {
@@ -83,40 +140,48 @@
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
     {
-        if (open)
-        {
-            open = false;
-        }
+        Close();
         StateHasChanged();
     }
 
+    // Only one panel stands open at a time. Opening either shuts the other, so the
+    // two never overlap on a screen this narrow.
     private void Toggle()
     {
         open = !open;
+        contentsOpen = false;
         runSand = open;
+    }
+
+    private void ToggleContents()
+    {
+        contentsOpen = !contentsOpen;
+        open = false;
+        runSand = contentsOpen;
     }
 
     private void Close()
     {
         open = false;
+        contentsOpen = false;
     }
 
     private void OnKeyDown(KeyboardEventArgs e)
     {
         if (e.Key == "Escape")
         {
-            open = false;
+            Close();
         }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        // The canvas only exists when the panel is open, so the sand can only start
+        // The canvas only exists when a panel is open, so the sand can only start
         // here, after the render that created it.
-        if (open && runSand)
+        if (runSand && (open || contentsOpen))
         {
             runSand = false;
-            await JS.InvokeVoidAsync("duneNav.sandSettle", sandCanvas);
+            await JS.InvokeVoidAsync("duneNav.sandSettle", open ? sandCanvas : contentsCanvas);
         }
     }
 

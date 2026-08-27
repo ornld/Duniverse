@@ -1307,12 +1307,14 @@ html {
         background: var(--dune-border);
     }
 
-    /* No measure here on purpose: the ledger's own two columns are its reading
-       structure, and definitions fill the page beside their terms as they always
-       did. Capping them once left the whole dictionary huddled on the left. */
+    /* The measure rides the layout: two entries run abreast past 80rem, so definitions
+       hold near sixty characters with the page full. The cap below covers the
+       single-column widths between phone and that. A bare cap huddled everything
+       left once. */
     .glossary-entry dd {
         margin: 0;
         color: var(--dune-text);
+        max-width: var(--measure-prose);
     }
 
 /* Trails the definition inline, a step quieter than the text around it. */
@@ -1338,6 +1340,19 @@ html {
 
         .glossary-entry dd {
             margin-bottom: 0.85rem;
+        }
+}
+
+/* Two abreast, print fashion, the way the epigraphs already read at width. The term
+   tracks go fixed at 13rem, which holds the longest term measured, and odd entries
+   part the pairs with a right pad. */
+@media (min-width: 80rem) {
+    .glossary {
+        grid-template-columns: 13rem minmax(0, 1fr) 13rem minmax(0, 1fr);
+    }
+
+        .glossary-entry:nth-child(odd) dd {
+            padding-right: 2.4rem;
         }
 }
 
@@ -3546,32 +3561,33 @@ button.chip {
     }
 }
 
-/* Only wakes on phones. Five items can't share the last tablet row at 375px, so
-   under 600px the Index gets its own row and the rows above keep three. The
-   divider hides with it, a stray mark alone. */
-.nav-break-phone {
+/* Contents holds the nine pages, and only phones ever see it. Wider screens read
+   the tabs straight off the bar, where they cost nothing. */
+.nav-contents {
     display: none;
 }
 
 @media (max-width: 600px) {
-    .nav-break-phone {
-        display: block;
-        flex-basis: 100%;
-        height: 0;
-    }
-
-    .nav-divider {
+    /* Nine tabs wrapped to four rows here and took a third of the screen before any
+       record showed. They live in Contents now, and the bar keeps one row: the two
+       controls, parted by the divider that used to end the tabs. */
+    .top-nav > a,
+    .nav-break {
         display: none;
     }
 
-    /* Each phone row is three tabs. Centering them left every row its own width, so
-       the columns drifted a few pixels between rows. Equal thirds line them up, and
-       the Index keeps its own centered row below. */
-    .top-nav > a {
-        flex: 1 1 0;
-        text-align: center;
-        white-space: nowrap;
+    .nav-contents {
+        display: inline-block;
     }
+
+    .top-nav {
+        gap: 0.4rem 0.7rem;
+        padding: 0.6rem var(--sp-4);
+    }
+}
+
+.nav-contents.open .index-chevron {
+    transform: rotate(180deg);
 }
 
 /* Above the wrap threshold the tabs stop clustering in the middle: each takes an

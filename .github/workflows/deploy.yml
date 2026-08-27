@@ -30,6 +30,11 @@ jobs:
       - name: Install wasm-tools workload
         run: dotnet workload install wasm-tools
 
+      # In Release, the same configuration the site ships in. The debug validators
+      # compile away out there, so this is where the spoiler promises get enforced.
+      - name: Test
+        run: dotnet test Duniverse.Tests/Duniverse.Tests.csproj -c Release --nologo
+
       - name: Publish
         run: dotnet publish Duniverse.Web/Duniverse.Web.csproj -c Release -o release --nologo
 

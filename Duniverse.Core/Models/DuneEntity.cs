@@ -44,11 +44,6 @@ namespace Duniverse.Models
         public List<HistorySegment> HistoryLayers { get; set; } = new List<HistorySegment>();
 
         /// <summary>
-        /// The local file path or URL to the image used on the card.
-        /// </summary>
-        public string? ImagePath { get; set; }
-
-        /// <summary>
         /// A list of IDs representing other related entities for hyperlink navigation.
         /// </summary>
         public List<string> RelatedEntityIds { get; set; } = new List<string>();

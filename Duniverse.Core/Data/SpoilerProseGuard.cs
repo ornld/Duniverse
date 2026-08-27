@@ -10,19 +10,37 @@ using Duniverse.Services;
 namespace Duniverse.Data
 {
     /// <summary>
-    /// Catches the spoilers the tier gate cannot see. The gate hides whole records and whole
-    /// layers, never sentences, so a safe record's prose can still name a sealed one. Debug
-    /// builds throw on it; Release never runs the check.
+    /// Catches the spoilers the tier gate cannot see: a safe record's prose naming a
+    /// sealed one. Debug builds throw at startup; the test suite runs the same scan in
+    /// every configuration.
     /// </summary>
     public static class SpoilerProseGuard
     {
         /// <summary>
-        /// Reads every line a record shows and fails when one names a record the reader has not
-        /// unlocked. Run it after SpoilerTierMap, since it compares against the stamped tiers.
+        /// Throws on any breach, in debug builds only, so development fails loudly at
+        /// startup. Release keeps the wrapper empty and the tests carry the scan instead.
         /// </summary>
         public static void Validate(EntityRegistry registry)
         {
 #if DEBUG
+            var breaches = FindBreaches(registry);
+            if (breaches.Count > 0)
+            {
+                throw new InvalidOperationException(
+                    "Prose names records the reader has not unlocked:"
+                    + Environment.NewLine + string.Join(Environment.NewLine, breaches)
+                    + Environment.NewLine
+                    + "Move the sentence into a HistoryLayer at the right tier, or raise the record's own tier.");
+            }
+#endif
+        }
+
+        /// <summary>
+        /// Reads every line a record shows and reports each one naming a record the reader
+        /// has not unlocked. Run it after SpoilerTierMap, since it compares stamped tiers.
+        /// </summary>
+        public static IReadOnlyList<string> FindBreaches(EntityRegistry registry)
+        {
             var all = registry.GetAllEntities<DuneEntity>().ToList();
             var breaches = new List<string>();
 
@@ -81,14 +99,7 @@ namespace Duniverse.Data
                 }
             }
 
-            if (breaches.Count > 0)
-            {
-                throw new InvalidOperationException(
-                    "Prose names records the reader has not unlocked:"
-                    + Environment.NewLine + string.Join(Environment.NewLine, breaches)
-                    + Environment.NewLine
-                    + "Move the sentence into a HistoryLayer at the right tier, or raise the record's own tier.");
-            }
+            return breaches;
 
             void Scan(string owner, string? selfId, Reach readAt, string? text, string where)
             {
@@ -115,10 +126,8 @@ namespace Duniverse.Data
                     }
                 }
             }
-#endif
         }
 
-#if DEBUG
         /// <summary>
         /// The weakest reader who can reach a piece of text: how far through the novels they
         /// have read, and whether they opted into the Expanded Universe. The toggle runs free
@@ -164,7 +173,6 @@ namespace Duniverse.Data
         {
             nameof(DuneEntity.Id),
             nameof(DuneEntity.Name),
-            nameof(DuneEntity.ImagePath),
             nameof(DuneEntity.RelatedEntityIds),
             nameof(Persona.AffiliationIds),
             nameof(House.HistoricalRivalries),
@@ -229,6 +237,5 @@ namespace Duniverse.Data
 
             return false;
         }
-#endif
     }
 }
