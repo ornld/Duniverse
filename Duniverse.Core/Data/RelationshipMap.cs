@@ -359,6 +359,144 @@ namespace Duniverse.Data
             new("house_Vernius", "char_RhomburVernius", "The House he never got back", "The heir who spent his life in exile", SpoilerTier.ExpandedUniverse),
             new("house_Vernius", "event_IxianCoup", "The House it toppled", "The night Ix was taken from them", SpoilerTier.ExpandedUniverse),
             new("house_Vernius", "char_HwiNoree", "The House that ruled Ix in an older age", "Ixian work from long after their fall", SpoilerTier.ExpandedUniverse),
+
+            // ---- Caladan: the green world and its people ----
+            new("loc_Caladan", "char_PaulAtreides", "The green world of his boyhood", "The son it raised for the desert to take"),
+            new("loc_Caladan", "char_DukeLetoAtreides", "The world he ruled from the ancestral castle", "Its Duke until the Emperor's summons"),
+            new("loc_Caladan", "char_LadyJessica", "Her home before the desert", "Lady of the castle by the sea"),
+            new("loc_Caladan", "bio_PundiRice", "The lowlands that grow it", "The staple of its paddies"),
+            new("loc_Caladan", "vehicle_Groundcar", "One of the settled worlds that drive them", "The ordinary way across its estates"),
+            new("loc_Caladan", "char_HelenaAtreides", "The world of her exile", "Sent to its far continent in disgrace", SpoilerTier.ExpandedUniverse),
+            new("loc_Caladan", "house_Wayku", "The world whose crypts they kept", "Wardens of the ducal crypts", SpoilerTier.ExpandedUniverse),
+
+            // ---- Stilgar: the Naib and his war ----
+            new("char_Stilgar", "char_Chani", "Naib of the troop she rode with", "Liet's daughter, of his own troop"),
+            new("char_Stilgar", "char_Otheym", "Fought beside him in the desert war", "Fedaykin who fought at his side"),
+            new("char_Stilgar", "char_Korba", "The Naib he fought beside", "A Fedaykin captain in the desert war"),
+            // Both records sit at Dune. The fact joining them closes the second book,
+            // so the label carries that book instead of the endpoint floor.
+            new("char_Stilgar", "char_GaiusHelenMohiam", "Her executioner when the plot broke", "Died at his order with the conspirators", SpoilerTier.DuneMessiah),
+            new("char_Stilgar", "char_Edric", "Put him to death with the other plotters", "The Steersman he executed", SpoilerTier.DuneMessiah),
+            new("char_Stilgar", "art_Crysknife", "A Naib who lives by its law", "The blade at his belt, law and faith at once"),
+            new("char_Stilgar", "loc_SietchTabr", "Its Naib", "The sietch he leads"),
+            new("char_Stilgar", "theo_FedaykinCreed", "A Naib its swearers answered to", "The oath of Muad'Dib's death commandos"),
+
+            // ---- Thufir Hawat: the old Mentat's ledger ----
+            new("char_ThufirHawat", "char_PiterDeVries", "The Atreides Mentat he was matched against", "His Harkonnen counterpart and rival"),
+            new("char_ThufirHawat", "char_BaronHarkonnen", "The captive Mentat he dared employ", "Took him captive and took his service"),
+            new("char_ThufirHawat", "art_MentatChart", "A Master of Assassins who kept his own", "The data pads of his trade"),
+            new("char_ThufirHawat", "disc_Mentat", "Master of Assassins and one of the finest", "The discipline behind his counsel"),
+            new("char_ThufirHawat", "char_GurneyHalleck", "The old Mentat who planned what he fought", "Brother-in-arms in the Duke's service"),
+            new("char_ThufirHawat", "org_MentatSchool", "An heir to its training, ages on", "The ancient founding behind his kind", SpoilerTier.ExpandedUniverse),
+
+            // ---- Ix: the machine world's dealings ----
+            new("loc_Ix", "theo_ButlerianDoctrine", "The world that works its edges", "The law it builds against"),
+            new("loc_Ix", "loc_Richese", "Its rival in the machine trades", "Its old rival in clever devices"),
+            new("loc_Ix", "house_Richese", "The world their machines contend with", "The House whose wares undercut its own"),
+            new("loc_Ix", "vehicle_NoShip", "The world that builds them", "The hulls it builds that sight cannot follow", SpoilerTier.HereticsOfDune),
+            new("loc_Ix", "char_DominicVernius", "The world he ruled and lost", "Its Earl before the coup", SpoilerTier.ExpandedUniverse),
+            new("loc_Ix", "event_IxianCoup", "The world it was fought over", "The night the Tleilaxu took it", SpoilerTier.ExpandedUniverse),
+
+            // ---- The Butlerian Doctrine: the ban and its shadow ----
+            new("theo_ButlerianDoctrine", "disc_Mentat", "The ban that made them necessary", "Human computation, kept lawful"),
+            new("theo_ButlerianDoctrine", "theo_OrangeCatholicBible", "Its great commandment, written into scripture", "Scripture that carries its one commandment"),
+            new("theo_ButlerianDoctrine", "house_Richese", "The law their fortunes lean against", "A House that trades at its edge"),
+            new("theo_ButlerianDoctrine", "char_Omnius", "Written to bar his kind forever", "The evermind it outlaws", SpoilerTier.ExpandedUniverse),
+            new("theo_ButlerianDoctrine", "char_Erasmus", "The lesson drawn from his cruelty", "The robot whose crimes it remembers", SpoilerTier.ExpandedUniverse),
+            new("theo_ButlerianDoctrine", "char_SerenaButler", "Preached in her name", "The woman its name descends from", SpoilerTier.ExpandedUniverse),
+            new("theo_ButlerianDoctrine", "org_LeagueOfNobles", "The victors' law", "The coalition that wrote it in blood", SpoilerTier.ExpandedUniverse),
+            new("theo_ButlerianDoctrine", "org_SynchronizedWorlds", "The ban raised over their ruins", "The machine empire it buried", SpoilerTier.ExpandedUniverse),
+
+            // ---- The Honored Matres: the returned and their war ----
+            new("org_HonoredMatres", "char_Murbella", "The order she was taken from", "The one they lost to the Sisterhood", SpoilerTier.HereticsOfDune),
+            new("org_HonoredMatres", "char_DarwiOdrade", "The enemy she inherited", "The Mother Superior raised against them", SpoilerTier.HereticsOfDune),
+            new("org_HonoredMatres", "char_MilesTeg", "The order his speed was loosed against", "The Bashar whose speed they never answered", SpoilerTier.HereticsOfDune),
+            new("org_HonoredMatres", "disc_HonoredMatreImprinting", "The order that wields it", "Their art of binding men", SpoilerTier.HereticsOfDune),
+            new("org_HonoredMatres", "event_DestructionOfRakis", "The hands that burned the world", "Their answer to defiance: a burned world", SpoilerTier.HereticsOfDune),
+            new("org_HonoredMatres", "bio_Futar", "The prey it was bred for", "The hunter bred to kill their kind", SpoilerTier.HereticsOfDune),
+            new("org_HonoredMatres", "vehicle_NoShip", "The pursuers its silence evades", "The hull their prey vanishes into", SpoilerTier.HereticsOfDune),
+            new("org_HonoredMatres", "event_TheScattering", "What came back out of it", "The far ground that made them", SpoilerTier.HereticsOfDune),
+
+            // ---- Scytale: the Face Dancer's threads ----
+            new("char_Scytale", "char_DuncanIdaho", "Offered the Emperor his restoration, at a price", "The ghola his order grew as bait", SpoilerTier.DuneMessiah),
+            new("char_Scytale", "disc_GholaCultivation", "A Face Dancer of the order that practices it", "His people's art of the returned dead", SpoilerTier.DuneMessiah),
+            new("char_Scytale", "loc_Tleilax", "Its Face Dancer abroad", "The hidden world that sent him", SpoilerTier.DuneMessiah),
+            new("char_Scytale", "theo_TleilaxuFaith", "A servant of its hidden purpose", "The faith beneath his masks", SpoilerTier.DuneMessiah),
+            new("char_Scytale", "event_MessiahConspiracy", "The Face Dancer among the plotters", "The plot he carried the knife for", SpoilerTier.DuneMessiah),
+
+            // ---- Miles Teg: the Bashar's last commission ----
+            new("char_MilesTeg", "char_Schwangyu", "The Bashar whose methods she fought", "The proctor set against his charge", SpoilerTier.HereticsOfDune),
+            new("char_MilesTeg", "disc_GholaCultivation", "Guarded its most repeated work", "The craft that keeps handing him Duncans", SpoilerTier.HereticsOfDune),
+            new("char_MilesTeg", "char_Taraza", "Her Bashar, called out of retirement", "The Mother Superior he answered to", SpoilerTier.HereticsOfDune),
+            new("char_MilesTeg", "char_Waff", "The Bashar who caught his hidden weapons", "The Master whose tricks he unpicked", SpoilerTier.HereticsOfDune),
+
+            // ---- Shai-Hulud: the maker and what moves around it ----
+            new("bio_ShaiHulud", "theo_CultOfShaiHulud", "The living god at its center", "The faith that names it divine"),
+            new("bio_ShaiHulud", "art_Thumper", "What answers its drumming", "The rhythm that calls one up"),
+            new("bio_ShaiHulud", "art_Crysknife", "The maker whose tooth it was", "Ground from a dead one's tooth"),
+            new("bio_ShaiHulud", "vehicle_SpiceHarvester", "Comes for the rhythm of its work", "The intruder it swallows whole"),
+            new("bio_ShaiHulud", "vehicle_Carryall", "What it races to beat", "Snatches the machines from its jaws"),
+            new("bio_ShaiHulud", "loc_Rakis", "Back in its sands after the long absence", "Where their kind returned at last", SpoilerTier.HereticsOfDune),
+            new("bio_ShaiHulud", "loc_Chapterhouse", "The kind it was remade to carry", "The world remade to receive them", SpoilerTier.HereticsOfDune),
+            new("bio_ShaiHulud", "event_DestructionOfRakis", "All but ended with the world", "The burning that nearly ended their kind", SpoilerTier.HereticsOfDune),
+
+            // ---- Melange: the spice and everything priced in it ----
+            new("bio_Melange", "art_WaterOfLife", "The gentler gift of the same worms", "The deadlier draught from the same source"),
+            new("bio_Melange", "disc_GuildNavigation", "What opens the paths they see", "The art that cannot work without it"),
+            new("bio_Melange", "vehicle_SpiceHarvester", "The prize it strips from the sand", "The machine that brings it in"),
+            new("bio_Melange", "vehicle_Heighliner", "What its Navigator burns to see", "Steered between stars by its gift"),
+            new("bio_Melange", "event_GuildFounding", "The fuel of the monopoly", "Turned it into the price of travel"),
+            new("bio_Melange", "char_EsmarTuek", "The wealth under his trade", "Made smuggling it a family business"),
+            new("bio_Melange", "char_StabanTuek", "The cargo of his hidden trade", "Ran it quietly off-world"),
+            new("bio_Melange", "char_JosefVenport", "The commodity his empire ran on", "Cornered its early trade", SpoilerTier.ExpandedUniverse),
+
+            // ---- Shaddam IV: the court of the eighty-first ----
+            new("char_ShaddamIV", "char_BaronHarkonnen", "The Emperor who lent him Sardaukar", "Partner in the Atreides trap"),
+            new("char_ShaddamIV", "loc_Kaitain", "The Emperor who reigned from it", "His capital in the years of splendor"),
+            new("char_ShaddamIV", "loc_SalusaSecundus", "The Emperor its legions answered", "His prison world, then his prison"),
+            new("char_ShaddamIV", "house_Fenring", "The Emperor the Count stood beside", "The minor House of his closest friend"),
+            new("char_ShaddamIV", "vehicle_ImperialBarge", "The Emperor it carried", "His own gilded landing craft"),
+            new("char_ShaddamIV", "char_FaradnCorrino", "Grandfather and fallen precedent", "Grandson who inherited the claim", SpoilerTier.ChildrenOfDune),
+
+            // ---- Gaius Helen Mohiam: the Truthsayer's instruments ----
+            new("char_GaiusHelenMohiam", "art_GomJabbar", "The Reverend Mother who tests with it", "The poisoned needle of her test"),
+            new("char_GaiusHelenMohiam", "art_PainBox", "The hand on the box at Castle Caladan", "The box she made Paul endure"),
+            new("char_GaiusHelenMohiam", "loc_WallachIX", "One of its sternest teachers", "The school where she taught"),
+            // Both records sit at Dune. What joins them is the conspiracy of the second
+            // book, so the label carries that book instead of the endpoint floor.
+            new("char_GaiusHelenMohiam", "char_PrincessIrulan", "Her Sisterhood handler in the plot", "The princess she steered for the Sisterhood", SpoilerTier.DuneMessiah),
+            new("char_GaiusHelenMohiam", "event_MessiahConspiracy", "The Reverend Mother among the plotters", "The plot that cost her everything", SpoilerTier.DuneMessiah),
+
+            // ---- Liet-Kynes: the planetologist's measures ----
+            new("char_LietKynes", "char_DukeLetoAtreides", "The Judge of the Change who warmed to him", "The Duke who surprised him into respect"),
+            new("char_LietKynes", "char_PaulAtreides", "Recognized the legend settling on him", "The boy he measured against the prophecy"),
+            new("char_LietKynes", "art_Stillsuit", "The planetologist who judged men by their fit", "The measure he took of strangers"),
+            new("char_LietKynes", "art_ResearchJournal", "Its author and keeper", "His life's ledger of the desert"),
+
+            // ---- Ghanima: the twin who stayed human ----
+            new("char_GhanimaAtreides", "event_TigerAssassinationAttempt", "The twin who walked out of it", "The hunt she walked away from", SpoilerTier.ChildrenOfDune),
+            new("char_GhanimaAtreides", "char_AliaAtreides", "The niece who saw what she had become", "Aunt and Regent, lost to the Baron within", SpoilerTier.ChildrenOfDune),
+            new("char_GhanimaAtreides", "event_AliaRegency", "Raised under it, wed at its end", "The Regency that held her as ward", SpoilerTier.ChildrenOfDune),
+            new("char_GhanimaAtreides", "bio_LazaTiger", "The prey that outlived them", "Set loose on her in the desert", SpoilerTier.ChildrenOfDune),
+
+            // ---- The Qizarate: the priesthood of the risen god ----
+            new("org_Qizarate", "theo_ChurchOfMuadDib", "The bureaucracy that runs it", "The faith it administers", SpoilerTier.DuneMessiah),
+            new("org_Qizarate", "char_PaulAtreides", "The priesthood built in his name", "The god its paperwork serves", SpoilerTier.DuneMessiah),
+            new("org_Qizarate", "char_Korba", "The priesthood he rose in", "Its panegyrist, once a Fedaykin", SpoilerTier.DuneMessiah),
+            new("org_Qizarate", "loc_Onn", "The old priesthood its rites descend from", "The festival city of the later faith", SpoilerTier.GodEmperorOfDune),
+            new("org_Qizarate", "char_BronsoOfIx", "The priesthood that condemned him", "The historian it hunted down", SpoilerTier.ExpandedUniverse),
+
+            // ---- The Church of Muad'Dib: the faith and its dissent ----
+            new("theo_ChurchOfMuadDib", "char_PaulAtreides", "The state faith raised around him", "The god at its center, unwilling", SpoilerTier.DuneMessiah),
+            new("theo_ChurchOfMuadDib", "event_MuadDibJihad", "The faith the war left behind", "The holy war it rose out of", SpoilerTier.DuneMessiah),
+            new("theo_ChurchOfMuadDib", "loc_Onn", "The faith behind the festivals", "The city that staged its festivals", SpoilerTier.GodEmperorOfDune),
+            new("theo_ChurchOfMuadDib", "char_BronsoOfIx", "The orthodoxy he wrote against", "The heretic who told it otherwise", SpoilerTier.ExpandedUniverse),
+
+            // ---- The tiger attempt: the plot against the twins ----
+            new("event_TigerAssassinationAttempt", "char_LetoIIAtreides", "The death he let the world believe", "The twin it was made to kill, who used it", SpoilerTier.ChildrenOfDune),
+            new("event_TigerAssassinationAttempt", "char_WensiciaCorrino", "Her bid to end the Atreides line", "The princess who loosed the tigers", SpoilerTier.ChildrenOfDune),
+            new("event_TigerAssassinationAttempt", "bio_LazaTiger", "The hunt they were bred for", "Bred for it and trained on children", SpoilerTier.ChildrenOfDune),
+            new("event_TigerAssassinationAttempt", "char_Javid", "The scheme his masters set loose", "The Corrino hand inside the Keep", SpoilerTier.ChildrenOfDune),
         };
 
         /// <summary>
