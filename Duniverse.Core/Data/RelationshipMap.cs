@@ -261,7 +261,7 @@ namespace Duniverse.Data
             new("house_Harkonnen", "event_BattleOfArrakeen", "The House that lost the planet there", "The day the desert took it all back"),
             new("house_Harkonnen", "event_ThroneDuel", "The House whose heir died in it", "Feyd's knife against Paul's, and the end of it"),
             new("house_Harkonnen", "loc_Gammu", "The House that ruined it first", "What Giedi Prime is called long after them", SpoilerTier.HereticsOfDune),
-            new("house_Harkonnen", "char_AbulurdHarkonnen", "The House that discarded him", "The Baron's father, put aside as too soft", SpoilerTier.ExpandedUniverse),
+            new("house_Harkonnen", "char_AbulurdHarkonnen", "The House that discarded him", "The Baron's half-brother, put aside as too soft", SpoilerTier.ExpandedUniverse),
             new("house_Harkonnen", "loc_Lankiveil", "The House whose origins sit here", "The cold world their name comes out of", SpoilerTier.ExpandedUniverse),
             new("house_Harkonnen", "char_DukePaulusAtreides", "The House behind his death", "Leto's father, removed on their orders", SpoilerTier.ExpandedUniverse),
             new("house_Harkonnen", "event_DeathOfDukePaulus", "The House that arranged it", "Their quiet work in an Atreides bullring", SpoilerTier.ExpandedUniverse),
@@ -356,7 +356,7 @@ namespace Duniverse.Data
             new("house_Vernius", "loc_Ix", "The House that ruled it before the Tleilaxu", "The world they ruled until the Tleilaxu came", SpoilerTier.ExpandedUniverse),
             new("house_Vernius", "house_Richese", "The rival whose machines outsold theirs", "The other House selling cleverness", SpoilerTier.ExpandedUniverse),
             new("house_Vernius", "char_DominicVernius", "The House he ruled and outlived", "The Earl who went underground rather than kneel", SpoilerTier.ExpandedUniverse),
-            new("house_Vernius", "char_RhomburVernius", "The House he never got back", "The heir who spent his life in exile", SpoilerTier.ExpandedUniverse),
+            new("house_Vernius", "char_RhomburVernius", "The House he took back", "The heir who spent his exile working toward Ix", SpoilerTier.ExpandedUniverse),
             new("house_Vernius", "event_IxianCoup", "The House it toppled", "The night Ix was taken from them", SpoilerTier.ExpandedUniverse),
             new("house_Vernius", "char_HwiNoree", "The House that ruled Ix in an older age", "Ixian work from long after their fall", SpoilerTier.ExpandedUniverse),
 
