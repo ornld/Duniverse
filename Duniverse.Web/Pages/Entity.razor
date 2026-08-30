@@ -79,6 +79,10 @@ else if (entity is not null)
             </dl>
         }
 
+        @* The reading stack gathered into one mass, so on a wide screen the fact ledger
+           can sit to its left the way Home seats the finder beside the day's saying. *@
+        <div class="entity-body">
+
         @* Every record opens safe, then adds passages a further book earns, like Irulan's
            history and its correctives. I show the marks only once every passage is earned,
            so a label can never describe a paragraph they haven't been given. *@
@@ -139,6 +143,8 @@ else if (entity is not null)
                 }
             </p>
         }
+
+        </div>
     </div>
 
     @* Who belongs to this house or order, read off the membership each person's own
@@ -618,11 +624,20 @@ else
             ? new[] { new MetaRow("Drawn From", EditionLabel(entity.SpoilerTier)) }
             : Array.Empty<MetaRow>();
 
-        return aliasRow
+        var present = aliasRow
             .Concat(editionRow)
             .Concat(rows)
+            .Where(row => row.Items is { Count: > 0 } || row.Parts is { Count: > 0 } || !string.IsNullOrWhiteSpace(row.Value))
+            .ToList();
+
+        var telling = present
             .Where(row => row.Items is { Count: > 0 } || row.Parts is { Count: > 0 } || HasFact(row.Value))
             .ToList();
+
+        // Placeholders stay off a ledger with real facts. When they are all a record has,
+        // they return: on a minor house "Not widely recorded" is itself the fact, and the
+        // split's left track holds it better than air.
+        return telling.Count > 0 ? telling : present;
     }
 
     // Whether a value says anything its absence wouldn't. Gaps that explain themselves

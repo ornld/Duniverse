@@ -3287,6 +3287,46 @@ button.chip {
             color: var(--dune-accent);
         }
 
+/* ---- The record split ----
+   The record borrows the archives head's five tracks whole, so the two pages
+   share one geometry: the title crowns the ledger on the left track, the story
+   answers from the instrument track, and the same clamped channel holds the
+   pair together at every width. Keyed on the story wrapper rather than the
+   ledger, since a minor house can lose its whole ledger to the "Not widely
+   recorded" filter and still deserves the stage. The gate card carries no
+   story, so :has leaves it be. */
+@media (min-width: 1100px) {
+    .entity-card.front:has(> .entity-body) {
+        display: grid;
+        grid-template-columns: 1fr minmax(0, 26em) clamp(4rem, 6vw, 6rem) minmax(24rem, 28rem) 1fr;
+        align-items: start;
+    }
+
+    .entity-card.front:has(> .entity-body) > * {
+        grid-column: 1 / -1;
+    }
+
+    .entity-card.front:has(> .entity-body) > h1 {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    .entity-card.front:has(> .entity-body) > .short-desc {
+        grid-column: 2;
+        grid-row: 2;
+    }
+
+    .entity-card.front:has(> .entity-body) > .entity-meta {
+        grid-column: 2;
+        grid-row: 3;
+    }
+
+    .entity-card.front:has(> .entity-body) > .entity-body {
+        grid-column: 4;
+        grid-row: 3;
+    }
+}
+
 /* Narrow screens don't have room for a fixed label column, so the label sits above
    its fact instead of beside it. Stacked like that a leader would run to nothing, so
    it goes; the same for the results count and the trial's clue labels. */
