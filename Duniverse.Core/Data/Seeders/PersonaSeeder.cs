@@ -552,13 +552,18 @@ namespace Duniverse.Data.Seeders
                 {
                     Id = "char_Murbella",
                     Name = "Murbella",
-                    ShortDescription = "A former Honored Matre who merges with the Bene Gesserit to forge a new Sisterhood.",
-                    DetailedHistory = "The Bene Gesserit captured Murbella during their desperate war against the Honored Matres. She then underwent an unprecedented cross-training. It fused the brutal efficiency of Honored Matre sexual-imprinting with the patient, disciplined arts of the Bene Gesserit Way. Neither order had ever managed that combination on its own. Her dual mastery made her uniquely suited to bridge the gap between the two orders, whose war had threatened to destroy them both rather than crown any victor. She did not simply defeat or absorb the Honored Matres. Her rise was a genuine synthesis, one that kept the strengths of both traditions and shed the worst excesses of each. Her ascension to lead a combined order ended a war that had come close to finishing both sides. It forged a Sisterhood strong enough to face whatever unknown threat still lurked beyond the reach of the Old Imperium.",
+                    ShortDescription = "An Honored Matre taken alive by the Bene Gesserit, bound to Duncan Idaho by an imprinting that ran both ways.",
+                    DetailedHistory = "The Bene Gesserit took Murbella alive on Gammu, and taking her alive was the strange part. She had come to bind the Duncan Idaho ghola with the sexual imprinting her order wields as a weapon, and the conditioning buried in him answered by binding her right back. Neither order had a precedent for a bond running in both directions, and neither could say with any confidence which of them had caught the other. The Sisterhood held her as prize, prisoner, and problem all at once. She stayed scornful of her captors' patience and fascinated by it in the same breath, and she carried Duncan's child, which made her bloodline the most interesting genetic property in either order's books. When Rakis burned she came out of the wreck of that war aboard a no-ship, bound for a hidden world her captors would not name, insisting the whole way that she remained an Honored Matre. The Sisterhood wrote her down as an acolyte and let the argument run.",
+                    HistoryLayers = new List<HistorySegment>
+                    {
+                        new(SpoilerTier.Chapterhouse, "The acolyte years remade her. A cross-training neither order had ever attempted fused the brutal efficiency of Honored Matre imprinting with the patient, disciplined arts of the Bene Gesserit Way, and she survived the spice agony that seals a Reverend Mother. When Darwi Odrade fell in the last assault on the Honored Matres, Murbella stood up holding both orders in one person, the only woman either side could read as its own. Her rise was a genuine synthesis rather than a victory, one that kept the strengths of both traditions and shed the worst excesses of each, and it ended a war that had come close to finishing both sides. What it forged was a Sisterhood strong enough to face whatever unknown threat still lurked beyond the reach of the Old Imperium."),
+                    },
                     RelatedEntityIds = new List<string> { "char_DarwiOdrade", "char_DuncanIdaho", "org_HonoredMatres", "org_BeneGesserit", "disc_HonoredMatreImprinting" },
-                    Affiliation = "Honored Matres (later Bene Gesserit)",
-                    // She ends up leading both orders, so both name her.
+                    Affiliation = "Honored Matres (held by the Bene Gesserit)",
+                    // The Matres bred her, the Sisterhood holds and trains her. Both rosters
+                    // have a claim, and the last book settles whose she finally is.
                     AffiliationIds = new List<string> { "org_HonoredMatres", "org_BeneGesserit" },
-                    Role = "Mother Superior",
+                    Role = "Honored Matre",
                     NotableQuotes = new List<string>()
                 },
                 new Persona
@@ -566,7 +571,11 @@ namespace Duniverse.Data.Seeders
                     Id = "char_Taraza",
                     Name = "Alma Mavis Taraza",
                     ShortDescription = "Mother Superior of the Bene Gesserit during the opening of the war against the Honored Matres.",
-                    DetailedHistory = "Alma Mavis Taraza was Mother Superior during the opening moves of the Bene Gesserit's war against the returning Honored Matres. She faced an unenviable task: preparing the Sisterhood for a threat unlike any in its long history. The enemy combined military conquest with a psychological weapon that could subvert the Bene Gesserit's own methods. Taraza was a master strategist in the truest Bene Gesserit tradition. She juggled the ongoing breeding program, an uneasy relationship with the secretive Tleilaxu, and the delicate recovery of a new Duncan Idaho ghola. She treated each as an interlocking piece of a plan she knew she would likely not live to see finished. She made hard, sometimes coldly calculated decisions. She trusted subordinates like Miles Teg and Darwi Odrade with responsibilities that would shape the Sisterhood's fate long after her death. It was the same patient, multi-generational thinking that had defined Bene Gesserit strategy for millennia. Her groundwork set the stage for the uneasy convergence between the Bene Gesserit and the Honored Matres, realized only under her successors.",
+                    DetailedHistory = "Alma Mavis Taraza was Mother Superior during the opening moves of the Bene Gesserit's war against the returning Honored Matres. She faced an unenviable task: preparing the Sisterhood for a threat unlike any in its long history. The enemy combined military conquest with a psychological weapon that could subvert the Bene Gesserit's own methods. Taraza was a master strategist in the truest Bene Gesserit tradition. She juggled the ongoing breeding program, an uneasy relationship with the secretive Tleilaxu, and the delicate recovery of a new Duncan Idaho ghola. She treated each as an interlocking piece of a plan she knew she would likely not live to see finished. She made hard, sometimes coldly calculated decisions. She trusted subordinates like Miles Teg and Darwi Odrade with responsibilities that would shape the Sisterhood's fate long after her death. It was the same patient, multi-generational thinking that had defined Bene Gesserit strategy for millennia, and it outlived her: everything the Sisterhood did in that war afterward stood on ground she had prepared.",
+                    HistoryLayers = new List<HistorySegment>
+                    {
+                        new(SpoilerTier.Chapterhouse, "What she seeded came true under her successors. The war she opened ended with the two orders folded into one, and the Sisterhood that came out of it stood on groundwork Taraza had laid knowing she would never see the finish."),
+                    },
                     RelatedEntityIds = new List<string> { "org_BeneGesserit", "char_MilesTeg", "char_DarwiOdrade" },
                     Affiliation = "Bene Gesserit",
                     AffiliationIds = new List<string> { "org_BeneGesserit" },

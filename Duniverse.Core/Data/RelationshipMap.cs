@@ -437,7 +437,8 @@ namespace Duniverse.Data
             new("bio_ShaiHulud", "vehicle_SpiceHarvester", "Comes for the rhythm of its work", "The intruder it swallows whole"),
             new("bio_ShaiHulud", "vehicle_Carryall", "What it races to beat", "Snatches the machines from its jaws"),
             new("bio_ShaiHulud", "loc_Rakis", "Back in its sands after the long absence", "Where their kind returned at last", SpoilerTier.HereticsOfDune),
-            new("bio_ShaiHulud", "loc_Chapterhouse", "The kind it was remade to carry", "The world remade to receive them", SpoilerTier.HereticsOfDune),
+            // The remaking is the sixth book's story, so the label waits for it.
+            new("bio_ShaiHulud", "loc_Chapterhouse", "The kind it was remade to carry", "The world remade to receive them", SpoilerTier.Chapterhouse),
             new("bio_ShaiHulud", "event_DestructionOfRakis", "All but ended with the world", "The burning that nearly ended their kind", SpoilerTier.HereticsOfDune),
 
             // ---- Melange: the spice and everything priced in it ----
