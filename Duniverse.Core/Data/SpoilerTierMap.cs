@@ -91,7 +91,6 @@ namespace Duniverse.Data
                 ["org_MentatSchool"] = SpoilerTier.ExpandedUniverse,
                 ["house_Vernius"] = SpoilerTier.ExpandedUniverse,
                 ["house_Moritani"] = SpoilerTier.ExpandedUniverse,
-                ["house_Wayku"] = SpoilerTier.ExpandedUniverse,
                 ["loc_Lankiveil"] = SpoilerTier.ExpandedUniverse,
                 ["vehicle_CymekWalker"] = SpoilerTier.ExpandedUniverse,
                 ["event_IxianCoup"] = SpoilerTier.ExpandedUniverse,

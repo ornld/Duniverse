@@ -109,17 +109,6 @@ namespace Duniverse.Data.Seeders
                 },
                 new House
                 {
-                    Id = "house_Wayku",
-                    Name = "House Wayku",
-                    ShortDescription = "A minor House once entrusted with guarding the Atreides ancestral crypts on Caladan.",
-                    DetailedHistory = "For generations, House Wayku held the solemn honor of tending House Atreides' ancestral burial grounds on Caladan. The position rested on quiet trust rather than any real political power within the Landsraad. That trust frayed over time. The House's loyalty to the Atreides name grew shakier as circumstances shifted around it. Its story survives in Atreides history less as a record of great deeds than as a cautionary tale. It stands as proof that even a bond sealed by tradition and ceremonial duty can rot when nobody tends to it. Wayku's modest holdings and thin military strength meant its drift from Atreides loyalty carried consequences that were more symbolic than strategic. Symbolism counted for a great deal with a House like the Atreides, though, whose entire rule rested on honor.",
-                    RelatedEntityIds = new List<string> { "house_Atreides", "loc_Caladan" },
-                    Sigil = "Not widely recorded",
-                    Motto = "Not widely recorded",
-                    HistoricalRivalries = new List<string> { "house_Atreides" }
-                },
-                new House
-                {
                     Id = "house_Tuek",
                     Name = "House Tuek",
                     ShortDescription = "A smuggling dynasty operating outside official Landsraad recognition, based on Arrakis.",

@@ -122,7 +122,7 @@ namespace Duniverse.Data.Seeders
                     Name = "Futar",
                     ShortDescription = "A bred human-feline hybrid, made somewhere in the Scattering to hunt Honored Matres.",
                     DetailedHistory = "Tleilaxu genetic science built the futar to hunt Honored Matres. It combines heightened feline senses and physical power with trained cunning, sharp enough to make it a uniquely effective hunter of otherwise elusive prey. Its creators had one quarry in mind, and that quarry was trained well enough to slip past ordinary human pursuers without much trouble. A futar hunts on a chilling mix of raw instinct and calculated purpose, savage in ways you can predict and tactical in ways you cannot. That combination made it feared even among factions well used to genetically engineered threats. Its existence says a great deal about what the far Scattering had been breeding to meet the Honored Matres, and about how little of that the Old Imperium saw coming.",
-                    RelatedEntityIds = new List<string> { "org_HonoredMatres", "org_BeneTleilax", "char_DuncanIdaho" },
+                    RelatedEntityIds = new List<string> { "org_HonoredMatres", "org_BeneTleilax" },
                     BiologicalClassification = "Genetically engineered human-feline hybrid (fauna)",
                     DerivedProducts = "None; bred exclusively as trackers and hunters"
                 }

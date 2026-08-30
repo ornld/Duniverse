@@ -86,6 +86,10 @@ namespace Duniverse.Data
             // ---- The God Emperor's reign ----
             new("char_MoneoAtreides", "char_LetoIIAtreides", "Majordomo bred to serve", "God Emperor and master", SpoilerTier.GodEmperorOfDune),
             new("char_MoneoAtreides", "char_SionaAtreides", "Father", "Rebel daughter", SpoilerTier.GodEmperorOfDune),
+            // Command, not membership: the corps is all female, so neither man sits on its
+            // roster, and these lines say what the roster cannot.
+            new("char_LetoIIAtreides", "org_FishSpeakers", "The God Emperor they worshipped", "The corps he raised and ruled through", SpoilerTier.GodEmperorOfDune),
+            new("char_MoneoAtreides", "org_FishSpeakers", "The majordomo who kept them pointed", "The corps he directed day to day", SpoilerTier.GodEmperorOfDune),
             new("char_SionaAtreides", "char_LetoIIAtreides", "Engineered his fall at the Hidden Ford", "The God Emperor she toppled", SpoilerTier.GodEmperorOfDune),
             new("char_HwiNoree", "char_LetoIIAtreides", "Ixian bride who unmade his resolve", "Her betrothed God Emperor", SpoilerTier.GodEmperorOfDune),
             new("char_DuncanIdaho", "char_LetoIIAtreides", "Serial ghola in his service", "The God Emperor who kept remaking him", SpoilerTier.GodEmperorOfDune),
@@ -220,7 +224,6 @@ namespace Duniverse.Data
             new("house_Atreides", "char_DukePaulusAtreides", "The House he ruled before Leto", "The Duke before Leto, killed by a bull", SpoilerTier.ExpandedUniverse),
             new("house_Atreides", "event_DeathOfDukePaulus", "The House it left to a young Duke", "The bullring death that put Leto in charge early", SpoilerTier.ExpandedUniverse),
             new("house_Atreides", "char_HelenaAtreides", "The House she married into and betrayed", "The Lady exiled for her husband's death", SpoilerTier.ExpandedUniverse),
-            new("house_Atreides", "house_Wayku", "The House whose dead they guarded", "Keepers of their crypts on Caladan", SpoilerTier.ExpandedUniverse),
 
             // ---- The Fremen: the desert people and their world ----
             new("org_Fremen", "loc_SietchTabr", "The people who dug it", "Stilgar's sietch, and one of their greatest"),
@@ -353,7 +356,7 @@ namespace Duniverse.Data
             new("event_DeathOfTheGodEmperor", "loc_Rakis", "What let its desert come back", "The world that takes its name after him", SpoilerTier.HereticsOfDune),
 
             // ---- House Vernius: the Earls of Ix before the Tleilaxu ----
-            new("house_Vernius", "loc_Ix", "The House that ruled it before the Tleilaxu", "The world they ruled until the Tleilaxu came", SpoilerTier.ExpandedUniverse),
+            new("house_Vernius", "loc_Ix", "The House that lost it and took it back", "The world they ruled, lost, and reclaimed", SpoilerTier.ExpandedUniverse),
             new("house_Vernius", "house_Richese", "The rival whose machines outsold theirs", "The other House selling cleverness", SpoilerTier.ExpandedUniverse),
             new("house_Vernius", "char_DominicVernius", "The House he ruled and outlived", "The Earl who went underground rather than kneel", SpoilerTier.ExpandedUniverse),
             new("house_Vernius", "char_RhomburVernius", "The House he took back", "The heir who spent his exile working toward Ix", SpoilerTier.ExpandedUniverse),
@@ -367,7 +370,6 @@ namespace Duniverse.Data
             new("loc_Caladan", "bio_PundiRice", "The lowlands that grow it", "The staple of its paddies"),
             new("loc_Caladan", "vehicle_Groundcar", "One of the settled worlds that drive them", "The ordinary way across its estates"),
             new("loc_Caladan", "char_HelenaAtreides", "The world of her exile", "Sent to its far continent in disgrace", SpoilerTier.ExpandedUniverse),
-            new("loc_Caladan", "house_Wayku", "The world whose crypts they kept", "Wardens of the ducal crypts", SpoilerTier.ExpandedUniverse),
 
             // ---- Stilgar: the Naib and his war ----
             new("char_Stilgar", "char_Chani", "Naib of the troop she rode with", "Liet's daughter, of his own troop"),

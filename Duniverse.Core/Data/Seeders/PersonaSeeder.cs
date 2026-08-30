@@ -131,7 +131,7 @@ namespace Duniverse.Data.Seeders
                         new(SpoilerTier.GodEmperorOfDune, "The Tleilaxu grew him again, and then again, and did not stop. Across thirty-five centuries Leto II called Duncan after Duncan out of the tanks, each one raised to serve an Emperor who had long since stopped being recognisably human, each one measured against the memory of the first man his ancestor ever called friend. Some lasted years and some lasted days. Nearly every one of them eventually looked at what the God Emperor had become and refused it, which appears to have been the point of sending for them."),
                         new(SpoilerTier.HereticsOfDune, "Long after that reign ended the Tleilaxu were still making him and the Bene Gesserit were still buying. The Duncan the Sisterhood woke into their war with the Honored Matres carried more lives behind his eyes than anyone had counted on, and turned out to be something neither his makers nor his keepers had planned for."),
                     },
-                    RelatedEntityIds = new List<string> { "char_DukeLetoAtreides", "char_PaulAtreides", "char_LadyJessica", "char_Scytale", "char_MilesTeg", "char_DarwiOdrade", "char_Murbella", "char_SionaAtreides", "disc_GholaCultivation", "bio_Futar" },
+                    RelatedEntityIds = new List<string> { "char_DukeLetoAtreides", "char_PaulAtreides", "char_LadyJessica", "char_Scytale", "char_MilesTeg", "char_DarwiOdrade", "char_Murbella", "char_SionaAtreides", "disc_GholaCultivation" },
                     Affiliation = "House Atreides",
                     // He trained at Ginaz before he ever wore Atreides colors, and the school still claims him.
                     AffiliationIds = new List<string> { "house_Atreides", "org_SwordmastersOfGinaz" },
@@ -372,8 +372,9 @@ namespace Duniverse.Data.Seeders
                     },
                     RelatedEntityIds = new List<string> { "char_PaulAtreides", "char_Chani", "char_GhanimaAtreides", "char_AliaAtreides", "char_MoneoAtreides", "char_SionaAtreides", "char_HwiNoree", "org_FishSpeakers" },
                     Affiliation = "House Atreides",
-                    // The Fish Speakers are his own corps, so he heads their roster.
-                    AffiliationIds = new List<string> { "house_Atreides", "org_FishSpeakers" },
+                    // Not on the Fish Speakers roster: the corps is all female and he is its
+                    // god, not a member. The relationship map carries the command instead.
+                    AffiliationIds = new List<string> { "house_Atreides" },
                     Role = "Emperor",
                     NotableQuotes = new List<string> { "I am a collection of obsolete memories." }
                 },
@@ -476,8 +477,9 @@ namespace Duniverse.Data.Seeders
                     DetailedHistory = "Moneo was a descendant of the Atreides line who came to understand the Golden Path better than almost anyone alive. He served as Leto II's steward and chief human administrator through much of the God Emperor's millennia-long reign. He ran the day-to-day governance of an empire built around his master's inscrutable, multi-generational plan. A childhood encounter with Leto's overwhelming presence had left him with a rare, hard-won grasp of both the necessity and the horror of the Golden Path. That made him uniquely able to serve Leto faithfully even when the God Emperor's demands turned terrifying. His devotion was tested constantly by his fear for his rebellious daughter Siona. Her defiance of Leto's rule put her in direct danger. Yet Moneo saw, with growing dread, that her genetic invisibility to prescience might be exactly what Leto had been breeding toward all along. His life sat between loyal service and a father's fear. It captured the human cost carried by those closest to Leto's inhuman, world-spanning ambitions.",
                     RelatedEntityIds = new List<string> { "char_LetoIIAtreides", "char_SionaAtreides", "org_FishSpeakers" },
                     Affiliation = "House Atreides",
-                    // Ran the Fish Speakers day to day as Leto II's majordomo.
-                    AffiliationIds = new List<string> { "house_Atreides", "org_FishSpeakers" },
+                    // No Fish Speakers roster entry: he directed the corps and never joined
+                    // it. The relationship map says so in as many words.
+                    AffiliationIds = new List<string> { "house_Atreides" },
                     Role = "Majordomo",
                     NotableQuotes = new List<string> { "The worm is God's mind, and it needs the freedom to wander in the wilderness." }
                 },
