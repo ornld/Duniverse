@@ -18,10 +18,13 @@
             <h2 id="ritual-title">How deep into the saga have you read?</h2>
 
             <div class="ritual-shelf">
+                @* The numeral prints as I and announces as a letter, so each spine speaks
+                   its place plainly instead: the title, then book one of six. *@
                 @for (int i = 0; i < Novels.Length; i++)
                 {
                     var novel = Novels[i];
                     <button type="button" class="ritual-spine" style="--i: @i"
+                            aria-label="@($"{novel.Title}, book {i + 1} of 6")"
                             @onclick="() => ChooseAsync(novel.Tier)">
                         <span class="spine-num">@novel.Numeral</span>
                         <span class="spine-title">@novel.Title</span>

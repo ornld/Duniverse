@@ -26,8 +26,11 @@ else
            row and lies flat at the shelf's end; its slot stays empty behind it. Dune
            lives at the bare address so the nav tab and old links land somewhere real. *@
         <nav class="sayings-shelf" aria-label="Choose a book">
+            @* Each spine names itself for a reader who cannot see it: the numeral prints
+               as I but announces as a letter, so the label says book one plainly. *@
             @{ var slotIndex = System.Array.IndexOf(Books, book); }
-            <a class="shelf-laid" href="@book.Href" aria-current="page">
+            <a class="shelf-laid" href="@book.Href" aria-current="page"
+               aria-label="@SpineName(book.ShortTitle, slotIndex)">
                 <span class="spine-num">@Roman(slotIndex + 1)</span>
                 <span class="spine-title">@book.ShortTitle</span>
             </a>
@@ -40,14 +43,16 @@ else
                        the lying book, so there the open book stays standing, marked in
                        the accent; the two swap through the stylesheet, never both shown. *@
                     <span class="shelf-slot" aria-hidden="true"></span>
-                    <a class="shelf-spine shelf-standing" href="@shelf.Href">
+                    <a class="shelf-spine shelf-standing" href="@shelf.Href" aria-current="page"
+                       aria-label="@SpineName(shelf.ShortTitle, i)">
                         <span class="spine-num">@Roman(i + 1)</span>
                         <span class="spine-title">@shelf.ShortTitle</span>
                     </a>
                 }
                 else
                 {
-                    <a class="shelf-spine" href="@shelf.Href">
+                    <a class="shelf-spine" href="@shelf.Href"
+                       aria-label="@SpineName(shelf.ShortTitle, i)">
                         <span class="spine-num">@Roman(i + 1)</span>
                         <span class="spine-title">@shelf.ShortTitle</span>
                     </a>
@@ -161,6 +166,9 @@ else
     }
 
     // Longest run is Children of Dune at LXIII, so the map stops at fifty.
+    // What a spine calls itself out loud: title first, place on the shelf after.
+    private static string SpineName(string title, int index) => $"{title}, book {index + 1} of 6";
+
     private static string Roman(int number)
     {
         var map = new (int Value, string Numeral)[]
