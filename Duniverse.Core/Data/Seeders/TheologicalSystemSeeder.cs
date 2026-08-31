@@ -67,10 +67,10 @@ namespace Duniverse.Data.Seeders
                 {
                     Id = "theo_OtherMemoryPhilosophy",
                     Name = "Litany Against Fear",
-                    ShortDescription = "The Bene Gesserit mental discipline for mastering fear and unlocking ancestral memory.",
+                    ShortDescription = "The Bene Gesserit discipline for mastering fear: named, faced, and let pass until only the self remains.",
                     DetailedHistory = "The Sisterhood's mental discipline and the ordeal of the Spice Agony both rest on the same idea. Fear is the single greatest obstacle to clear thought and effective action. It is 'the mind-killer,' something to be named, faced, and let to pass rather than pushed down or denied. That premise gives Bene Gesserit acolytes a tool they can return to again and again. It is something to grip during extreme danger, pain, or the crushing weight of absorbing centuries of ancestral memory during the Reverend Mother transformation. Lady Jessica recites the Litany in moments of mortal danger, well past its most famous use in the Spice Agony. That shows how far the philosophy has worked its way into ordinary Bene Gesserit life. Self-mastery, not suppression, opens the path past fear. That single insistence captures the whole Bene Gesserit worldview: human potential unlocked through disciplined confrontation with one's limits rather than flight from them.",
                     RelatedEntityIds = new List<string> { "org_BeneGesserit", "disc_BeneGesseritTraining", "char_LadyJessica" },
-                    CoreTenets = "Fear is the mind-killer; mastery of self grants access to Other Memory",
+                    CoreTenets = "Fear is the mind-killer; self-mastery, not suppression, opens the path past it",
                     FoundationalTexts = new List<string> { "The Litany Against Fear" }
                 },
                 new TheologicalSystem
