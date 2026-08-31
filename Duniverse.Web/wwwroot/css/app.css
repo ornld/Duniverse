@@ -2121,6 +2121,27 @@ html {
     margin-right: 0.15rem;
 }
 
+/* Search results land the way the rest of the archive hands things over: a rise of a
+   few pixels, one row a beat after the last. Backwards fill holds each row unseen
+   until its delay comes due. */
+@keyframes result-settle {
+    from {
+        opacity: 0;
+        transform: translateY(7px);
+    }
+}
+
+.result-settle {
+    animation: result-settle 0.26s ease-out backwards;
+    animation-delay: calc(var(--i) * 0.05s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .result-settle {
+        animation: none;
+    }
+}
+
 .candidates {
     margin-top: var(--sp-5);
     margin-inline: -1rem;

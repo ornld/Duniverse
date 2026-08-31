@@ -20,20 +20,24 @@
         <button @onclick="HandleSearch">Search</button>
     </div>
 
+    @* Results settle the way everything else the archive hands over does: header first,
+       rows on their own beats, the beats capped so a long list arrives as one motion.
+       Keyed per search, so a fresh query replays the landing. *@
     @if (notFound)
     {
-        <p class="no-results">No matching records found for "@lastQuery". Check the spelling and try again.</p>
+        <p class="no-results result-settle" style="--i: 0" @key="@($"none-{searchEpoch}")">No matching records found for "@lastQuery". Check the spelling and try again.</p>
     }
 
     @if (candidates.Count > 0)
     {
-        <div class="candidates">
-            <p>@candidates.Count records match "@lastQuery". Did you mean:</p>
+        <div class="candidates" @key="@($"names-{searchEpoch}")">
+            <p class="result-settle" style="--i: 0">@candidates.Count records match "@lastQuery". Did you mean:</p>
             <ul>
-                @foreach (var candidate in candidates)
+                @for (var i = 0; i < candidates.Count; i++)
                 {
+                    var candidate = candidates[i];
                     var slug = GraphLayoutService.CategorySlug(candidate);
-                    <li>
+                    <li class="result-settle" style="--i: @Math.Min(i + 1, 8)">
                         @* Which drawer each match comes out of. A mixed list of names read
                            as one kind of thing without it. *@
                         <Mark Name="@slug" CssClass="@($"candidate-mark connection-cat category-{slug}")" />
@@ -50,15 +54,16 @@
        is a weaker claim than a name. *@
     @if (contentMatches.Count > 0)
     {
-        <div class="candidates text-matches">
-            <p>
+        <div class="candidates text-matches" @key="@($"text-{searchEpoch}")">
+            <p class="result-settle" style="--i: @Math.Min(candidates.Count + 1, 8)">
                 @(candidates.Count > 0 ? "Also mentioned" : "Mentioned")
                 in the text of @contentMatchTotal @(contentMatchTotal == 1 ? "record" : "records")@(contentMatchTotal > contentMatches.Count ? $", closest {contentMatches.Count} first" : ""):
             </p>
             <ul>
-                @foreach (var match in contentMatches)
+                @for (var j = 0; j < contentMatches.Count; j++)
                 {
-                    <li>
+                    var match = contentMatches[j];
+                    <li class="result-settle" style="--i: @Math.Min(candidates.Count + 2 + j, 8)">
                         <a href="@($"/entity/{match.Id}")">@match.Name</a>
                         <span class="muted">@(Snippet(match, lastQuery) ?? match.ShortDescription)</span>
                     </li>
@@ -91,6 +96,7 @@
     private string lastQuery = "";
     private List<DuneEntity> everyRecord = new();
     private int sealEpoch;
+    private int searchEpoch;
     private bool notFound;
     private List<DuneEntity> rawCandidates = new();
     private List<DuneEntity> candidates = new();
@@ -151,6 +157,10 @@
         {
             return;
         }
+
+        // A new question, a new landing: the bump rebuilds the keyed result blocks, so
+        // their settle replays instead of the rows swapping in place.
+        searchEpoch++;
 
         var result = Registry.Resolve(lastQuery);
 
