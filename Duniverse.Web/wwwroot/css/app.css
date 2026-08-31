@@ -3194,6 +3194,26 @@ button.chip {
             color: var(--dune-accent-bright);
         }
 
+    /* The chosen book comes off the shelf: a lift past the hover's, a small tip at
+       the hinge, and the close fades around the held pose. The other five stand
+       where they were left. */
+    .ritual-spine.is-chosen {
+        transform-origin: 50% 100%;
+        animation: spine-pull 0.28s var(--ease-crest) forwards;
+        border-color: var(--dune-accent);
+        box-shadow: inset 3px 0 0 rgba(var(--dune-accent-rgb), 0.6), inset -2px 0 4px rgba(0, 0, 0, 0.45), 0 10px 22px rgba(var(--dune-accent-rgb), 0.24);
+    }
+
+        .ritual-spine.is-chosen .spine-title {
+            color: var(--dune-accent-bright);
+        }
+
+@keyframes spine-pull {
+    to {
+        transform: translateY(-14px) rotate(-4deg);
+    }
+}
+
 .spine-num {
     color: var(--dune-muted);
     font-size: 0.72rem;
@@ -3226,7 +3246,8 @@ button.chip {
 @media (prefers-reduced-motion: reduce) {
     .ritual-backdrop,
     .ritual-panel,
-    .ritual-spine {
+    .ritual-spine,
+    .ritual-spine.is-chosen {
         animation: none;
     }
 }

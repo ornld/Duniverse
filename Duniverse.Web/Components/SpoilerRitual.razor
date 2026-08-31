@@ -25,7 +25,7 @@
                 @for (int i = 0; i < Novels.Length; i++)
                 {
                     var novel = Novels[i];
-                    <button type="button" class="ritual-spine" style="--i: @i"
+                    <button type="button" class="ritual-spine @(chosenTier == novel.Tier ? "is-chosen" : null)" style="--i: @i"
                             aria-label="@($"{novel.Title}, book {i + 1} of 6")"
                             @onclick="() => ChooseAsync(novel.Tier)">
                         <span class="spine-num">@novel.Numeral</span>
@@ -58,6 +58,10 @@
     private bool closing;
     private bool activated;
     private bool reportedOpen;
+
+    // The book being taken down. Set the moment a spine is clicked, so the pull plays
+    // before the panel starts its fade, and so no second choice lands mid-pull.
+    private SpoilerTier? chosenTier;
     private ElementReference panel;
     private ElementReference sandCanvas;
 
@@ -142,6 +146,7 @@
         else
         {
             activated = false;
+            chosenTier = null;
         }
 
         if (reportedOpen == ShouldShow)
@@ -158,12 +163,28 @@
 
     private async Task ChooseAsync(SpoilerTier tier)
     {
+        if (closing || chosenTier is not null)
+        {
+            return;
+        }
+
+        // The pull is the acknowledgment: the chosen book comes off the shelf first,
+        // and only then does the panel begin its fade. The delay matches the CSS.
+        chosenTier = tier;
+        StateHasChanged();
+        await Task.Delay(280);
+
         await Spoiler.UpdateAsync(enabled: true, tier, includeExpandedUniverse: false);
         await CloseAsync(applied: true);
     }
 
     private async Task OpenEverythingAsync()
     {
+        if (closing || chosenTier is not null)
+        {
+            return;
+        }
+
         await Spoiler.UpdateAsync(enabled: false, Spoiler.NovelProgress, Spoiler.IncludeExpandedUniverse);
         await CloseAsync(applied: true);
     }
@@ -173,6 +194,12 @@
     // these defaults, so nothing needs to re-filter.
     private async Task SkipAsync()
     {
+        // A tap on the surround while a chosen book is mid-pull is not a skip.
+        if (closing || chosenTier is not null)
+        {
+            return;
+        }
+
         await Spoiler.UpdateAsync(Spoiler.Enabled, Spoiler.NovelProgress, Spoiler.IncludeExpandedUniverse);
         await CloseAsync(applied: false);
     }
