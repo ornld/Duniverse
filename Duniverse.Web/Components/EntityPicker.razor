@@ -41,6 +41,13 @@
                 }
             </ul>
         }
+        else if (nothingAnswered)
+        {
+            @* Enter on a name the archive cannot resolve used to pass in silence. The line
+               is deliberately the same whether a record is misspelled, missing, or sealed
+               past the reader's progress: confirming a seal is itself a leak. *@
+            <p class="endpoint-empty muted" role="status">The archive holds no record by that name.</p>
+        }
     }
 </div>
 
@@ -65,9 +72,11 @@
 
     private string query = "";
     private List<DuneEntity> suggestions = new();
+    private bool nothingAnswered;
 
     private void UpdateSuggestions()
     {
+        nothingAnswered = false;
         var trimmed = query.Trim();
 
         // A single letter matches half the archive, so wait for two before suggesting.
@@ -95,8 +104,10 @@
         }
 
         // Enter takes the archive's best read of the text (exact ID, unique name, or
-        // typo fix), and otherwise falls back to the top suggestion.
-        var resolved = Registry.Resolve(query.Trim()).Entity;
+        // typo fix), and otherwise falls back to the top suggestion. A name that
+        // resolves to nothing gets said so; an empty box asked no question.
+        var trimmed = query.Trim();
+        var resolved = Registry.Resolve(trimmed).Entity;
         if (resolved is not null && Spoiler.IsVisible(resolved))
         {
             await PickAsync(resolved);
@@ -105,12 +116,17 @@
         {
             await PickAsync(suggestions[0]);
         }
+        else if (trimmed.Length > 0)
+        {
+            nothingAnswered = true;
+        }
     }
 
     private async Task PickAsync(DuneEntity entity)
     {
         query = "";
         suggestions.Clear();
+        nothingAnswered = false;
         Selected = entity;
         await SelectedChanged.InvokeAsync(entity);
     }

@@ -2818,6 +2818,15 @@ html {
     border-radius: var(--r-sharp);
 }
 
+/* The answer to an Enter that resolved nothing, in the suggestion panel's slot so
+   the reply lands where the reader was already looking. */
+.endpoint-empty {
+    margin: 0.4rem 0 0;
+    padding: 0.45rem 0.6rem;
+    font-size: var(--fs-small);
+    font-style: italic;
+}
+
     .endpoint-suggestions button {
         display: flex;
         align-items: baseline;
