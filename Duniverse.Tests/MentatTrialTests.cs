@@ -30,16 +30,17 @@ namespace Duniverse.Tests
         }
 
         [Fact]
-        public void TheFirstClueSealsEveryNameTheAnswerCarries()
+        public void TheSummaryClueSealsEveryNameTheAnswerCarries()
         {
             // Paul's summary names him only through an alias, which is exactly how the
             // leak slipped out the first time. Arrakis does the same through "Dune".
+            // The summary rides last in the deal now; the promise rides with it.
             var reader = ArchiveFixture.ReaderAt(SpoilerTier.Chapterhouse, expanded: true);
 
             foreach (var id in new[] { "char_PaulAtreides", "loc_Arrakis" })
             {
                 var answer = _registry.GetEntity(id)!;
-                var clue = _trial.BuildClues(answer, reader)[0];
+                var clue = _trial.BuildClues(answer, reader)[^1];
 
                 foreach (var name in new[] { answer.Name }.Concat(answer.Aliases))
                 {
@@ -58,7 +59,7 @@ namespace Duniverse.Tests
             // "Kwisatz Haderach" is two sealed words side by side. One bar tells less than
             // two, and the count of a name's words is itself a clue.
             var reader = ArchiveFixture.ReaderAt(SpoilerTier.Chapterhouse, expanded: true);
-            var clue = _trial.BuildClues(_registry.GetEntity("char_PaulAtreides")!, reader)[0];
+            var clue = _trial.BuildClues(_registry.GetEntity("char_PaulAtreides")!, reader)[^1];
 
             Assert.Single(Regex.Matches(clue, Regex.Escape(MentatTrialService.RedactionBar)));
         }
