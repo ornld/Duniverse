@@ -89,19 +89,20 @@ namespace Duniverse.Services
         }
 
         /// <summary>
-        /// The five clues, vague to specific: redacted summary, category, book of first
-        /// appearance, one visible connection, and the shape of the name. Always exactly five and
-        /// never empty, since missing data degrades to an honest archive line.
+        /// The five clues, vague to specific: the shape of its web, category, book of first
+        /// appearance, one visible connection, and last the redacted summary, the most
+        /// identifying line the archive will surrender. Always exactly five and never empty,
+        /// since missing data degrades to an honest archive line.
         /// </summary>
         public IReadOnlyList<string> BuildClues(DuneEntity answer, Func<SpoilerTier, bool> tierVisible)
         {
             return new[]
             {
-                SummaryClue(answer),
+                WebClue(answer, tierVisible),
                 CategoryClue(answer),
                 BookClue(answer),
                 ConnectionClue(answer, tierVisible),
-                NameShapeClue(answer),
+                SummaryClue(answer),
             };
         }
 
@@ -140,7 +141,39 @@ namespace Duniverse.Services
             _ => "records beyond category",
         };
 
-        // ---- Clue one: the redacted summary ----
+        // ---- Clue one: the shape of its web ----
+
+        /// <summary>
+        /// Structural facts only, nothing quoted. The summary line used to open the trial,
+        /// but its unredacted words were a verbatim quote the archive's own search would
+        /// trace to the answer in one paste. Counts and categories give search nothing.
+        /// </summary>
+        private string WebClue(DuneEntity answer, Func<SpoilerTier, bool> tierVisible)
+        {
+            var neighbors = _registry.GetDirectlyRelated(answer.Id, tierVisible)
+                .Where(neighbor => tierVisible(neighbor.SpoilerTier))
+                .ToList();
+
+            if (neighbors.Count == 0)
+            {
+                return "No visible tie binds this record to the web. The archive holds it alone.";
+            }
+
+            if (neighbors.Count == 1)
+            {
+                return "A single visible tie binds this record to the rest of the archive.";
+            }
+
+            var leading = neighbors
+                .GroupBy(CategoryLabel)
+                .OrderByDescending(group => group.Count())
+                .ThenBy(group => group.Key, StringComparer.Ordinal)
+                .First().Key;
+
+            return $"{CountWord(neighbors.Count)} visible ties bind this record to the web, {leading.ToLowerInvariant()} above all.";
+        }
+
+        // ---- Clue five: the redacted summary ----
 
         private static string SummaryClue(DuneEntity answer)
         {
@@ -254,28 +287,8 @@ namespace Duniverse.Services
             return $"A direct connection is on record: {neighbors[0].Name}.";
         }
 
-        // ---- Clue five: the shape of the name ----
-
-        private static string NameShapeClue(DuneEntity answer)
-        {
-            var words = answer.Name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            if (words.Length == 0)
-            {
-                return "The record's name is missing from the index. Its shape cannot be told.";
-            }
-
-            char first = words[0].FirstOrDefault(char.IsLetterOrDigit);
-            if (first == default)
-            {
-                first = words[0][0];
-            }
-            first = char.ToUpperInvariant(first);
-
-            return words.Length == 1
-                ? $"One word. It begins with {first}."
-                : $"{CountWord(words.Length)} words. The first begins with {first}.";
-        }
-
+        // Spelled out while the ledger voice can carry it, digits once it cannot. A count
+        // opens the web clue's sentence, so every form here reads right at a capital.
         private static string CountWord(int count) => count switch
         {
             2 => "Two",
@@ -283,6 +296,12 @@ namespace Duniverse.Services
             4 => "Four",
             5 => "Five",
             6 => "Six",
+            7 => "Seven",
+            8 => "Eight",
+            9 => "Nine",
+            10 => "Ten",
+            11 => "Eleven",
+            12 => "Twelve",
             _ => count.ToString(),
         };
 
