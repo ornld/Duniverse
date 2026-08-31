@@ -27,4 +27,15 @@ window.duneScroll = {
             well = well.parentElement;
         }
     },
+
+    // A well opens on whatever sits at its left edge, and at low reading progress the
+    // bloodline chart keeps empty canvas there. The page hands over where its drawn
+    // people center, and the well starts on them. No overflow, no movement.
+    centerWell: function (selector, fraction) {
+        const well = document.querySelector(selector);
+        if (!well || well.scrollWidth <= well.clientWidth) {
+            return;
+        }
+        well.scrollLeft = Math.max(0, fraction * well.scrollWidth - well.clientWidth / 2);
+    },
 };

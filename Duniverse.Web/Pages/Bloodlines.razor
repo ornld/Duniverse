@@ -1,4 +1,5 @@
 @page "/bloodlines"
+@implements IDisposable
 @inject EntityRegistry Registry
 @inject SpoilerSettings Spoiler
 @inject NavigationManager Nav
@@ -30,7 +31,7 @@
                as the chart moves. *@
             <div class="bloodline-scroll" tabindex="0" role="group"
                  aria-label="Bloodline chart, scrolls sideways">
-            <svg class="bloodline-chart" viewBox="0 0 @W @((int)chartHeight)" preserveAspectRatio="xMidYMid meet">
+            <svg class="bloodline-chart @(entered ? "is-entered" : "is-waiting")" viewBox="0 0 @W @((int)chartHeight)" preserveAspectRatio="xMidYMid meet">
                 @* Every element carries its generation's row index (--row), and I stagger
                    the entrance by it in CSS. Solid lines draw themselves in, since
                    pathLength normalizes them for the dash trick. Dashed ones fade
@@ -135,6 +136,13 @@
 
     private string? focusedId;
 
+    // The chart enters when first seen, not when built: on a phone it mounts below the
+    // fold and the settle used to play to nobody. Until the well scrolls into view the
+    // svg waits under is-waiting, hidden and still.
+    private bool entered;
+    private double contentMidFraction = 0.5;
+    private CancellationTokenSource? revealWait;
+
     protected override void OnInitialized()
     {
         BuildChart();
@@ -147,12 +155,53 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        // Bring the highlighted ancestor into view once, since a deep generation can
-        // sit below the fold and the page would otherwise look untouched.
-        if (firstRender && focusedId is not null)
+        if (!firstRender || placed.Count == 0)
         {
-            await JS.InvokeVoidAsync("duneScroll.toId", "bloodline-focus");
+            return;
         }
+
+        // The well's first position comes before the reveal, so it already stands on
+        // the family when the chart draws itself in. A focus link centers its own
+        // person; everyone else gets the middle of what is actually drawn.
+        try
+        {
+            if (focusedId is not null)
+            {
+                await JS.InvokeVoidAsync("duneScroll.toId", "bloodline-focus");
+            }
+            else
+            {
+                await JS.InvokeVoidAsync("duneScroll.centerWell", ".bloodline-scroll", contentMidFraction);
+            }
+        }
+        catch
+        {
+            // A blocked script costs the starting pan, nothing more.
+        }
+
+        revealWait = new CancellationTokenSource();
+        try
+        {
+            await JS.InvokeAsync<bool>("duneReveal.once", revealWait.Token, ".bloodline-chart");
+        }
+        catch (OperationCanceledException)
+        {
+            // Navigated away before first sight. The next visit starts its own wait.
+            return;
+        }
+        catch
+        {
+            // If the observer is unavailable the chart must still show, entrance and all.
+        }
+
+        entered = true;
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        revealWait?.Cancel();
+        revealWait?.Dispose();
     }
 
     private void BuildChart()
@@ -212,6 +261,11 @@
             placed[node.EntityId] = new PlacedNode(entity!.Id, entity.Name, entity.ShortDescription ?? "",
                 node.Fill, node.Ring, x, rowY[node.Generation], genRow[node.Generation]);
         }
+
+        // Where the drawn people actually center, as a fraction of the canvas. A partial
+        // chart clusters away from its edges, and the well opens on this instead of on
+        // the empty margin that sits at scroll position zero.
+        contentMidFraction = (placed.Values.Min(p => p.X) + placed.Values.Max(p => p.X)) / 2 / W;
 
         // Stagger neighboring labels within each generation so long names stay legible.
         foreach (var row in placed.Values.GroupBy(p => p.Y))

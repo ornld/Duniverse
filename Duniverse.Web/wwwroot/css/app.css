@@ -1415,12 +1415,23 @@ html {
     gap: var(--sp-2) var(--sp-3);
 }
 
+/* Bordered like buttons, these begged taps they could not answer. A key wears dots
+   now, the same language the whole Duniverse legend speaks, and nothing about it
+   promises a control. */
 .legend-chip {
-    padding: 0.2rem 0.7rem;
-    border-radius: var(--r-sharp);
-    border: var(--rule-hair) solid currentColor;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
     font-size: var(--fs-caption);
 }
+
+    .legend-chip::before {
+        content: "";
+        width: 0.6rem;
+        height: 0.6rem;
+        border-radius: 50%;
+        background: currentColor;
+    }
 
 .legend-note {
     flex-basis: 100%;
@@ -1659,6 +1670,18 @@ html {
 .bloodline-edges path.dashed {
     animation: blood-appear 0.45s ease-out backwards;
     animation-delay: calc(var(--row) * 0.38s + 0.18s);
+}
+
+/* The page chart holds its entrance for first sight: mounted below a phone's fold,
+   the settle used to play to nobody. The page trades is-waiting for is-entered when
+   the well scrolls into view; a record's strip keeps its mount timing. */
+.bloodline-chart.is-waiting .bloodline-bands g,
+.bloodline-chart.is-waiting .bloodline-node,
+.bloodline-chart.is-waiting .bloodline-node circle,
+.bloodline-chart.is-waiting .bloodline-edges path.draw,
+.bloodline-chart.is-waiting .bloodline-edges path.dashed {
+    animation: none;
+    opacity: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
