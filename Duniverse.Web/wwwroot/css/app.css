@@ -4681,12 +4681,25 @@ button.chip {
 /* The censor's mark: a fixed width of ink whatever hides beneath, edged in spice so it
    reads as sealed rather than missing. Pale block glyphs here looked like highlighter. */
 .redacted {
+    position: relative;
     display: inline-block;
     width: 4.2em;
     height: 0.95em;
     vertical-align: -0.1em;
     background: var(--dune-ink);
     border: var(--rule-hair) solid rgba(var(--dune-accent-rgb), 0.4);
+}
+
+/* Present for the clipboard, invisible on the page: a copied clue reads [sealed]
+   where the ink sits instead of a double space. Clipped rather than display:none,
+   which the clipboard would drop along with the render. */
+.redacted-copy {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
 }
 
 /* Trial elements stage their arrival like the dossier: the page-enter fade stands
