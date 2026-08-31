@@ -58,6 +58,21 @@ namespace Duniverse.Services
         }
 
         /// <summary>
+        /// A stable fingerprint of any text, on the same FNV-1a arithmetic as the pool hash.
+        /// The trial page seals its stored ledger with it, so a record edited by hand stops
+        /// parsing as one the app wrote.
+        /// </summary>
+        public static string Fingerprint(string text)
+        {
+            ulong hash = 14695981039346656037UL;
+            foreach (var b in Encoding.UTF8.GetBytes(text))
+            {
+                hash = (hash ^ b) * 1099511628211UL;
+            }
+            return hash.ToString("x16");
+        }
+
+        /// <summary>
         /// The day's sealed record, or null on an empty pool. A date-derived number indexes the
         /// pool, fixed arithmetic and not System.Random, so every runtime lands the same. I mix
         /// it so consecutive days don't walk neighboring ids.

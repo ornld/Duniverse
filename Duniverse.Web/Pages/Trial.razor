@@ -190,17 +190,18 @@
     private record GuessRow(DuneEntity Entity, TrialGuessResult Result);
 
     // Everything persisted under duniverse.trial.v1: today's trial by date and pool
-    // fingerprint, plus the streak ledger that outlives it.
+    // fingerprint, plus the streak ledger that outlives it. The answer is never written;
+    // date and pool recompute it, so storage holds nothing worth peeking at.
     private record StoredTrial(
         string Date,
-        string AnswerId,
         string PoolFingerprint,
         List<string> GuessIds,
         bool Finished,
         bool Won,
         int Streak,
         int LongestStreak,
-        string? LastFinishedDate);
+        string? LastFinishedDate,
+        string? Seal);
 
     // The first clue is free; each miss buys the next. A win freezes the count where it
     // stood, so the reveal shows only the clues that were actually earned.
@@ -228,7 +229,8 @@
     /// <summary>
     /// Rehydrates a saved trial. The streak carries over; the day's guesses only when the
     /// date and pool fingerprint match, so moving reading progress mid-day starts that tier
-    /// fresh. A stored answer no longer visible gets dropped, never named.
+    /// fresh. Those two recompute the day's answer by themselves, which is why it is
+    /// never stored.
     /// </summary>
     private async Task RestoreAsync()
     {
@@ -251,15 +253,21 @@
             return;
         }
 
+        // A record whose seal does not match is not one I wrote, so none of it is
+        // trusted, the ledger included. Deleting the key remains possible and costs
+        // the run, which is deterrent enough for a solo game.
+        if (stored.Seal != SealFor(stored))
+        {
+            return;
+        }
+
         streak = stored.Streak;
         longestStreak = stored.LongestStreak;
         lastFinishedDate = stored.LastFinishedDate;
 
         bool sameTrial = stored.Date == today
             && stored.PoolFingerprint == fingerprint
-            && answer is not null
-            && string.Equals(stored.AnswerId, answer.Id, StringComparison.OrdinalIgnoreCase)
-            && Spoiler.IsVisible(answer);
+            && answer is not null;
 
         if (!sameTrial)
         {
@@ -343,14 +351,15 @@
         {
             var stored = new StoredTrial(
                 today,
-                answer?.Id ?? "",
                 fingerprint,
                 history.Select(row => row.Entity.Id).ToList(),
                 finished,
                 won,
                 streak,
                 longestStreak,
-                lastFinishedDate);
+                lastFinishedDate,
+                Seal: null);
+            stored = stored with { Seal = SealFor(stored) };
             await JS.InvokeVoidAsync("localStorage.setItem", StorageKey, JsonSerializer.Serialize(stored));
         }
         catch
@@ -358,6 +367,21 @@
             // If saving fails the trial still plays out in memory for this visit.
         }
     }
+
+    // The seal is honesty, not secrecy: the arithmetic ships to every browser. It stops
+    // a streak edited in devtools from parsing as a record the app wrote, and that is
+    // the whole claim it makes.
+    private static string SealFor(StoredTrial stored) =>
+        MentatTrialService.Fingerprint(string.Join('\n',
+            "duniverse.trial.seal.v1",
+            stored.Date,
+            stored.PoolFingerprint,
+            string.Join(',', stored.GuessIds),
+            stored.Finished,
+            stored.Won,
+            stored.Streak,
+            stored.LongestStreak,
+            stored.LastFinishedDate ?? ""));
 
     private static string Verdict(TrialGuessResult result)
     {
