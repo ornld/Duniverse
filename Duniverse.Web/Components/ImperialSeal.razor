@@ -8,6 +8,16 @@
 
 @if (sealedCount > 0)
 {
+    @* One stamp per sealed record, none of them named or openable: the mass is the
+       tease. Hidden from assistive tech, since the sentence below already carries the
+       count, and hearing image sixty-nine times carries nothing. *@
+    <div class="imperial-seal-stamps" aria-hidden="true">
+        @for (var i = 0; i < sealedCount; i++)
+        {
+            <GateSeal Unbroken="true" />
+        }
+    </div>
+
     @* I made it a status region, so the count reaches a screen reader when progress shifts
        and the number changes under them. *@
     @* Razor eats whitespace between a closing brace and the next block, so I write the

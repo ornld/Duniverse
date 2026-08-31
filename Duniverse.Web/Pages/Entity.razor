@@ -224,6 +224,18 @@ else if (entity is not null)
             </div>
         </div>
     }
+
+    @* Every record ends under the same mark, so the foot of one page never says more
+       than the foot of another. The line reads the whole archive's state, nothing about
+       this record: presence here is not a hint that deeper layers exist. *@
+    <footer class="record-colophon dossier-item" style="--i: 7">
+        <GateSeal Unbroken="true" />
+        <p class="muted">
+            @(archiveHoldsSeals
+                ? "The archive keeps what lies past your reading under seal."
+                : "Nothing in the archive is sealed to you.")
+        </p>
+    </footer>
     </div>
 }
 else if (candidates.Count > 0)
@@ -259,6 +271,7 @@ else
     public string Id { get; set; } = "";
 
     private DuneEntity? entity;
+    private bool archiveHoldsSeals;
     private bool isGated;
     private bool revealed;
     private bool editionMarks;
@@ -368,6 +381,10 @@ else
         var result = Registry.Resolve(Id);
         entity = result.Entity;
         candidates = result.Candidates.Where(Spoiler.IsVisible).ToList();
+
+        // For the colophon: whether anything anywhere is still shut. Archive-wide on
+        // purpose, so the foot of this record tells nothing about this record.
+        archiveHoldsSeals = Registry.GetAllEntities<DuneEntity>().Any(e => !Spoiler.IsVisible(e));
 
         if (entity is null)
         {

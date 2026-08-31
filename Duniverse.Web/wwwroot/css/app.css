@@ -1129,6 +1129,34 @@ html {
    How much of a drawer is still shut. Reads as a footnote the archive is admitting rather
    than a feature announcing itself, so it sits quiet: small, muted, one hairline above it. */
 
+/* The gate's hawk, whole. The colophon and the count stamps both wear it; whoever
+   mounts it sets the size, and currentColor sets the ink. */
+.seal-mark {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* One stamp per sealed record, none named, none openable: a drawer of unopened
+   letters. The sentence below them carries the count for anyone not looking. */
+.imperial-seal-stamps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: var(--sp-5);
+    color: rgba(var(--dune-accent-rgb), 0.38);
+}
+
+    .imperial-seal-stamps .seal-mark {
+        width: 0.95rem;
+    }
+
+    /* When the stamps lead, the sentence is their caption: it closes the gap and keeps
+       its hairline as the plate's lower rule. */
+    .imperial-seal-stamps + .imperial-seal {
+        margin-top: var(--sp-2);
+    }
+
 .imperial-seal {
     margin: var(--sp-5) 0 0;
     padding-top: 0.85rem;
@@ -1137,6 +1165,26 @@ html {
     color: var(--dune-muted);
     letter-spacing: 0.01em;
 }
+
+/* ---- The colophon ----
+   Every record ends under the same faded hawk and one line about the whole archive.
+   Uniform on purpose: a foot that varied by record would whisper which ones go on. */
+.record-colophon {
+    margin-top: var(--sp-5);
+    text-align: center;
+    color: rgba(var(--dune-accent-rgb), 0.5);
+}
+
+    .record-colophon .seal-mark {
+        width: 2.1rem;
+        margin: 0 auto var(--sp-2);
+    }
+
+    .record-colophon p {
+        margin: 0;
+        font-size: var(--fs-small);
+        font-style: italic;
+    }
 
     .imperial-seal span {
         /* The nudge toward the next book earns a little more light than the count itself. */

@@ -1,18 +1,22 @@
 @* The seal on a sealed record: an angular hawk of my own drawing, held in one bold ring.
    Two copies clipped along a zigzag crack, overlapped a hair so no seam shows: breaking
-   is two halves parting, not a swap. *@
+   is two halves parting, not a swap. Unbroken stamps the device once, whole, for the
+   colophon and the count stamps, which never part. *@
 
-<svg class="gate-seal @(Breaking ? "is-breaking" : "")" viewBox="0 0 120 120"
+<svg class="@(Unbroken ? "seal-mark" : $"gate-seal {(Breaking ? "is-breaking" : "")}")" viewBox="0 0 120 120"
      aria-hidden="true" focusable="false">
     <defs>
         @* Ids carry a Guid the way TwinMoons' gradients do, so a second seal on the same
            page never captures this one's clips. *@
-        <clipPath id="seal-left-@uid">
-            <polygon points="0,0 63.3,0 57.3,20 63.3,40 57.3,60 63.3,82 57.3,102 63.3,120 0,120" />
-        </clipPath>
-        <clipPath id="seal-right-@uid">
-            <polygon points="120,0 62.7,0 56.7,20 62.7,40 56.7,60 62.7,82 56.7,102 62.7,120 120,120" />
-        </clipPath>
+        @if (!Unbroken)
+        {
+            <clipPath id="seal-left-@uid">
+                <polygon points="0,0 63.3,0 57.3,20 63.3,40 57.3,60 63.3,82 57.3,102 63.3,120 0,120" />
+            </clipPath>
+            <clipPath id="seal-right-@uid">
+                <polygon points="120,0 62.7,0 56.7,20 62.7,40 56.7,60 62.7,82 56.7,102 62.7,120 120,120" />
+            </clipPath>
+        }
 
         @* Drawn once, stamped twice: wings closing the V, the head floating in the crook,
            the tail dropping straight from the fork. Paint rides on the elements as
@@ -26,17 +30,27 @@
         </g>
     </defs>
 
-    <g class="seal-half left" clip-path="url(#seal-left-@uid)">
+    @if (Unbroken)
+    {
         <use href="#seal-device-@uid" />
-    </g>
-    <g class="seal-half right" clip-path="url(#seal-right-@uid)">
-        <use href="#seal-device-@uid" />
-    </g>
+    }
+    else
+    {
+        <g class="seal-half left" clip-path="url(#seal-left-@uid)">
+            <use href="#seal-device-@uid" />
+        </g>
+        <g class="seal-half right" clip-path="url(#seal-right-@uid)">
+            <use href="#seal-device-@uid" />
+        </g>
+    }
 </svg>
 
 @code {
     [Parameter]
     public bool Breaking { get; set; }
+
+    [Parameter]
+    public bool Unbroken { get; set; }
 
     private readonly string uid = Guid.NewGuid().ToString("N")[..8];
 }
