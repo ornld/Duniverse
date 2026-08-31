@@ -1,4 +1,8 @@
 @page "/not-found"
+@* Every address the router cannot place lands here by the catch-all, inside the app
+   and at the URL typed. Without it an unmatched in-app navigation falls back to a
+   document load, and the whole runtime reboots to say 404. *@
+@page "/{*path:nonfile}"
 @layout MainLayout
 
 <PageTitle>Page not found - Duniverse</PageTitle>
@@ -7,3 +11,8 @@
     This path leads to open sand. The archive keeps no record at this address.
     Check the link for a misprint, or let the wind carry you back.
 </LostDesert>
+
+@code {
+    // Bound so the catch-all has somewhere to land; nothing reads it.
+    [Parameter] public string? Path { get; set; }
+}
