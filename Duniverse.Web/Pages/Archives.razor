@@ -16,7 +16,7 @@
            are not obliged to read it. The search box is the whole point of this page. *@
         <input @bind="query" @bind:event="oninput" @onkeyup="HandleKeyUp"
                aria-label="Search the archive by name or ID"
-               placeholder="Search a name or ID... e.g. Paul Atreides, Arrakis, Bene Gesserit" />
+               placeholder="Ask for a name or an ID: Paul Atreides, Arrakis, Bene Gesserit..." />
         <button @onclick="HandleSearch">Search</button>
     </div>
 
@@ -68,7 +68,7 @@
     }
 
     <div class="examples">
-        <span class="examples-label">Try:</span>
+        <span class="examples-label">Start anywhere:</span>
         @foreach (var example in Examples)
         {
             <a class="chip" href="@($"/entity/{example.Id}")">@example.Label</a>
@@ -76,8 +76,8 @@
     </div>
 
     <p class="surprise-line">
-        Not sure where to start?
-        <button class="surprise-btn" @onclick="RandomJump">Surprise me</button>
+        Anywhere is a beginning.
+        <button class="surprise-btn" @onclick="RandomJump">Let the archive choose</button>
     </p>
 
     @* Keyed to the epoch so changing reading progress recounts the seals straight away, rather

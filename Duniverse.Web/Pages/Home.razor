@@ -12,11 +12,11 @@
     </p>
 
     <div class="home-search">
-        <EntityPicker Label="Find a record" Placeholder="Try Paul Atreides, Arrakis, or the Bene Gesserit..."
+        <EntityPicker Label="Find a record" Placeholder="Ask the archive: Paul Atreides, Arrakis, the Bene Gesserit..."
                       SelectedChanged="OpenRecord" />
     </div>
     <p class="cta">
-        <button class="surprise-btn" @onclick="RandomJump">Drop me somewhere in the Dune universe</button>
+        <button class="surprise-btn" @onclick="RandomJump">Let the archive choose</button>
     </p>
 
     @if (dailySaying is not null)

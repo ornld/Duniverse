@@ -14,10 +14,10 @@
     </p>
 
     <div class="connection-pickers">
-        <EntityPicker Label="First record" Placeholder="e.g. Duncan Idaho"
+        <EntityPicker Label="First record" Placeholder="Duncan Idaho..."
                       Selected="@from" SelectedChanged="OnFromChanged" />
         <span class="connection-joiner" aria-hidden="true">&#8596;</span>
-        <EntityPicker Label="Second record" Placeholder="e.g. Shai-Hulud"
+        <EntityPicker Label="Second record" Placeholder="Shai-Hulud..."
                       Selected="@to" SelectedChanged="OnToChanged" />
     </div>
 
@@ -93,7 +93,7 @@
     }
 
     <div class="examples">
-        <span class="examples-label">Try:</span>
+        <span class="examples-label">Trace one of these:</span>
         @foreach (var pair in ExamplePairs)
         {
             <button type="button" class="chip" @onclick="() => ApplyExample(pair.FromId, pair.ToId)">
