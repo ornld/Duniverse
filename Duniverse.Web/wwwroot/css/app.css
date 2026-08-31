@@ -3720,6 +3720,17 @@ button.chip {
         color: #4a8fe8;
     }
 
+/* On a phone these two controls are the whole map of the site, and at text height
+   they measured 26px against a thumb's 44. Below the base rule on purpose: the same
+   selector above would win the cascade and quietly undo this. In rem, so scaled
+   text scales its target with it. */
+@media (max-width: 600px) {
+    .index-trigger {
+        min-height: 2.75rem;
+        padding-inline: 1rem;
+    }
+}
+
 .index-chevron {
     width: 0.72rem;
     height: 0.72rem;
