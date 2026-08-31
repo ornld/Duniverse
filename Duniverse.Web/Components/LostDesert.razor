@@ -2,6 +2,8 @@
 @inject SpoilerSettings Spoiler
 @inject NavigationManager Nav
 @inject IJSRuntime JS
+@inject LostPageSignal Lost
+@implements IDisposable
 
 @* Open sand for a URL with no page or an id with no record. I keep the canvas first in
    DOM order, so copy and actions paint above it; moved after, it would cover them and
@@ -19,6 +21,18 @@
 
 @code {
     private ElementReference sandCanvas;
+
+    // Standing in the sand is announced, not inferred: the catch-all route means a
+    // lost page can wear any address, so the ritual asks this signal instead of the URL.
+    protected override void OnInitialized()
+    {
+        Lost.Set(true);
+    }
+
+    public void Dispose()
+    {
+        Lost.Set(false);
+    }
 
     /// <summary>
     /// The line over the sand. Both callers say the same thing so far, which is the point:

@@ -18,5 +18,6 @@ builder.Services.AddSingleton<PathFinderService>();
 builder.Services.AddSingleton<MentatTrialService>();
 builder.Services.AddScoped<SpoilerSettings>();
 builder.Services.AddScoped<UnsealedRecords>();
+builder.Services.AddScoped<LostPageSignal>();
 
 await builder.Build().RunAsync();

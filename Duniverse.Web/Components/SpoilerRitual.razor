@@ -1,11 +1,13 @@
 @inject SpoilerSettings Spoiler
 @inject NavigationManager Nav
 @inject IJSRuntime JS
+@inject LostPageSignal Lost
 @implements IDisposable
 
 @* First visit only. The reader marks the last novel they finished and everything past
    it seals. Main menu and About stay exempt, so a newcomer can read about the book in
-   peace. Every choice saves, so it asks once. *@
+   peace, and the deep desert too: asking how far someone has read over a page that
+   says nothing is here played as farce. Every choice saves, so it asks once. *@
 
 @if (ShouldShow)
 {
@@ -59,7 +61,7 @@
     private ElementReference panel;
     private ElementReference sandCanvas;
 
-    private bool ShouldShow => Spoiler.Loaded && !Spoiler.HasStoredChoice && !dismissed && !OnExemptPage;
+    private bool ShouldShow => Spoiler.Loaded && !Spoiler.HasStoredChoice && !dismissed && !OnExemptPage && !Lost.Active;
 
     // Main menu and About hold no records, so the ritual never covers them. It waits
     // for the first step into the archive proper. I strip query strings and fragments
@@ -95,8 +97,10 @@
     protected override async Task OnInitializedAsync()
     {
         // Re-check on every route change: that's the moment a fresh reader steps off
-        // the main menu and the ritual is due.
+        // the main menu and the ritual is due. The desert's signal lands after the
+        // route settles, so it gets its own subscription.
         Nav.LocationChanged += OnLocationChanged;
+        Lost.Changed += OnLostChanged;
 
         // I await the storage read here rather than lean on the layout's copy. It's
         // idempotent. A parent re-render skips this component when parameters compare
@@ -109,9 +113,15 @@
         StateHasChanged();
     }
 
+    private void OnLostChanged()
+    {
+        StateHasChanged();
+    }
+
     public void Dispose()
     {
         Nav.LocationChanged -= OnLocationChanged;
+        Lost.Changed -= OnLostChanged;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
