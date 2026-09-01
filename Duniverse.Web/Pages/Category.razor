@@ -18,7 +18,11 @@
             <Mark Name="@Slug.ToLowerInvariant()" CssClass="category-heading-mark" />
             <h1>@categoryTitle</h1>
         </div>
-        <p class="tagline">@items.Count records. Select one to see its full entry and connections.</p>
+        <p class="tagline">
+            @(items.Count == 1
+                ? "To begin your study, one record lies open here. It tells its whole account."
+                : $"To begin your study, choose freely among {items.Count} open records. Each tells its whole account.")
+        </p>
 
         @* Only the worlds drawer opens onto the register; the other nine have no fiefs. *@
         @if (Slug.Equals("worlds", StringComparison.OrdinalIgnoreCase))
@@ -27,9 +31,14 @@
         }
 
         <div class="category-grid">
-            @foreach (var item in items)
+            @* Each card files itself: the drawer's mark and singular name lead, in the
+               drawer's mineral. The deal caps at the tenth beat, so a big drawer lands
+               as one motion. *@
+            @for (var i = 0; i < items.Count; i++)
             {
-                <a class="category-tile" href="@($"/entity/{item.Id}")">
+                var item = items[i];
+                <a class="category-tile" href="@($"/entity/{item.Id}")" style="--i: @Math.Min(i, 10)">
+                    <span class="file-line"><Mark Name="@Slug.ToLowerInvariant()" CssClass="file-mark" />@filingLabel</span>
                     <strong>@item.Name</strong>
                     <span class="muted">@item.ShortDescription</span>
                 </a>
@@ -50,6 +59,7 @@ else
     public string Slug { get; set; } = "";
 
     private string categoryTitle = "";
+    private string filingLabel = "";
     private string heroStyle = "";
     private List<DuneEntity> items = new();
     private List<DuneEntity> allInCategory = new();
@@ -72,19 +82,21 @@ else
     {
         var slug = Slug.ToLowerInvariant();
 
-        (categoryTitle, IEnumerable<DuneEntity> found) = slug switch
+        // Title for the heading, singular for the cards' filing line: the same names the
+        // Index panel files these drawers under.
+        (categoryTitle, filingLabel, IEnumerable<DuneEntity> found) = slug switch
         {
-            "artifacts" => ("Artifacts", Registry.GetAllEntities<Artifact>()),
-            "disciplines" => ("Disciplines", Registry.GetAllEntities<Discipline>()),
-            "flora-fauna" => ("Flora & Fauna", Registry.GetAllEntities<FloraFauna>()),
-            "historical-events" => ("Historical Events", Registry.GetAllEntities<HistoricalEvent>()),
-            "houses" => ("Houses", Registry.GetAllEntities<House>()),
-            "organizations" => ("Organizations", Registry.GetAllEntities<Organization>()),
-            "personas" => ("Personas", Registry.GetAllEntities<Persona>()),
-            "theological-systems" => ("Theological Systems", Registry.GetAllEntities<TheologicalSystem>()),
-            "vehicles" => ("Vehicles", Registry.GetAllEntities<Vehicle>()),
-            "worlds" => ("Worlds & Locations", Registry.GetAllEntities<World>()),
-            _ => ("", Enumerable.Empty<DuneEntity>())
+            "artifacts" => ("Artifacts", "Artifact", Registry.GetAllEntities<Artifact>()),
+            "disciplines" => ("Disciplines", "Discipline", Registry.GetAllEntities<Discipline>()),
+            "flora-fauna" => ("Flora & Fauna", "Flora & Fauna", Registry.GetAllEntities<FloraFauna>()),
+            "historical-events" => ("Historical Events", "Historical Event", Registry.GetAllEntities<HistoricalEvent>()),
+            "houses" => ("Houses", "House", Registry.GetAllEntities<House>()),
+            "organizations" => ("Organizations", "Organization", Registry.GetAllEntities<Organization>()),
+            "personas" => ("Personas", "Persona", Registry.GetAllEntities<Persona>()),
+            "theological-systems" => ("Theological Systems", "Theological System", Registry.GetAllEntities<TheologicalSystem>()),
+            "vehicles" => ("Vehicles", "Vehicle", Registry.GetAllEntities<Vehicle>()),
+            "worlds" => ("Worlds & Locations", "World", Registry.GetAllEntities<World>()),
+            _ => ("", "", Enumerable.Empty<DuneEntity>())
         };
 
         // Kept unfiltered as well as filtered: the seal line needs to know how many records the

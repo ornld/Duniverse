@@ -4116,23 +4116,49 @@ button.chip {
     color: var(--dune-muted);
 }
 
+/* An index card from the drawer: filing line on top, engraved inner hairline, a faint
+   top-light so the face reads as paper under the hero's lamp. Cards deal in on a
+   40ms beat, capped at the tenth, so a full drawer lands inside a second. */
 .category-tile {
+    position: relative;
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
-    background: var(--dune-panel);
+    gap: 0.45rem;
+    background: linear-gradient(180deg, #281f18, var(--dune-panel) 62%);
     border: var(--rule-hair) solid var(--dune-border);
     border-radius: var(--r-sharp);
-    padding: var(--sp-4);
+    padding: 0.85rem var(--sp-4) var(--sp-4);
     text-decoration: none;
     color: var(--dune-text);
     transition: border-color 0.3s ease, box-shadow 0.3s ease, transform var(--dur-open) ease;
+    animation: card-deal 0.3s ease-out backwards;
+    animation-delay: calc(var(--i, 0) * 0.04s);
 }
+
+@keyframes card-deal {
+    from {
+        opacity: 0;
+        transform: translateY(9px);
+    }
+}
+
+    /* The engraved plate hairline the chart wells wear; it stands down while the
+       spice frame has the rim. */
+    .category-tile::after {
+        content: "";
+        position: absolute;
+        inset: 3px;
+        border: var(--rule-hair) solid var(--dune-border);
+        opacity: 0.55;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+    }
 
     /* Hover: the frame lights and catches the spice once, the card lifts, the fill stays
        opaque and the text stays light. The old spice wash turned the text dark and
        measured under AA over the busiest gradient. */
-    .category-tile:hover {
+    .category-tile:hover,
+    .category-tile:focus-visible {
         transform: translateY(-2px);
         border-color: transparent;
         background:
@@ -4143,16 +4169,57 @@ button.chip {
         animation: spice-shimmer 1.4s ease-in-out;
     }
 
+        .category-tile:hover::after,
+        .category-tile:focus-visible::after {
+            opacity: 0;
+        }
+
+    /* The drawer's own mark and name head each card, in the drawer's mineral, with a
+       hairline leader running out to the frame the way a ledger rules its columns. */
+    .file-line {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        color: var(--cat-color, var(--dune-accent));
+        font-size: 0.68rem;
+        letter-spacing: 0.17em;
+        text-transform: uppercase;
+        opacity: 0.9;
+    }
+
+        .file-line::after {
+            content: "";
+            flex: 1;
+            border-top: var(--rule-hair) solid var(--dune-border);
+            margin-left: 0.2rem;
+        }
+
+    .file-mark {
+        width: 0.85rem;
+        height: 0.85rem;
+        flex: none;
+        stroke-width: 1.9;
+    }
+
+    /* Quiet ink at rest, gold when the card wakes: the name answers the hover instead
+       of shouting from the shelf. */
     .category-tile strong {
-        color: var(--dune-accent-bright);
+        color: var(--dune-text);
         font-family: var(--font-display);
         font-weight: 400;
-        font-size: var(--fs-h3);
+        font-size: 1.16rem;
+        line-height: 1.25;
         letter-spacing: 0.01em;
     }
 
+        .category-tile:hover strong,
+        .category-tile:focus-visible strong {
+            color: var(--dune-accent-bright);
+        }
+
     .category-tile .muted {
         font-size: var(--fs-small);
+        line-height: 1.45;
     }
 
 /* One pass of light along the rim, out and back, then done. I had it looping forever,
@@ -4171,6 +4238,7 @@ button.chip {
 }
 
 @media (prefers-reduced-motion: reduce) {
+    .category-tile,
     .category-tile:hover {
         animation: none;
     }
