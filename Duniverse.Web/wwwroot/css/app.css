@@ -1977,6 +1977,27 @@ html {
 /* ---- A sealed shelf ----
    Past the reader's progress, a whole book sits behind one seal, the same hawk a
    gated record wears. Centered in the reading column; the actions are the gate's own. */
+/* What a broken seal lets through. The gate's halves part, and the sayings behind
+   them settle in on their own beats, the way a record's papers land once its seal
+   goes. Only after a reveal: the page sets this class then and at no other time. */
+@keyframes unseal-settle {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+}
+
+.unseal-settle {
+    animation: unseal-settle var(--dur-settle) ease-out backwards;
+    animation-delay: calc(var(--i, 0) * 0.07s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .unseal-settle {
+        animation: none;
+    }
+}
+
 .sayings-gate {
     max-width: 60ch;
     margin: var(--sp-5) auto 0;

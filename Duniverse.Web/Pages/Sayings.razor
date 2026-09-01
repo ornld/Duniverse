@@ -81,12 +81,15 @@ else
         }
         else
         {
+            @* Straight after a seal breaks, the sayings settle in behind it the way a
+               record's papers do. Only then: on an ordinary visit the page's own fade
+               already carries them, and a second stagger on top would drag. *@
             <section class="sayings-group">
-                <h2 class="sayings-source">@book.Title</h2>
+                <h2 class="sayings-source @UnsealClass" style="--i: 0">@book.Title</h2>
                 @for (var i = 0; i < epigraphs.Count; i++)
                 {
                     var epigraph = epigraphs[i];
-                    <blockquote class="epigraph">
+                    <blockquote class="epigraph @UnsealClass" style="--i: @SettleBeat(i + 1)">
                         @* Herbert never numbered his chapters; the tally is ours, one count
                            per book, so a reader can find their place on the shelf. *@
                         <span class="epigraph-number">@Roman(i + 1)</span>
@@ -101,10 +104,10 @@ else
             @foreach (var group in spokenGroups)
             {
                 <section class="sayings-group">
-                    <h2 class="sayings-source">@group.Key</h2>
+                    <h2 class="sayings-source @UnsealClass" style="--i: @SettleBeat(epigraphs.Count + 1)">@group.Key</h2>
                     @foreach (var epigraph in group)
                     {
-                        <blockquote class="epigraph">
+                        <blockquote class="epigraph @UnsealClass" style="--i: @SettleBeat(epigraphs.Count + 2)">
                             <p class="epigraph-text">@epigraph.Text</p>
                         </blockquote>
                     }
@@ -140,11 +143,22 @@ else
     private bool revealed;
     private bool sealBreaking;
 
+    // True only for the render where a seal just broke, never on an ordinary visit, the
+    // way the trial's moonrise waits for the solve itself.
+    private bool justUnsealed;
+
+    // The stagger the freed sayings arrive on, capped so a book of sixty-three lands as
+    // one motion instead of a procession.
+    private const int LastBeat = 8;
+    private string? UnsealClass => justUnsealed ? "unseal-settle" : null;
+    private static int SettleBeat(int position) => Math.Min(position, LastBeat);
+
     protected override void OnParametersSet()
     {
         book = Books.FirstOrDefault(b => b.Slug == (string.IsNullOrEmpty(Slug) ? "dune" : Slug));
         revealed = false;
         sealBreaking = false;
+        justUnsealed = false;
 
         if (book is null)
         {
@@ -202,5 +216,6 @@ else
         await Task.Delay(700);
         sealBreaking = false;
         revealed = true;
+        justUnsealed = true;
     }
 }
