@@ -8,7 +8,7 @@
 @* Open sand for a URL with no page or an id with no record. I keep the canvas first in
    DOM order, so copy and actions paint above it; moved after, it would cover them and
    swallow their clicks. *@
-<div class="hero lost-desert">
+<div class="hero lost-desert" @ref="hero">
     <canvas class="lost-sand" @ref="sandCanvas"></canvas>
     <h1>@Heading</h1>
     <p class="tagline">@ChildContent</p>
@@ -21,6 +21,8 @@
 
 @code {
     private ElementReference sandCanvas;
+    private ElementReference hero;
+    private DotNetObjectReference<LostDesert>? self;
 
     // Standing in the sand is announced, not inferred: the catch-all route means a
     // lost page can wear any address, so the ritual asks this signal instead of the URL.
@@ -32,6 +34,15 @@
     public void Dispose()
     {
         Lost.Set(false);
+        self?.Dispose();
+    }
+
+    // The door to the deep desert. Three taps on the sand in a walking rhythm call the
+    // worm. The script counts them and rings me here, and I answer by walking there.
+    [JSInvokable]
+    public void WormCalled()
+    {
+        Nav.NavigateTo("/deep-desert");
     }
 
     /// <summary>
@@ -53,6 +64,8 @@
         if (firstRender)
         {
             await JS.InvokeVoidAsync("duneNav.sandSettle", sandCanvas);
+            self = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("duneNav.thumper", hero, self);
         }
     }
 

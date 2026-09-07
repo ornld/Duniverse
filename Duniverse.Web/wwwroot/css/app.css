@@ -4608,6 +4608,17 @@ button.chip {
     pointer-events: none;
 }
 
+/* The thumper's rings and the wormsign crossing, on a canvas the script adds above the
+   copy on the first tap. Pointer events off, so the chips beneath keep their clicks. */
+.lost-thumper {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+}
+
 .lost-actions {
     display: flex;
     flex-wrap: wrap;
@@ -5119,4 +5130,221 @@ button.chip {
 /* The crest divider becomes a grid item inside the group; it keeps its own row. */
 .sayings-group + .sayings-group::before {
     grid-column: 1 / -1;
+}
+
+/* ---- The deep desert ----
+   The worm's own page. One fixed stage with none of the site's chrome on it: a thin
+   head for the tally, and the canvas takes everything under it. */
+
+.open-sand {
+    position: fixed;
+    inset: 0;
+    background: var(--dune-bg);
+    overflow: hidden;
+}
+
+.desert-stage {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* The head: the way out on the left, the two tallies after it, all on one baseline.
+   Counts sit in Marcellus like page numbers; labels take the register's small caps. */
+.desert-hud {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--sp-2) var(--sp-6);
+    padding: var(--sp-3) var(--gutter);
+    border-bottom: var(--rule-hair) solid var(--dune-border);
+    background: var(--dune-bg);
+}
+
+.desert-leave {
+    margin-right: auto;
+    color: var(--dune-muted-lit);
+    text-decoration: none;
+    font-size: var(--fs-label);
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+}
+
+    .desert-leave:hover {
+        color: var(--dune-accent-bright);
+    }
+
+.desert-scores {
+    display: flex;
+    align-items: baseline;
+    gap: var(--sp-6);
+}
+
+.desert-tally {
+    display: flex;
+    align-items: baseline;
+    gap: var(--sp-2);
+}
+
+.desert-label {
+    color: var(--dune-muted);
+    font-size: var(--fs-label);
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+}
+
+.desert-count {
+    min-width: 2ch;
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    line-height: 1;
+    color: var(--dune-accent-bright);
+    font-variant-numeric: tabular-nums;
+}
+
+.desert-sand {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+}
+
+/* touch-action off, or a swipe scrolls the page instead of bending the worm. */
+.desert-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    touch-action: none;
+}
+
+/* The panels float over the sand. The inner box centers on its own auto margins, so
+   on a short screen it scrolls from the top instead of losing its head off the edge. */
+.desert-panel {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    padding: var(--gutter);
+    overflow: auto;
+    background: rgba(15, 13, 12, 0.5);
+    animation: desert-panel-in 0.25s ease-out;
+}
+
+    .desert-panel[hidden] {
+        display: none;
+    }
+
+.desert-panel-inner {
+    width: 100%;
+    max-width: 36rem;
+    margin: auto;
+    padding: var(--sp-5) var(--sp-6);
+    background: rgba(36, 28, 22, 0.94);
+    border: var(--rule-hair) solid var(--dune-border);
+    border-top: var(--rule-note) solid var(--dune-accent);
+    border-radius: var(--r-sharp);
+}
+
+    .desert-panel-inner h1 {
+        margin: 0 0 var(--sp-4);
+        font-size: var(--fs-display);
+        line-height: 1.08;
+    }
+
+    .desert-panel-inner h2 {
+        margin: 0 0 var(--sp-4);
+    }
+
+    .desert-panel-inner p {
+        margin: 0 0 var(--sp-4);
+        line-height: var(--lh-body);
+        text-wrap: pretty;
+    }
+
+.desert-keys {
+    color: var(--dune-muted-lit);
+    font-size: var(--fs-small);
+}
+
+.desert-tallies strong {
+    color: var(--dune-accent-bright);
+}
+
+.desert-record {
+    color: var(--dune-accent-bright);
+    font-size: var(--fs-small);
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+}
+
+/* The one line in the quote voice, set the way every saying on the site is set. */
+.desert-epigraph {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.15rem;
+    line-height: 1.75;
+    color: var(--dune-muted-lit);
+}
+
+.desert-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-3);
+    margin-top: var(--sp-5);
+}
+
+/* A key: the same filled spice key the search box uses. */
+.desert-key {
+    padding: 0.6rem 1.2rem;
+    background: var(--dune-accent);
+    border: none;
+    border-radius: var(--r-sharp);
+    color: var(--dune-ink);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+}
+
+    .desert-key:hover {
+        background: var(--dune-accent-bright);
+    }
+
+@keyframes desert-panel-in {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .desert-panel {
+        animation: none;
+    }
+}
+
+@media (max-width: 600px) {
+    .desert-hud {
+        gap: var(--sp-2) var(--sp-4);
+        padding: var(--sp-2) var(--gutter);
+    }
+
+    .desert-scores {
+        gap: var(--sp-4);
+    }
+
+    .desert-count {
+        font-size: 1.15rem;
+    }
+
+    .desert-panel-inner {
+        padding: var(--sp-4);
+    }
 }

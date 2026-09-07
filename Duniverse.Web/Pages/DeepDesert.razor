@@ -1,0 +1,143 @@
+@page "/deep-desert"
+@layout OpenSandLayout
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<PageTitle>The Deep Desert - Duniverse</PageTitle>
+
+@* One stage, and after the first render it belongs to the script. Nothing here ever
+   re-renders: the module hides the panels and writes the counts itself, and a render
+   from this side would fight it. *@
+<div class="desert-stage" @ref="stage">
+    <header class="desert-hud">
+        <a class="desert-leave" href="/">Leave the desert</a>
+        @* Grouped so a phone wraps both counts onto one row together, never one each. *@
+        <div class="desert-scores">
+            <div class="desert-tally">
+                <span class="desert-label">The Emperor's tally</span>
+                <span class="desert-count" data-desert="tally">0</span>
+            </div>
+            <div class="desert-tally">
+                <span class="desert-label">Longest hunt</span>
+                <span class="desert-count" data-desert="best">0</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="desert-sand">
+        <canvas class="desert-canvas" aria-label="Open desert, seen from above"></canvas>
+
+        <section class="desert-panel" data-desert="intro">
+            <div class="desert-panel-inner">
+                <h1>Shai-Hulud</h1>
+                <p>You are Shai-Hulud, the great worm of Arrakis, and you are hungry.</p>
+                <p>
+                    The board is open desert, a sheet of spice sand seen from above. You move
+                    beneath it as a long ridge of displaced dune, and you never stop. Rhythm
+                    calls you forward. All you decide is which way the ridge bends: north,
+                    south, east, west.
+                </p>
+                <p>
+                    Somewhere on the sand, an ornithopter beats down through the heat shimmer
+                    and drops a single Sardaukar. He lands in full armor, blade drawn, standing
+                    on open sand like he's been trained to fear nothing. That's your food. Drive
+                    the ridge across him and he's gone, swallowed with barely a ripple. The
+                    Emperor's tally of the lost ticks up by one. Your body grows by one segment.
+                </p>
+                <p>
+                    A worm cannot cross a worm. Fold back into your own coils and the great
+                    maker dies where it lies. The dunes are bounded by the Shield Wall. Strike
+                    the rock at the edge and the outcome is the same.
+                </p>
+                <p class="desert-keys">Arrow keys or WASD bend the ridge. On a phone, swipe. Escape pauses the hunt.</p>
+                <div class="desert-actions">
+                    <button type="button" class="desert-key" data-desert="begin">Begin the hunt</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="desert-panel" data-desert="paused" hidden>
+            <div class="desert-panel-inner">
+                <h2>The worm waits beneath the sand.</h2>
+                <p class="desert-keys">Escape resumes the hunt as well.</p>
+                <div class="desert-actions">
+                    <button type="button" class="desert-key" data-desert="resume">Resume the hunt</button>
+                    <a class="chip" href="/">Leave the desert</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="desert-panel" data-desert="fallen" hidden>
+            <div class="desert-panel-inner">
+                <h2 data-desert="cause">The ridge folded back into its own coils.</h2>
+                <p>The great maker dies where it lies.</p>
+                <p class="desert-tallies">
+                    The Emperor's tally stands at <strong data-desert="fallen-tally">0</strong>.
+                    Your longest hunt reached <strong data-desert="fallen-best">0</strong>.
+                </p>
+                <p class="desert-record" data-desert="record" hidden>A new longest hunt.</p>
+                <p class="desert-epigraph">Sardaukar die to Shai-Hulud in the thousands. Shai-Hulud only ever dies to itself.</p>
+                <div class="desert-actions">
+                    <button type="button" class="desert-key" data-desert="again">Call the worm again</button>
+                    <a class="chip" href="/">Leave the desert</a>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+@code {
+    private ElementReference stage;
+    private IJSObjectReference? module;
+    private bool gone;
+
+    // The game only downloads when someone stands here. A script tag in index.html
+    // would ship it to every reader of every record.
+
+    // Editing the module means a rebuild: the import map pins its fingerprint and
+    // hash, and a stale hash makes the browser refuse the file outright.
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        try
+        {
+            var loaded = await JS.InvokeAsync<IJSObjectReference>("import", "./js/deep-desert.js");
+            if (gone)
+            {
+                // They left during the download. Nothing to start, only something to drop.
+                await loaded.DisposeAsync();
+                return;
+            }
+
+            module = loaded;
+            await module.InvokeVoidAsync("start", stage);
+        }
+        catch (JSException)
+        {
+            // No module, no hunt. The page stays a still desert with its copy on it.
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        gone = true;
+        if (module is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await module.InvokeVoidAsync("stop");
+            await module.DisposeAsync();
+        }
+        catch
+        {
+            // The loop checks for itself once the stage is gone.
+        }
+    }
+}

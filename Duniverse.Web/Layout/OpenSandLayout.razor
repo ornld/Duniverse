@@ -1,0 +1,29 @@
+@inherits LayoutComponentBase
+@inject IJSRuntime JS
+
+@* The worm's own page. No header, nav, footer or reading ritual: one fixed stage, and
+   whatever page stands inside it paints the whole screen. *@
+<div class="open-sand">
+    @Body
+</div>
+
+@code {
+    // The boot screen waits for the page's all-clear, and the main layout is the one
+    // that usually gives it. Without this a typed visit would sit out the full cap.
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        try
+        {
+            await JS.InvokeVoidAsync("duneBoot.ready");
+        }
+        catch
+        {
+            // No boot screen listening. Its own timer lifts it.
+        }
+    }
+}
