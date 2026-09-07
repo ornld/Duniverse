@@ -5,11 +5,9 @@
 @inject LostPageSignal Lost
 @implements IDisposable
 
-@* Open sand for a URL with no page or an id with no record. I keep the canvas first in
-   DOM order, so copy and actions paint above it; moved after, it would cover them and
-   swallow their clicks. *@
+@* Open sand for a URL with no page or an id with no record. The night sky and its stars
+   come from the CSS alone; the blowing sand used to run here too and it did not belong. *@
 <div class="hero lost-desert" @ref="hero">
-    <canvas class="lost-sand" @ref="sandCanvas"></canvas>
     <h1>@Heading</h1>
     <p class="tagline">@ChildContent</p>
     <div class="lost-actions">
@@ -17,12 +15,84 @@
         <a class="chip" href="/">Return home</a>
         <button class="surprise-btn" @onclick="FollowGuide">Follow a Fremen guide</button>
     </div>
+
+    @* The door to the deep desert: a thumper planted in the sand. A real button, so a
+       keyboard can plant it too. Press it and the clapper pounds, the sand rings, and the
+       worm comes to carry the page away. *@
+    <button type="button" class="thumper @(planted ? "is-thumping" : "")" title="Thumper"
+            aria-label="Plant the thumper" disabled="@planted" @ref="thumper" @onclick="PlantThumper">
+        @* Drawn from the book's description, a stake with a spring-driven clapper: dome head,
+           slotted body, notched collar, ribbed neck, and the spike into a low mound of sand.
+           Flat fills with highlight strokes, no gradients, so nothing needs an id. *@
+        <svg class="thumper-art" viewBox="0 0 100 250" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+            <ellipse cx="50" cy="234" rx="34" ry="7" fill="rgba(224, 164, 88, 0.10)" />
+            <ellipse cx="50" cy="235" rx="14" ry="3" fill="rgba(0, 0, 0, 0.45)" />
+
+            <path d="M45 178 H55 L51 236 H49 Z" fill="#141110" />
+            <path d="M50 178 H55 L51 236 H50 Z" fill="#221d19" />
+
+            <rect x="37" y="150" width="26" height="30" rx="2" fill="#1a1613" />
+            <rect x="37" y="155" width="26" height="2" fill="#0a0908" />
+            <rect x="37" y="157" width="26" height="1" fill="#332b25" />
+            <rect x="37" y="161" width="26" height="2" fill="#0a0908" />
+            <rect x="37" y="163" width="26" height="1" fill="#332b25" />
+            <rect x="37" y="167" width="26" height="2" fill="#0a0908" />
+            <rect x="37" y="169" width="26" height="1" fill="#332b25" />
+            <rect x="37" y="173" width="26" height="2" fill="#0a0908" />
+            <rect x="37" y="175" width="26" height="1" fill="#332b25" />
+
+            <rect x="28" y="132" width="44" height="18" rx="3" fill="#201b17" stroke="#3b322a" stroke-width="1" />
+            <rect x="32" y="136" width="3" height="10" fill="#0a0908" />
+            <rect x="35" y="136" width="1" height="10" fill="#3b322a" />
+            <rect x="38" y="136" width="3" height="10" fill="#0a0908" />
+            <rect x="41" y="136" width="1" height="10" fill="#3b322a" />
+            <rect x="44" y="136" width="3" height="10" fill="#0a0908" />
+            <rect x="47" y="136" width="1" height="10" fill="#3b322a" />
+            <rect x="50" y="136" width="3" height="10" fill="#0a0908" />
+            <rect x="53" y="136" width="1" height="10" fill="#3b322a" />
+            <rect x="56" y="136" width="3" height="10" fill="#0a0908" />
+            <rect x="59" y="136" width="1" height="10" fill="#3b322a" />
+            <rect x="62" y="136" width="3" height="10" fill="#0a0908" />
+            <rect x="65" y="136" width="1" height="10" fill="#3b322a" />
+
+            <rect x="26" y="30" width="48" height="104" rx="7" fill="#1c1815" />
+            <rect x="30" y="34" width="6" height="96" rx="3" fill="rgba(255, 255, 255, 0.05)" />
+            <rect x="64" y="34" width="8" height="96" rx="3" fill="rgba(0, 0, 0, 0.35)" />
+            <rect x="32" y="44" width="5" height="66" rx="2.5" fill="#070605" />
+            <rect x="32" y="46" width="1" height="62" fill="rgba(255, 255, 255, 0.06)" />
+            <rect x="41" y="44" width="6" height="66" rx="3" fill="#070605" />
+            <rect x="41" y="46" width="1" height="62" fill="rgba(255, 255, 255, 0.06)" />
+            <rect x="51" y="44" width="6" height="66" rx="3" fill="#070605" />
+            <rect x="51" y="46" width="1" height="62" fill="rgba(255, 255, 255, 0.06)" />
+            <rect x="61" y="44" width="5" height="66" rx="2.5" fill="#070605" />
+            <rect x="61" y="46" width="1" height="62" fill="rgba(255, 255, 255, 0.06)" />
+            <rect x="26" y="118" width="48" height="1.5" fill="#0a0908" />
+            <rect x="26" y="124" width="48" height="1.5" fill="#0a0908" />
+
+            <g class="thumper-cap">
+                <path d="M26 36 C26 14 38 8 50 8 C62 8 74 14 74 36 Z" fill="#221d19" />
+                <path d="M31 32 C31 18 40 13 50 13" stroke="rgba(255, 255, 255, 0.08)" stroke-width="2" fill="none" />
+                <rect x="26" y="34" width="48" height="4" fill="#0f0d0b" />
+            </g>
+
+            <path d="M73 40 V128" stroke="rgba(244, 192, 124, 0.25)" stroke-width="1.2" />
+            <path d="M71 134 V148" stroke="rgba(244, 192, 124, 0.3)" stroke-width="1" />
+            <path d="M62 152 V178" stroke="rgba(244, 192, 124, 0.22)" stroke-width="1" />
+            <path d="M30 30 Q50 22 70 30" stroke="rgba(244, 192, 124, 0.18)" stroke-width="1" fill="none" />
+        </svg>
+    </button>
+
+    @* The rings and the wormsign crossing draw here, last in DOM order so they paint above
+       everything, sized by the script when the thumper is planted. Pointer events off. *@
+    <canvas class="lost-thumper" @ref="ceremonyCanvas" aria-hidden="true"></canvas>
 </div>
 
 @code {
-    private ElementReference sandCanvas;
     private ElementReference hero;
-    private DotNetObjectReference<LostDesert>? self;
+    private ElementReference thumper;
+    private ElementReference ceremonyCanvas;
+    private bool planted;
+    private bool gone;
 
     // Standing in the sand is announced, not inferred: the catch-all route means a
     // lost page can wear any address, so the ritual asks this signal instead of the URL.
@@ -33,16 +103,8 @@
 
     public void Dispose()
     {
+        gone = true;
         Lost.Set(false);
-        self?.Dispose();
-    }
-
-    // The door to the deep desert. Three taps on the sand in a walking rhythm call the
-    // worm. The script counts them and rings me here, and I answer by walking there.
-    [JSInvokable]
-    public void WormCalled()
-    {
-        Nav.NavigateTo("/deep-desert");
     }
 
     /// <summary>
@@ -59,13 +121,29 @@
     [Parameter, EditorRequired]
     public RenderFragment? ChildContent { get; set; }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    // Planting is a ceremony the script runs: three slams, the rings, the crossing. It
+    // answers true once the worm has crossed, and then I walk the page to the deep desert.
+    private async Task PlantThumper()
     {
-        if (firstRender)
+        if (planted)
         {
-            await JS.InvokeVoidAsync("duneNav.sandSettle", sandCanvas);
-            self = DotNetObjectReference.Create(this);
-            await JS.InvokeVoidAsync("duneNav.thumper", hero, self);
+            return;
+        }
+        planted = true;
+
+        bool called;
+        try
+        {
+            called = await JS.InvokeAsync<bool>("duneNav.thumperCall", hero, thumper, ceremonyCanvas);
+        }
+        catch
+        {
+            called = false;
+        }
+
+        if (called && !gone)
+        {
+            Nav.NavigateTo("/deep-desert");
         }
     }
 

@@ -229,193 +229,154 @@ window.duneNav = {
         };
     },
 
-    // The door to the deep desert. Three taps on the open sand in a walking rhythm and the
-    // worm answers: a ring marks each tap, wormsign crosses the hero, then I ring the page.
-    thumper: function (hero, page) {
-        if (!hero || !page) {
-            return;
-        }
-
-        let taps = 0;
-        let lastTap = 0;
-        let armed = true;
-        let overlay = null;
-        let octx = null;
-        let dpr = 1;
-        let drawing = false;
-        const rings = [];
-        let ridge = null;
-        const palette = ["#f4c07c", "#e0a458", "#c97f3d", "#a05c22"];
-
-        // Made on the first tap, never on load: most visitors never touch the sand at all.
-        function surface() {
-            const rect = hero.getBoundingClientRect();
-            dpr = Math.min(window.devicePixelRatio || 1, 2);
-            if (!overlay) {
-                overlay = document.createElement("canvas");
-                overlay.className = "lost-thumper";
-                overlay.setAttribute("aria-hidden", "true");
-                hero.appendChild(overlay);
-                octx = overlay.getContext("2d");
-            }
-            const w = Math.round(rect.width * dpr);
-            const h = Math.round(rect.height * dpr);
-            if (overlay.width !== w || overlay.height !== h) {
-                overlay.width = w;
-                overlay.height = h;
-            }
-        }
-
-        function trace(pts, dx, dy) {
-            octx.beginPath();
-            for (let i = 0; i < pts.length; i++) {
-                if (i === 0) {
-                    octx.moveTo(pts[i][0] + dx, pts[i][1] + dy);
-                } else {
-                    octx.lineTo(pts[i][0] + dx, pts[i][1] + dy);
-                }
-            }
-        }
-
-        function draw(now) {
-            if (!hero.isConnected) {
-                drawing = false;
+    // The door to the deep desert. Planting the thumper runs the ceremony here: a ring and
+    // a kick of sand on each slam, then wormsign crossing the hero at the thumper's foot.
+    // Answers true once the worm has crossed, false if the page left first.
+    thumperCall: function (hero, button, overlay) {
+        return new Promise(function (resolve) {
+            if (!hero || !button || !overlay) {
+                resolve(false);
                 return;
             }
+
+            const octx = overlay.getContext("2d");
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            const heroRect = hero.getBoundingClientRect();
+            overlay.width = Math.round(heroRect.width * dpr);
+            overlay.height = Math.round(heroRect.height * dpr);
             const w = overlay.width;
             const h = overlay.height;
-            octx.clearRect(0, 0, w, h);
 
-            for (let i = rings.length - 1; i >= 0; i--) {
-                const r = rings[i];
-                const p = (now - r.at) / 560;
-                if (p >= 1) {
-                    rings.splice(i, 1);
-                    continue;
-                }
-                const ease = 1 - (1 - p) * (1 - p);
-                octx.strokeStyle = "rgba(244,192,124," + (0.6 * (1 - p)) + ")";
-                octx.lineWidth = (2.2 - 1.6 * p) * dpr;
-                octx.beginPath();
-                octx.arc(r.x, r.y, (6 + 60 * ease) * dpr, 0, Math.PI * 2);
-                octx.stroke();
-            }
+            // The spike meets the sand a little above the art's foot. Rings spread from there.
+            const art = button.getBoundingClientRect();
+            const base = {
+                x: (art.left - heroRect.left + art.width / 2) * dpr,
+                y: (art.top - heroRect.top + art.height * 0.94) * dpr
+            };
 
-            if (ridge) {
-                const p = Math.min(1, (now - ridge.at) / ridge.span);
-                const x = (-0.1 + 1.2 * p) * w;
-                const y = ridge.y + Math.sin(p * 9 + ridge.phase) * h * 0.06;
-                ridge.trail.push([x, y]);
-                if (ridge.trail.length > 32) {
-                    ridge.trail.shift();
-                }
-                for (let k = 0; k < 3; k++) {
-                    ridge.grains.push({
-                        x: x, y: y + (Math.random() - 0.5) * 10 * dpr,
-                        vx: (Math.random() - 0.5) * 1.6 * dpr, vy: -(0.5 + Math.random() * 1.6) * dpr,
-                        at: now, life: 320 + Math.random() * 320,
+            const palette = ["#f4c07c", "#e0a458", "#c97f3d", "#a05c22"];
+            // Matched to the cap's CSS slam: 0.7 s a beat, the strike just before the middle.
+            const slams = [320, 1020, 1720];
+            const crossAt = 1900;
+            const crossSpan = 1400;
+            const start = performance.now();
+            let slamsDone = 0;
+            const rings = [];
+            const grains = [];
+            const trail = [];
+            const phase = Math.random() * 6;
+
+            function kick(x, y, count, lift) {
+                for (let k = 0; k < count; k++) {
+                    grains.push({
+                        x: x + (Math.random() - 0.5) * 16 * dpr,
+                        y: y,
+                        vx: (Math.random() - 0.5) * 2.4 * dpr,
+                        vy: -(lift + Math.random() * 2) * dpr,
+                        at: performance.now(),
+                        life: 360 + Math.random() * 320,
                         c: palette[(Math.random() * palette.length) | 0]
                     });
                 }
+            }
 
-                octx.lineCap = "round";
-                octx.lineJoin = "round";
-                trace(ridge.trail, 5 * dpr, 6 * dpr);
-                octx.strokeStyle = "rgba(60,34,12,0.5)";
-                octx.lineWidth = 26 * dpr;
-                octx.stroke();
-                trace(ridge.trail, 0, 0);
-                octx.strokeStyle = "#dcae70";
-                octx.lineWidth = 20 * dpr;
-                octx.stroke();
-                trace(ridge.trail, -4 * dpr, -4 * dpr);
-                octx.strokeStyle = "rgba(255,232,190,0.55)";
-                octx.lineWidth = 5 * dpr;
-                octx.stroke();
-                octx.fillStyle = "#e2b579";
+            function trace(pts, dx, dy) {
                 octx.beginPath();
-                octx.arc(x, y, 14 * dpr, 0, Math.PI * 2);
-                octx.fill();
+                for (let i = 0; i < pts.length; i++) {
+                    if (i === 0) {
+                        octx.moveTo(pts[i][0] + dx, pts[i][1] + dy);
+                    } else {
+                        octx.lineTo(pts[i][0] + dx, pts[i][1] + dy);
+                    }
+                }
+            }
 
-                for (let i = ridge.grains.length - 1; i >= 0; i--) {
-                    const g = ridge.grains[i];
+            function draw(now) {
+                if (!hero.isConnected) {
+                    resolve(false);
+                    return;
+                }
+                const t = now - start;
+
+                while (slamsDone < slams.length && t >= slams[slamsDone]) {
+                    rings.push({ at: now });
+                    kick(base.x, base.y, 14, 1);
+                    slamsDone++;
+                }
+
+                octx.clearRect(0, 0, w, h);
+
+                // Flattened rings, since the sand here is seen at a low angle, not from above.
+                for (let i = rings.length - 1; i >= 0; i--) {
+                    const p = (now - rings[i].at) / 1000;
+                    if (p >= 1) {
+                        rings.splice(i, 1);
+                        continue;
+                    }
+                    const ease = 1 - (1 - p) * (1 - p);
+                    octx.strokeStyle = "rgba(244,192,124," + (0.55 * (1 - p)) + ")";
+                    octx.lineWidth = (2.4 - 1.8 * p) * dpr;
+                    octx.beginPath();
+                    octx.ellipse(base.x, base.y, (8 + 120 * ease) * dpr, (3 + 34 * ease) * dpr, 0, 0, Math.PI * 2);
+                    octx.stroke();
+                }
+
+                if (t >= crossAt) {
+                    const p = Math.min(1, (t - crossAt) / crossSpan);
+                    const x = (-0.1 + 1.2 * p) * w;
+                    const y = base.y + Math.sin(p * 9 + phase) * h * 0.05;
+                    trail.push([x, y]);
+                    if (trail.length > 32) {
+                        trail.shift();
+                    }
+                    kick(x, y, 3, 0.5);
+
+                    octx.lineCap = "round";
+                    octx.lineJoin = "round";
+                    trace(trail, 5 * dpr, 6 * dpr);
+                    octx.strokeStyle = "rgba(60,34,12,0.5)";
+                    octx.lineWidth = 26 * dpr;
+                    octx.stroke();
+                    trace(trail, 0, 0);
+                    octx.strokeStyle = "#dcae70";
+                    octx.lineWidth = 20 * dpr;
+                    octx.stroke();
+                    trace(trail, -4 * dpr, -4 * dpr);
+                    octx.strokeStyle = "rgba(255,232,190,0.55)";
+                    octx.lineWidth = 5 * dpr;
+                    octx.stroke();
+                    octx.fillStyle = "#e2b579";
+                    octx.beginPath();
+                    octx.arc(x, y, 14 * dpr, 0, Math.PI * 2);
+                    octx.fill();
+                }
+
+                for (let i = grains.length - 1; i >= 0; i--) {
+                    const g = grains[i];
                     const age = (now - g.at) / g.life;
                     if (age >= 1) {
-                        ridge.grains.splice(i, 1);
+                        grains.splice(i, 1);
                         continue;
                     }
                     g.x += g.vx;
                     g.y += g.vy;
-                    g.vy += 0.04 * dpr;
+                    g.vy += 0.05 * dpr;
                     octx.globalAlpha = 0.8 * (1 - age);
                     octx.fillStyle = g.c;
                     octx.fillRect(g.x, g.y, 1.5 * dpr, 1.5 * dpr);
                 }
                 octx.globalAlpha = 1;
 
-                if (p >= 1) {
-                    ridge = null;
-                    finish();
+                if (t >= crossAt + crossSpan) {
+                    octx.clearRect(0, 0, w, h);
+                    resolve(true);
+                    return;
                 }
-            }
-
-            if (rings.length || ridge) {
-                requestAnimationFrame(draw);
-            } else {
-                drawing = false;
-            }
-        }
-
-        // The page owns the walk to the desert. A reference already disposed just rejects,
-        // and a rejection here has nobody left to tell.
-        function finish() {
-            if (!hero.isConnected) {
-                return;
-            }
-            try {
-                page.invokeMethodAsync("WormCalled").catch(function () { });
-            } catch (e) {
-                // Nothing to do; the sand simply settles.
-            }
-        }
-
-        function onDown(e) {
-            if (!armed || !e.isPrimary || e.button !== 0) {
-                return;
-            }
-            // The chips and the guide button keep their own meaning.
-            if (e.target && e.target.closest && e.target.closest("a, button, input")) {
-                return;
-            }
-            const now = performance.now();
-            const gap = now - lastTap;
-            taps = gap > 180 && gap < 1400 ? taps + 1 : 1;
-            lastTap = now;
-
-            surface();
-            const rect = overlay.getBoundingClientRect();
-            rings.push({ x: (e.clientX - rect.left) * dpr, y: (e.clientY - rect.top) * dpr, at: now });
-
-            if (taps >= 3) {
-                armed = false;
-                hero.removeEventListener("pointerdown", onDown);
-                ridge = {
-                    at: now,
-                    span: 1500,
-                    y: overlay.height * (0.42 + Math.random() * 0.2),
-                    phase: Math.random() * 6,
-                    trail: [],
-                    grains: []
-                };
-            }
-
-            if (!drawing) {
-                drawing = true;
                 requestAnimationFrame(draw);
             }
-        }
 
-        hero.addEventListener("pointerdown", onDown);
+            requestAnimationFrame(draw);
+        });
     },
 
     // Where focus belongs once the ritual lets go, matching the router's own target. A heading

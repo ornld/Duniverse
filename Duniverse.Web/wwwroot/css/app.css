@@ -4550,9 +4550,8 @@ button.chip {
 }
 
 /* ---- Lost in the deep desert ----
-   Any dead end, a bad URL or a missing record, gets open desert at night. I keep
-   the copy above the canvas on DOM order alone, since both share a stacking
-   level. */
+   Any dead end, a bad URL or a missing record, gets open desert at night, with a
+   thumper planted in the sand below the exits. */
 
 .lost-desert {
     position: relative;
@@ -4600,16 +4599,8 @@ button.chip {
         max-width: 34rem;
     }
 
-.lost-sand {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-}
-
-/* The thumper's rings and the wormsign crossing, on a canvas the script adds above the
-   copy on the first tap. Pointer events off, so the chips beneath keep their clicks. */
+/* The thumper's rings and the wormsign crossing, on the last canvas in the hero so it
+   paints above the copy. Pointer events off, so the chips beneath keep their clicks. */
 .lost-thumper {
     position: absolute;
     inset: 0;
@@ -4617,6 +4608,96 @@ button.chip {
     height: 100%;
     z-index: 1;
     pointer-events: none;
+}
+
+/* The thumper itself, planted below the exits. A bare button around the drawing, with
+   the same lift and glow the footer icons take under the hand. */
+.thumper {
+    margin-top: var(--sp-6);
+    padding: 0;
+    background: none;
+    border: 0;
+    line-height: 0;
+    cursor: pointer;
+}
+
+    .thumper:disabled {
+        cursor: default;
+    }
+
+.thumper-art {
+    width: 4.5rem;
+    height: auto;
+    transition: transform var(--dur-touch) ease, filter var(--dur-touch) ease;
+}
+
+    .thumper:hover .thumper-art,
+    .thumper:focus-visible .thumper-art {
+        transform: translateY(-2px);
+        filter: drop-shadow(0 0 10px rgba(var(--dune-accent-rgb), 0.35));
+    }
+
+/* Once planted the clapper pounds three times and the whole stake shivers with each
+   strike. The script's rings follow the same 0.7 s beat, so sound and sand agree. */
+.thumper-cap {
+    transform-box: fill-box;
+}
+
+.thumper.is-thumping .thumper-cap {
+    animation: thumper-slam 0.7s ease-in 3;
+}
+
+.thumper.is-thumping .thumper-art {
+    animation: thumper-shiver 0.7s linear 3;
+}
+
+@keyframes thumper-slam {
+    0% {
+        transform: translateY(0);
+    }
+
+    30% {
+        transform: translateY(-7px);
+    }
+
+    46% {
+        transform: translateY(3px);
+    }
+
+    62%, 100% {
+        transform: translateY(0);
+    }
+}
+
+@keyframes thumper-shiver {
+    0%, 40%, 62%, 100% {
+        transform: translate(0, 0);
+    }
+
+    46% {
+        transform: translate(0, 1px);
+    }
+
+    50% {
+        transform: translate(1px, 0);
+    }
+
+    56% {
+        transform: translate(-1px, 0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .thumper.is-thumping .thumper-cap,
+    .thumper.is-thumping .thumper-art {
+        animation: none;
+    }
+}
+
+@media (max-width: 600px) {
+    .thumper-art {
+        width: 3.75rem;
+    }
 }
 
 .lost-actions {

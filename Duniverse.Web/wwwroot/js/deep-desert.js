@@ -961,10 +961,7 @@ function drawHead(p) {
 
 // Grains flung off the head every frame, the wake of a ridge pushing through sand.
 function spray() {
-    if (!snake.length) {
-        return;
-    }
-    if (acc < 0) {
+    if (!snake.length || acc < 0) {
         return;
     }
     const p = lerpCell(prev[0] || snake[0], snake[0], acc / tickMs);
