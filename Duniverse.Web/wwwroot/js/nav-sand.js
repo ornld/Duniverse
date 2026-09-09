@@ -230,29 +230,33 @@ window.duneNav = {
     },
 
     // The door to the deep desert. Planting the thumper runs the ceremony here: a ring and
-    // a kick of sand on each slam, then wormsign crossing the hero at the thumper's foot.
+    // a kick of sand on each slam, then wormsign crossing the strip at the thumper's foot.
     // Answers true once the worm has crossed, false if the page left first.
-    thumperCall: function (hero, button, overlay) {
+    thumperCall: function (button, overlay) {
         return new Promise(function (resolve) {
-            if (!hero || !button || !overlay) {
+            if (!button || !overlay) {
                 resolve(false);
                 return;
             }
 
             const octx = overlay.getContext("2d");
             const dpr = Math.min(window.devicePixelRatio || 1, 2);
-            const heroRect = hero.getBoundingClientRect();
-            overlay.width = Math.round(heroRect.width * dpr);
-            overlay.height = Math.round(heroRect.height * dpr);
+            const box = overlay.getBoundingClientRect();
+            overlay.width = Math.round(box.width * dpr);
+            overlay.height = Math.round(box.height * dpr);
             const w = overlay.width;
             const h = overlay.height;
 
             // The spike meets the sand a little above the art's foot. Rings spread from there.
             const art = button.getBoundingClientRect();
             const base = {
-                x: (art.left - heroRect.left + art.width / 2) * dpr,
-                y: (art.top - heroRect.top + art.height * 0.94) * dpr
+                x: (art.left - box.left + art.width / 2) * dpr,
+                y: (art.top - box.top + art.height * 0.94) * dpr
             };
+
+            // The ceremony scales with the stake, floored so a moon-sized thumper still
+            // raises rings and a ridge that read from across the page.
+            const s = Math.max(0.4, Math.min(1, art.height / 180));
 
             const palette = ["#f4c07c", "#e0a458", "#c97f3d", "#a05c22"];
             // Matched to the cap's CSS slam: 0.7 s a beat, the strike just before the middle.
@@ -266,13 +270,15 @@ window.duneNav = {
             const trail = [];
             const phase = Math.random() * 6;
 
+            // Each grain remembers the sand it left, and lands there instead of falling past it.
             function kick(x, y, count, lift) {
                 for (let k = 0; k < count; k++) {
                     grains.push({
-                        x: x + (Math.random() - 0.5) * 16 * dpr,
+                        x: x + (Math.random() - 0.5) * 16 * s * dpr,
                         y: y,
-                        vx: (Math.random() - 0.5) * 2.4 * dpr,
-                        vy: -(lift + Math.random() * 2) * dpr,
+                        floor: y,
+                        vx: (Math.random() - 0.5) * 2.4 * s * dpr,
+                        vy: -(lift + Math.random() * 2) * s * dpr,
                         at: performance.now(),
                         life: 360 + Math.random() * 320,
                         c: palette[(Math.random() * palette.length) | 0]
@@ -292,7 +298,7 @@ window.duneNav = {
             }
 
             function draw(now) {
-                if (!hero.isConnected) {
+                if (!overlay.isConnected) {
                     resolve(false);
                     return;
                 }
@@ -306,7 +312,8 @@ window.duneNav = {
 
                 octx.clearRect(0, 0, w, h);
 
-                // Flattened rings, since the sand here is seen at a low angle, not from above.
+                // Flattened arcs, since the sand here is seen at a low angle, not from above.
+                // Only the upper half: a ring passing under the stake looked wrong.
                 for (let i = rings.length - 1; i >= 0; i--) {
                     const p = (now - rings[i].at) / 1000;
                     if (p >= 1) {
@@ -317,53 +324,53 @@ window.duneNav = {
                     octx.strokeStyle = "rgba(244,192,124," + (0.55 * (1 - p)) + ")";
                     octx.lineWidth = (2.4 - 1.8 * p) * dpr;
                     octx.beginPath();
-                    octx.ellipse(base.x, base.y, (8 + 120 * ease) * dpr, (3 + 34 * ease) * dpr, 0, 0, Math.PI * 2);
+                    octx.ellipse(base.x, base.y, (8 + 120 * ease) * s * dpr, (3 + 34 * ease) * s * dpr, 0, Math.PI, Math.PI * 2);
                     octx.stroke();
                 }
 
                 if (t >= crossAt) {
                     const p = Math.min(1, (t - crossAt) / crossSpan);
                     const x = (-0.1 + 1.2 * p) * w;
-                    const y = base.y + Math.sin(p * 9 + phase) * h * 0.05;
+                    const y = base.y + Math.sin(p * 9 + phase) * 6 * s * dpr;
                     trail.push([x, y]);
-                    if (trail.length > 32) {
+                    if (trail.length > 24) {
                         trail.shift();
                     }
                     kick(x, y, 3, 0.5);
 
                     octx.lineCap = "round";
                     octx.lineJoin = "round";
-                    trace(trail, 5 * dpr, 6 * dpr);
+                    trace(trail, 5 * s * dpr, 6 * s * dpr);
                     octx.strokeStyle = "rgba(60,34,12,0.5)";
-                    octx.lineWidth = 26 * dpr;
+                    octx.lineWidth = 26 * s * dpr;
                     octx.stroke();
                     trace(trail, 0, 0);
                     octx.strokeStyle = "#dcae70";
-                    octx.lineWidth = 20 * dpr;
+                    octx.lineWidth = 20 * s * dpr;
                     octx.stroke();
-                    trace(trail, -4 * dpr, -4 * dpr);
+                    trace(trail, -4 * s * dpr, -4 * s * dpr);
                     octx.strokeStyle = "rgba(255,232,190,0.55)";
-                    octx.lineWidth = 5 * dpr;
+                    octx.lineWidth = 5 * s * dpr;
                     octx.stroke();
                     octx.fillStyle = "#e2b579";
                     octx.beginPath();
-                    octx.arc(x, y, 14 * dpr, 0, Math.PI * 2);
+                    octx.arc(x, y, 14 * s * dpr, 0, Math.PI * 2);
                     octx.fill();
                 }
 
                 for (let i = grains.length - 1; i >= 0; i--) {
                     const g = grains[i];
                     const age = (now - g.at) / g.life;
-                    if (age >= 1) {
+                    if (age >= 1 || (g.vy > 0 && g.y >= g.floor)) {
                         grains.splice(i, 1);
                         continue;
                     }
                     g.x += g.vx;
                     g.y += g.vy;
-                    g.vy += 0.05 * dpr;
+                    g.vy += 0.05 * s * dpr;
                     octx.globalAlpha = 0.8 * (1 - age);
                     octx.fillStyle = g.c;
-                    octx.fillRect(g.x, g.y, 1.5 * dpr, 1.5 * dpr);
+                    octx.fillRect(g.x, g.y, Math.max(1, 1.5 * s) * dpr, Math.max(1, 1.5 * s) * dpr);
                 }
                 octx.globalAlpha = 1;
 

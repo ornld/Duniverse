@@ -40,10 +40,12 @@
         @* A horizon, not a straight line: twin moons over three dune crests. Moons
            render before the dunes so their glow melts into the crests. The near
            crest takes the content fill, so the footer reads as the closest dune. *@
-        <div class="footer-horizon" aria-hidden="true">
+        @* Not aria-hidden as a whole any more: the thumper inside is a real button. The
+           moons and the dunes hide themselves instead. *@
+        <div class="footer-horizon">
             <TwinMoons />
             <svg class="horizon-dunes" viewBox="0 0 1440 90" preserveAspectRatio="none"
-                 xmlns="http://www.w3.org/2000/svg" focusable="false">
+                 xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
                 @* The crests carry classes instead of baked-in fills, so their colors
                    live in app.css with everything else and the near crest can read
                    the panel tone straight from the theme. *@
@@ -55,6 +57,8 @@
                    stretched viewBox distorts everything else. *@
                 <path class="crest-light" stroke-width="1.2" vector-effect="non-scaling-stroke" d="M0 76 C 150 68 320 62 540 70 C 720 76 830 83 1020 79 C 1190 75 1320 68 1440 74" />
             </svg>
+            @* Last in the band, so it stands in front of the near dune, under the small moon. *@
+            <Thumper />
         </div>
         <div class="footer-content">
             <span>An unofficial encyclopedia of the Dune universe.</span>

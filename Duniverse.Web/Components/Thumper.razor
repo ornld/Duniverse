@@ -1,0 +1,111 @@
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+@implements IDisposable
+
+@* The door to the deep desert: a thumper no taller than the small moon, planted on the
+   near crest beneath it on every page. A real button, so a keyboard can plant it too.
+   Press it and the clapper pounds, the sand rings, and the worm carries the page away. *@
+<button type="button" class="thumper @(planted ? "is-thumping" : "")" title="Thumper"
+        aria-label="Plant the thumper" disabled="@planted" @ref="thumper" @onclick="PlantThumper">
+    @* Drawn from the book's description, a stake with a spring-driven clapper: dome head,
+       slotted body, notched collar, ribbed neck, and the spike into a low mound of sand.
+       Flat fills with highlight strokes, no gradients, so nothing needs an id. *@
+    <svg class="thumper-art" viewBox="0 0 100 250" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <ellipse cx="50" cy="234" rx="34" ry="7" fill="rgba(224, 164, 88, 0.10)" />
+        <ellipse cx="50" cy="235" rx="14" ry="3" fill="rgba(0, 0, 0, 0.45)" />
+
+        <path d="M45 178 H55 L51 236 H49 Z" fill="#141110" />
+        <path d="M50 178 H55 L51 236 H50 Z" fill="#221d19" />
+
+        <rect x="37" y="150" width="26" height="30" rx="2" fill="#1a1613" />
+        <rect x="37" y="155" width="26" height="2" fill="#0a0908" />
+        <rect x="37" y="157" width="26" height="1" fill="#332b25" />
+        <rect x="37" y="161" width="26" height="2" fill="#0a0908" />
+        <rect x="37" y="163" width="26" height="1" fill="#332b25" />
+        <rect x="37" y="167" width="26" height="2" fill="#0a0908" />
+        <rect x="37" y="169" width="26" height="1" fill="#332b25" />
+        <rect x="37" y="173" width="26" height="2" fill="#0a0908" />
+        <rect x="37" y="175" width="26" height="1" fill="#332b25" />
+
+        <rect x="28" y="132" width="44" height="18" rx="3" fill="#201b17" stroke="#3b322a" stroke-width="1" />
+        <rect x="32" y="136" width="3" height="10" fill="#0a0908" />
+        <rect x="35" y="136" width="1" height="10" fill="#3b322a" />
+        <rect x="38" y="136" width="3" height="10" fill="#0a0908" />
+        <rect x="41" y="136" width="1" height="10" fill="#3b322a" />
+        <rect x="44" y="136" width="3" height="10" fill="#0a0908" />
+        <rect x="47" y="136" width="1" height="10" fill="#3b322a" />
+        <rect x="50" y="136" width="3" height="10" fill="#0a0908" />
+        <rect x="53" y="136" width="1" height="10" fill="#3b322a" />
+        <rect x="56" y="136" width="3" height="10" fill="#0a0908" />
+        <rect x="59" y="136" width="1" height="10" fill="#3b322a" />
+        <rect x="62" y="136" width="3" height="10" fill="#0a0908" />
+        <rect x="65" y="136" width="1" height="10" fill="#3b322a" />
+
+        <rect x="26" y="30" width="48" height="104" rx="7" fill="#1c1815" />
+        <rect x="30" y="34" width="6" height="96" rx="3" fill="rgba(255, 255, 255, 0.05)" />
+        <rect x="64" y="34" width="8" height="96" rx="3" fill="rgba(0, 0, 0, 0.35)" />
+        <rect x="32" y="44" width="5" height="66" rx="2.5" fill="#070605" />
+        <rect x="32" y="46" width="1" height="62" fill="rgba(255, 255, 255, 0.06)" />
+        <rect x="41" y="44" width="6" height="66" rx="3" fill="#070605" />
+        <rect x="41" y="46" width="1" height="62" fill="rgba(255, 255, 255, 0.06)" />
+        <rect x="51" y="44" width="6" height="66" rx="3" fill="#070605" />
+        <rect x="51" y="46" width="1" height="62" fill="rgba(255, 255, 255, 0.06)" />
+        <rect x="61" y="44" width="5" height="66" rx="2.5" fill="#070605" />
+        <rect x="61" y="46" width="1" height="62" fill="rgba(255, 255, 255, 0.06)" />
+        <rect x="26" y="118" width="48" height="1.5" fill="#0a0908" />
+        <rect x="26" y="124" width="48" height="1.5" fill="#0a0908" />
+
+        <g class="thumper-cap">
+            <path d="M26 36 C26 14 38 8 50 8 C62 8 74 14 74 36 Z" fill="#221d19" />
+            <path d="M31 32 C31 18 40 13 50 13" stroke="rgba(255, 255, 255, 0.08)" stroke-width="2" fill="none" />
+            <rect x="26" y="34" width="48" height="4" fill="#0f0d0b" />
+        </g>
+
+        <path d="M73 40 V128" stroke="rgba(244, 192, 124, 0.25)" stroke-width="1.2" />
+        <path d="M71 134 V148" stroke="rgba(244, 192, 124, 0.3)" stroke-width="1" />
+        <path d="M62 152 V178" stroke="rgba(244, 192, 124, 0.22)" stroke-width="1" />
+        <path d="M30 30 Q50 22 70 30" stroke="rgba(244, 192, 124, 0.18)" stroke-width="1" fill="none" />
+    </svg>
+</button>
+
+@* The rings and the wormsign crossing draw here, over the whole horizon band, sized by
+   the script when the thumper is planted. Pointer events off. *@
+<canvas class="thumper-stage" @ref="stage" aria-hidden="true"></canvas>
+
+@code {
+    private ElementReference thumper;
+    private ElementReference stage;
+    private bool planted;
+    private bool gone;
+
+    public void Dispose()
+    {
+        gone = true;
+    }
+
+    // Planting is a ceremony the script runs: three slams, the rings, the crossing. It
+    // answers true once the worm has crossed, and then I walk the page to the deep desert.
+    private async Task PlantThumper()
+    {
+        if (planted)
+        {
+            return;
+        }
+        planted = true;
+
+        bool called;
+        try
+        {
+            called = await JS.InvokeAsync<bool>("duneNav.thumperCall", thumper, stage);
+        }
+        catch
+        {
+            called = false;
+        }
+
+        if (called && !gone)
+        {
+            Nav.NavigateTo("/deep-desert");
+        }
+    }
+}

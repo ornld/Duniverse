@@ -4550,8 +4550,8 @@ button.chip {
 }
 
 /* ---- Lost in the deep desert ----
-   Any dead end, a bad URL or a missing record, gets open desert at night, with a
-   thumper planted in the sand below the exits. */
+   Any dead end, a bad URL or a missing record, gets open desert at night. The thumper
+   that opens the deep desert stands in the footer's sand, styled further down. */
 
 .lost-desert {
     position: relative;
@@ -4599,21 +4599,25 @@ button.chip {
         max-width: 34rem;
     }
 
-/* The thumper's rings and the wormsign crossing, on the last canvas in the hero so it
-   paints above the copy. Pointer events off, so the chips beneath keep their clicks. */
-.lost-thumper {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-    pointer-events: none;
+/* The horizon band is the thumper's ground on every page: it stands on the near crest
+   beneath the small moon, no taller than the moon itself. The x is the small moon's
+   center, worked back from the moons' right offset and their drawing; the foot pins
+   the spike to the crest there. The phone block scales all three with the moons. */
+.footer-horizon {
+    --thumper-h: 1.625rem;
+    --thumper-foot: 102px;
+    --thumper-x: calc(91% - 36px);
 }
 
-/* The thumper itself, planted below the exits. A bare button around the drawing, with
-   the same lift and glow the footer icons take under the hand. */
+/* A bare button around the drawing, moonlit at rest so a stake this small still reads
+   against the dune, brighter under the hand. The hit pad is the timeline dot's trick:
+   a stake ten pixels wide is no target for a thumb. */
 .thumper {
-    margin-top: var(--sp-6);
+    position: absolute;
+    left: var(--thumper-x);
+    top: calc(var(--thumper-foot) - var(--thumper-h) * 0.936);
+    z-index: 2;
+    transform: translateX(-50%);
     padding: 0;
     background: none;
     border: 0;
@@ -4621,20 +4625,38 @@ button.chip {
     cursor: pointer;
 }
 
+    .thumper::after {
+        content: "";
+        position: absolute;
+        inset: -10px -16px;
+    }
+
     .thumper:disabled {
         cursor: default;
     }
 
 .thumper-art {
-    width: 4.5rem;
-    height: auto;
+    height: var(--thumper-h);
+    width: auto;
+    filter: drop-shadow(0 0 1.5px rgba(var(--dune-accent-bright-rgb), 0.45));
     transition: transform var(--dur-touch) ease, filter var(--dur-touch) ease;
+}
+
+/* The thumper's rings and the wormsign crossing, over the whole horizon band. Pointer
+   events off, so the footer links beneath keep their clicks. */
+.thumper-stage {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+    pointer-events: none;
 }
 
     .thumper:hover .thumper-art,
     .thumper:focus-visible .thumper-art {
-        transform: translateY(-2px);
-        filter: drop-shadow(0 0 10px rgba(var(--dune-accent-rgb), 0.35));
+        transform: translateY(-1px);
+        filter: drop-shadow(0 0 4px rgba(var(--dune-accent-bright-rgb), 0.7));
     }
 
 /* Once planted the clapper pounds three times and the whole stake shivers with each
@@ -4651,17 +4673,18 @@ button.chip {
     animation: thumper-shiver 0.7s linear 3;
 }
 
+/* Scaled to the stake's own height, so the slam reads at any size. */
 @keyframes thumper-slam {
     0% {
         transform: translateY(0);
     }
 
     30% {
-        transform: translateY(-7px);
+        transform: translateY(calc(var(--thumper-h) * -0.05));
     }
 
     46% {
-        transform: translateY(3px);
+        transform: translateY(calc(var(--thumper-h) * 0.02));
     }
 
     62%, 100% {
@@ -4695,8 +4718,10 @@ button.chip {
 }
 
 @media (max-width: 600px) {
-    .thumper-art {
-        width: 3.75rem;
+    .footer-horizon {
+        --thumper-h: 1.25rem;
+        --thumper-foot: 76px;
+        --thumper-x: calc(95% - 27px);
     }
 }
 
