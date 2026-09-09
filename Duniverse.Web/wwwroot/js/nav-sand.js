@@ -267,7 +267,6 @@ window.duneNav = {
             let slamsDone = 0;
             const rings = [];
             const grains = [];
-            const trail = [];
             const phase = Math.random() * 6;
 
             // Each grain remembers the sand it left, and lands there instead of falling past it.
@@ -286,15 +285,192 @@ window.duneNav = {
                 }
             }
 
-            function trace(pts, dx, dy) {
-                octx.beginPath();
-                for (let i = 0; i < pts.length; i++) {
-                    if (i === 0) {
-                        octx.moveTo(pts[i][0] + dx, pts[i][1] + dy);
-                    } else {
-                        octx.lineTo(pts[i][0] + dx, pts[i][1] + dy);
+            // The worm is the game's animal, drawn small: a pale tapered tube with dark seams
+            // riding a wave along the crest, and the cut, angled head with the red crescent.
+            const W = 30 * s * dpr;
+            const LEN = W * 7;
+            function wave(x) {
+                return base.y + Math.sin(x / (w * 0.11) + phase) * 6 * s * dpr;
+            }
+
+            function drawWorm(headX) {
+                const n = 26;
+                const xs = [];
+                const ys = [];
+                const nx = [];
+                const ny = [];
+                const ws = [];
+                for (let i = 0; i <= n; i++) {
+                    const x = headX - LEN * i / n;
+                    const y = wave(x);
+                    const dy = (wave(x + 1) - wave(x - 1)) / 2;
+                    const len = Math.hypot(1, dy);
+                    xs.push(x);
+                    ys.push(y);
+                    nx.push(-dy / len);
+                    ny.push(1 / len);
+                    const f = i / n;
+                    let ww = W * (1 - 0.1 * f);
+                    if (f > 0.65) {
+                        ww *= 1 - 0.72 * Math.pow((f - 0.65) / 0.35, 1.4);
                     }
+                    ww *= 1 + 0.04 * Math.sin(i * Math.PI * 0.5);
+                    ws.push(Math.max(ww, W * 0.14));
                 }
+                function band(dx, dy, scale) {
+                    octx.beginPath();
+                    for (let i = 0; i <= n; i++) {
+                        const hw = ws[i] * scale / 2;
+                        const x = xs[i] + dx + nx[i] * hw;
+                        const y = ys[i] + dy + ny[i] * hw;
+                        if (i === 0) {
+                            octx.moveTo(x, y);
+                        } else {
+                            octx.lineTo(x, y);
+                        }
+                    }
+                    for (let i = n; i >= 0; i--) {
+                        const hw = ws[i] * scale / 2;
+                        octx.lineTo(xs[i] + dx - nx[i] * hw, ys[i] + dy - ny[i] * hw);
+                    }
+                    octx.closePath();
+                }
+                octx.fillStyle = "rgba(240,212,166,0.14)";
+                band(-W * 0.04, -W * 0.04, 1.6);
+                octx.fill();
+                octx.fillStyle = "rgba(45,30,15,0.45)";
+                band(W * 0.12, W * 0.16, 1.06);
+                octx.fill();
+                octx.fillStyle = "#aeaba2";
+                band(0, 0, 1);
+                octx.fill();
+                octx.save();
+                band(0, 0, 1);
+                octx.clip();
+                octx.fillStyle = "rgba(60,58,52,0.5)";
+                band(W * 0.2, W * 0.24, 0.7);
+                octx.fill();
+                octx.fillStyle = "rgba(242,240,234,0.42)";
+                band(-W * 0.16, -W * 0.19, 0.62);
+                octx.fill();
+                octx.lineWidth = Math.max(1, W * 0.06);
+                for (let d = W * 0.6; d < LEN; d += W * 0.5) {
+                    const i = Math.round(d / LEN * n);
+                    if (i > n) {
+                        break;
+                    }
+                    const hw = ws[i] / 2;
+                    octx.strokeStyle = "rgba(45,43,39,0.55)";
+                    octx.beginPath();
+                    octx.moveTo(xs[i] + nx[i] * hw, ys[i] + ny[i] * hw);
+                    octx.lineTo(xs[i] - nx[i] * hw, ys[i] - ny[i] * hw);
+                    octx.stroke();
+                    octx.strokeStyle = "rgba(236,232,224,0.3)";
+                    octx.beginPath();
+                    octx.moveTo(xs[i] - W * 0.06 + nx[i] * hw, ys[i] + ny[i] * hw);
+                    octx.lineTo(xs[i] - W * 0.06 - nx[i] * hw, ys[i] - ny[i] * hw);
+                    octx.stroke();
+                }
+                octx.restore();
+                drawHead(xs[0], ys[0], Math.atan2(ys[0] - ys[1], xs[0] - xs[1]));
+            }
+
+            // The cut end of the tube: flared to the rim, corners chamfered, a flat nose with
+            // the mouth as a red crescent along it. The same hull the game's head uses.
+            function drawHead(x, y, angle) {
+                const L = W * 1.25;
+                const F = W * 1.14;
+                const B = W;
+                const hull = new Path2D();
+                [[-0.5, -0.5 * B / F], [0.12, -0.5], [0.4, -0.36], [0.5, -0.12], [0.5, 0.12], [0.4, 0.36], [0.12, 0.5], [-0.5, 0.5 * B / F]]
+                    .forEach(function (pt, i) {
+                        if (i === 0) {
+                            hull.moveTo(pt[0] * L, pt[1] * F);
+                        } else {
+                            hull.lineTo(pt[0] * L, pt[1] * F);
+                        }
+                    });
+                hull.closePath();
+                const nose = [[0.12, -0.5], [0.4, -0.36], [0.5, -0.12], [0.5, 0.12], [0.4, 0.36], [0.12, 0.5]];
+                const cx = L * 0.08;
+
+                octx.save();
+                octx.translate(x, y);
+                octx.rotate(angle);
+                octx.fillStyle = "rgba(45,30,15,0.4)";
+                octx.beginPath();
+                octx.ellipse(W * 0.1, W * 0.14, W * 0.7, W * 0.62, 0, 0, Math.PI * 2);
+                octx.fill();
+
+                const hide = octx.createLinearGradient(0, -F / 2, 0, F / 2);
+                hide.addColorStop(0, "#6f6c64");
+                hide.addColorStop(0.3, "#c9c6bc");
+                hide.addColorStop(0.6, "#a6a399");
+                hide.addColorStop(1, "#5f5c54");
+                octx.fillStyle = hide;
+                octx.fill(hull);
+
+                octx.save();
+                octx.clip(hull);
+                octx.fillStyle = "rgba(255,255,255,0.13)";
+                octx.beginPath();
+                octx.moveTo(L * 0.12, -F * 0.5);
+                octx.lineTo(L * 0.4, -F * 0.36);
+                octx.lineTo(L * 0.5, -F * 0.12);
+                octx.lineTo(L * 0.22, -F * 0.16);
+                octx.closePath();
+                octx.fill();
+                octx.fillStyle = "rgba(0,0,0,0.2)";
+                octx.beginPath();
+                octx.moveTo(L * 0.12, F * 0.5);
+                octx.lineTo(L * 0.4, F * 0.36);
+                octx.lineTo(L * 0.5, F * 0.12);
+                octx.lineTo(L * 0.22, F * 0.16);
+                octx.closePath();
+                octx.fill();
+                octx.fillStyle = "rgba(0,0,0,0.1)";
+                octx.fillRect(L * 0.4, -F, L * 0.2, F * 2);
+
+                octx.beginPath();
+                nose.forEach(function (pt, i) {
+                    const px = cx + (pt[0] * L - cx) * 0.95;
+                    const py = pt[1] * F * 0.95;
+                    if (i === 0) {
+                        octx.moveTo(px, py);
+                    } else {
+                        octx.lineTo(px, py);
+                    }
+                });
+                for (let i = nose.length - 1; i >= 0; i--) {
+                    const f = 0.5 - 0.12 * (1 - Math.abs(i / (nose.length - 1) * 2 - 1));
+                    octx.lineTo(cx + (nose[i][0] * L - cx) * f, nose[i][1] * F * f);
+                }
+                octx.closePath();
+                octx.fillStyle = "#4a170d";
+                octx.fill();
+                octx.fillStyle = "rgba(230,115,45,0.45)";
+                octx.beginPath();
+                octx.arc(L * 0.4, 0, W * 0.16, 0, Math.PI * 2);
+                octx.fill();
+                octx.strokeStyle = "rgba(220,216,206,0.8)";
+                octx.lineWidth = Math.max(1, W * 0.03);
+                octx.beginPath();
+                nose.forEach(function (pt, i) {
+                    const px = cx + (pt[0] * L - cx) * 0.95;
+                    const py = pt[1] * F * 0.95;
+                    if (i === 0) {
+                        octx.moveTo(px, py);
+                    } else {
+                        octx.lineTo(px, py);
+                    }
+                });
+                octx.stroke();
+                octx.restore();
+
+                octx.strokeStyle = "rgba(30,28,25,0.45)";
+                octx.lineWidth = Math.max(1, W * 0.035);
+                octx.stroke(hull);
+                octx.restore();
             }
 
             function draw(now) {
@@ -330,32 +506,9 @@ window.duneNav = {
 
                 if (t >= crossAt) {
                     const p = Math.min(1, (t - crossAt) / crossSpan);
-                    const x = (-0.1 + 1.2 * p) * w;
-                    const y = base.y + Math.sin(p * 9 + phase) * 6 * s * dpr;
-                    trail.push([x, y]);
-                    if (trail.length > 24) {
-                        trail.shift();
-                    }
-                    kick(x, y, 3, 0.5);
-
-                    octx.lineCap = "round";
-                    octx.lineJoin = "round";
-                    trace(trail, 5 * s * dpr, 6 * s * dpr);
-                    octx.strokeStyle = "rgba(60,34,12,0.5)";
-                    octx.lineWidth = 26 * s * dpr;
-                    octx.stroke();
-                    trace(trail, 0, 0);
-                    octx.strokeStyle = "#dcae70";
-                    octx.lineWidth = 20 * s * dpr;
-                    octx.stroke();
-                    trace(trail, -4 * s * dpr, -4 * s * dpr);
-                    octx.strokeStyle = "rgba(255,232,190,0.55)";
-                    octx.lineWidth = 5 * s * dpr;
-                    octx.stroke();
-                    octx.fillStyle = "#e2b579";
-                    octx.beginPath();
-                    octx.arc(x, y, 14 * s * dpr, 0, Math.PI * 2);
-                    octx.fill();
+                    const headX = (-0.15 + 1.3 * p) * w;
+                    kick(headX, wave(headX), 3, 0.5);
+                    drawWorm(headX);
                 }
 
                 for (let i = grains.length - 1; i >= 0; i--) {

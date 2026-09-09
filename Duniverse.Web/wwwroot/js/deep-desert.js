@@ -18,6 +18,11 @@ const TICK_STEP = 2.2;
 const TICK_FLOOR = 88;
 const START_LENGTH = 3;
 
+// The worm's body as a share of a cell, and the pitch of its rings. Two rings a cell
+// reads as a segmented hose at every board size I tried.
+const TUBE = 0.7;
+const RING = 0.5;
+
 const NORTH = { x: 0, y: -1 };
 const SOUTH = { x: 0, y: 1 };
 const EAST = { x: 1, y: 0 };
@@ -46,6 +51,7 @@ let ox = 0;
 let oy = 0;
 let rim = 0;
 let terrain = null;
+let sprites = null;
 let seed = 1;
 
 // intro, hunting, paused, dying, fallen.
@@ -71,6 +77,11 @@ let best = 0;
 let rings = [];
 let grains = [];
 let fell = null;
+
+// The strike: 0 with the head down and the mouth shut, 1 reared over a soldier with
+// the mouth open. slamAt marks the moment it came down.
+let strike = 0;
+let slamAt = -1e9;
 
 // ---- lifecycle -------------------------------------------------------------------
 
@@ -123,6 +134,7 @@ export function stop() {
     canvas = null;
     ctx = null;
     terrain = null;
+    sprites = null;
     hud = null;
 }
 
@@ -318,6 +330,7 @@ function fit() {
     oy = Math.round((viewH - rows * cell) / 2);
     rim = Math.max(10, Math.round(cell * 0.4));
     paintTerrain();
+    buildSprites();
 }
 
 function cellCenter(c) {
@@ -335,8 +348,20 @@ function mulberry32(a) {
     };
 }
 
+// A canvas in CSS units at the device ratio, so every sprite lands pixel sharp.
+function makeCanvas(w, h) {
+    const c = document.createElement("canvas");
+    c.width = Math.max(1, Math.ceil(w * dpr));
+    c.height = Math.max(1, Math.ceil(h * dpr));
+    const g = c.getContext("2d");
+    g.scale(dpr, dpr);
+    return { c, g };
+}
+
+// ---- the terrain -----------------------------------------------------------------
+
 // Painted once per fit onto its own canvas. A frame then copies it in one call and
-// pays only for what moves.
+// pays only for what moves, so the dunes can carry as much detail as I like.
 function paintTerrain() {
     const rnd = mulberry32(seed);
     terrain = document.createElement("canvas");
@@ -363,9 +388,9 @@ function paintTerrain() {
 
     // The sand itself, painted over the wall's inner half so the board edge stays clean.
     const sand = t.createLinearGradient(ox, oy, ox + bw, oy + bh);
-    sand.addColorStop(0, "#cf9c5f");
-    sand.addColorStop(0.5, "#c48f52");
-    sand.addColorStop(1, "#ad7843");
+    sand.addColorStop(0, "#d4a367");
+    sand.addColorStop(0.5, "#c69257");
+    sand.addColorStop(1, "#ae7843");
     t.fillStyle = sand;
     t.fillRect(ox, oy, bw, bh);
 
@@ -373,43 +398,46 @@ function paintTerrain() {
     t.beginPath();
     t.rect(ox, oy, bw, bh);
     t.clip();
+    t.lineCap = "round";
+    t.lineJoin = "round";
 
-    // Dunes: long soft ridges, each lit up-left and shaded down-right like the worm.
-    const ridges = Math.max(4, Math.round((bw + bh) / 240));
-    for (let i = 0; i < ridges; i++) {
-        const y0 = oy + (i + 0.5) / ridges * bh + (rnd() - 0.5) * cell * 1.5;
-        const amp = cell * (0.8 + rnd() * 1.6);
-        const freq = (0.5 + rnd() * 0.9) * TAU / bw;
-        const phase = rnd() * TAU;
-        const tilt = (rnd() - 0.5) * 0.18;
-        const pts = [];
-        for (let x = ox - 20; x <= ox + bw + 20; x += 10) {
-            pts.push([x, y0 + Math.sin(x * freq + phase) * amp + (x - ox) * tilt]);
-        }
-        t.lineCap = "round";
-        t.lineJoin = "round";
-        t.strokeStyle = "rgba(236,190,128,0.16)";
-        t.lineWidth = cell * 1.5;
-        tracePoints(t, pts, 0, 0);
-        t.stroke();
-        t.strokeStyle = "rgba(98,58,26,0.26)";
-        t.lineWidth = cell * 0.5;
-        tracePoints(t, pts, cell * 0.12, cell * 0.28);
-        t.stroke();
-        t.strokeStyle = "rgba(250,212,152,0.34)";
-        t.lineWidth = cell * 0.16;
-        tracePoints(t, pts, -cell * 0.1, -cell * 0.1);
-        t.stroke();
+    // Broad drift first: soft pools of lighter and darker sand, so the ground undulates
+    // before any crest is drawn on it.
+    const pools = 5 + ((rnd() * 4) | 0);
+    for (let i = 0; i < pools; i++) {
+        const cx = ox + rnd() * bw;
+        const cy = oy + rnd() * bh;
+        const r = cell * (3 + rnd() * 5);
+        const g = t.createRadialGradient(cx, cy, 0, cx, cy, r);
+        g.addColorStop(0, rnd() < 0.5 ? "rgba(255,226,178,0.13)" : "rgba(88,48,18,0.13)");
+        g.addColorStop(1, "rgba(0,0,0,0)");
+        t.fillStyle = g;
+        t.fillRect(cx - r, cy - r, r * 2, r * 2);
+    }
+
+    // Dunes: a bright crest, a soft lit windward face up and left of it, and a steeper
+    // shadowed slip face down and right, the way they read from the air.
+    const crests = Math.max(4, Math.round((bw + bh) / 230));
+    for (let i = 0; i < crests; i++) {
+        drawCrest(t, crestPath(rnd, i, crests, bw, bh));
+    }
+
+    drawRipples(t, rnd, bw, bh);
+
+    // Melange on the sand: rust streaks where a spice blow has come through.
+    const veins = 3 + ((rnd() * 3) | 0);
+    for (let i = 0; i < veins; i++) {
+        drawSpiceVein(t, rnd, bw, bh);
     }
 
     // Speckle for grain, and a dot at every cell corner faint enough to pass as texture.
     // The dots are what let a player judge one bend from the next.
-    const specks = Math.round(bw * bh / 34);
+    const specks = Math.round(bw * bh / 30);
     for (let i = 0; i < specks; i++) {
-        t.fillStyle = rnd() < 0.5 ? "rgba(255,226,172,0.11)" : "rgba(80,45,15,0.11)";
+        t.fillStyle = rnd() < 0.5 ? "rgba(255,228,176,0.12)" : "rgba(80,45,15,0.12)";
         t.fillRect(ox + rnd() * bw, oy + rnd() * bh, 1, 1);
     }
-    t.fillStyle = "rgba(60,35,12,0.20)";
+    t.fillStyle = "rgba(60,35,12,0.17)";
     for (let cx = 1; cx < cols; cx++) {
         for (let cy = 1; cy < rows; cy++) {
             t.fillRect(ox + cx * cell - 0.5, oy + cy * cell - 0.5, 1, 1);
@@ -440,6 +468,106 @@ function paintTerrain() {
     t.strokeStyle = "rgba(20,12,6,0.7)";
     t.lineWidth = 2;
     t.strokeRect(ox + 1, oy + 1, bw - 2, bh - 2);
+}
+
+// A crest line across the board: a long swell with a shorter ripple riding on it and a
+// slight tilt, so no two run parallel.
+function crestPath(rnd, i, n, bw, bh) {
+    const y0 = oy + (i + 0.5) / n * bh + (rnd() - 0.5) * cell * 1.2;
+    const a1 = cell * (0.8 + rnd() * 1.8);
+    const f1 = (0.4 + rnd() * 0.7) * TAU / bw;
+    const p1 = rnd() * TAU;
+    const a2 = cell * (0.2 + rnd() * 0.6);
+    const f2 = (1.2 + rnd() * 1.6) * TAU / bw;
+    const p2 = rnd() * TAU;
+    const tilt = (rnd() - 0.5) * 0.25;
+    const pts = [];
+    for (let x = ox - cell; x <= ox + bw + cell; x += 8) {
+        pts.push([x, y0 + Math.sin(x * f1 + p1) * a1 + Math.sin(x * f2 + p2) * a2 + (x - ox) * tilt]);
+    }
+    return pts;
+}
+
+// A gradient across a stroke is not a thing canvas can do, so each face is a stack of
+// strokes stepped away from the crest, each fainter than the last.
+function drawCrest(t, pts) {
+    const steps = 6;
+    const slip = cell * 1.15;
+    for (let k = 0; k < steps; k++) {
+        const f = k / steps;
+        t.strokeStyle = "rgba(66,36,12," + (0.075 * (1 - f)) + ")";
+        t.lineWidth = slip / steps * 2;
+        tracePoints(t, pts, slip * f * 0.28, slip * f * 0.96);
+        t.stroke();
+    }
+    const wind = cell * 0.8;
+    for (let k = 0; k < steps; k++) {
+        const f = k / steps;
+        t.strokeStyle = "rgba(255,236,196," + (0.06 * (1 - f)) + ")";
+        t.lineWidth = wind / steps * 2;
+        tracePoints(t, pts, -wind * f * 0.28, -wind * f * 0.96);
+        t.stroke();
+    }
+    t.lineWidth = Math.max(1, cell * 0.03);
+    t.strokeStyle = "rgba(255,238,200,0.5)";
+    tracePoints(t, pts, 0, 0);
+    t.stroke();
+    t.lineWidth = Math.max(1, cell * 0.02);
+    t.strokeStyle = "rgba(60,32,12,0.4)";
+    tracePoints(t, pts, cell * 0.02, cell * 0.06);
+    t.stroke();
+}
+
+// Wind ripples over everything: a line every fifth of a cell, each with its own small
+// wobble, a shadow stroke with a lit one a pixel under it.
+function drawRipples(t, rnd, bw, bh) {
+    const gap = Math.max(4, cell * 0.2);
+    const f = (1.5 + rnd()) * TAU / bw;
+    const ph = rnd() * TAU;
+    t.lineWidth = 1;
+    for (let y = oy + gap * (0.5 + rnd()); y < oy + bh; y += gap) {
+        const amp = cell * (0.1 + rnd() * 0.08);
+        const local = ph + y * 0.05;
+        const pts = [];
+        for (let x = ox; x <= ox + bw; x += 6) {
+            pts.push([x, y + Math.sin(x * f + local) * amp + Math.sin(x * f * 3.1 + local * 1.7) * amp * 0.3]);
+        }
+        t.strokeStyle = "rgba(80,45,15,0.07)";
+        tracePoints(t, pts, 0, 0);
+        t.stroke();
+        t.strokeStyle = "rgba(255,232,190,0.06)";
+        tracePoints(t, pts, 0, 1);
+        t.stroke();
+    }
+}
+
+function drawSpiceVein(t, rnd, bw, bh) {
+    const x0 = ox + rnd() * bw;
+    const y0 = oy + rnd() * bh;
+    const pts = [];
+    let x = x0;
+    let y = y0;
+    let a = rnd() * TAU;
+    const steps = 6 + ((rnd() * 8) | 0);
+    for (let i = 0; i < steps; i++) {
+        pts.push([x, y]);
+        a += (rnd() - 0.5) * 1.2;
+        x += Math.cos(a) * cell * 0.7;
+        y += Math.sin(a) * cell * 0.7;
+    }
+    t.strokeStyle = "rgba(170,78,28,0.12)";
+    t.lineWidth = cell * 0.55;
+    tracePoints(t, pts, 0, 0);
+    t.stroke();
+    t.strokeStyle = "rgba(140,58,20,0.14)";
+    t.lineWidth = cell * 0.16;
+    tracePoints(t, pts, 0, 0);
+    t.stroke();
+    for (let i = 0; i < steps * 4; i++) {
+        const p = pts[(rnd() * pts.length) | 0];
+        t.fillStyle = rnd() < 0.5 ? "rgba(190,90,30,0.35)" : "rgba(120,45,15,0.35)";
+        t.fillRect(p[0] + (rnd() - 0.5) * cell * 0.8, p[1] + (rnd() - 0.5) * cell * 0.8, 1.5, 1.5);
+    }
 }
 
 // The Shield Wall: a jagged band of paler rock hugging the board, cracked and edge lit.
@@ -497,6 +625,368 @@ function tracePoints(c, pts, dx, dy) {
     }
 }
 
+// ---- the sprites -----------------------------------------------------------------
+
+// Everything with detail is baked once per board size and stamped each frame: the seam
+// tiles that make the body a segmented hose, and the head with its mouth shut and open.
+function buildSprites() {
+    const w = cell * TUBE;
+    const pitch = cell * RING;
+    sprites = {
+        w: w,
+        pitch: pitch,
+        rings: [makeRingTile(w, pitch, 0), makeRingTile(w, pitch, 1), makeRingTile(w, pitch, 2)],
+        shut: makeHead(w, false),
+        open: makeHead(w, true)
+    };
+}
+
+// One segment of hide, head to the right: mottled pale gray, flanks darkening, a few
+// grooves, and the seam at the leading edge, a dark fold with a thread of paler tissue
+// behind it. The flanks fade out so the tile follows a round body.
+function makeRingTile(w, d, variant) {
+    const { c, g } = makeCanvas(d, w);
+    const rnd = mulberry32(seed * 3 + variant * 101 + 7);
+
+    const lateral = g.createLinearGradient(0, 0, 0, w);
+    lateral.addColorStop(0, "rgba(40,38,34,0.5)");
+    lateral.addColorStop(0.22, "rgba(40,38,34,0.06)");
+    lateral.addColorStop(0.45, "rgba(255,253,248,0.07)");
+    lateral.addColorStop(0.72, "rgba(40,38,34,0.04)");
+    lateral.addColorStop(1, "rgba(40,38,34,0.55)");
+    g.fillStyle = lateral;
+    g.fillRect(0, 0, d, w);
+
+    for (let i = 0; i < 10; i++) {
+        g.fillStyle = rnd() < 0.55 ? "rgba(30,28,25,0.07)" : "rgba(255,255,255,0.06)";
+        disc(g, d * rnd(), w * (0.1 + rnd() * 0.8), w * (0.04 + rnd() * 0.09));
+        g.fill();
+    }
+    for (let i = 0; i < 6; i++) {
+        const y = w * (0.1 + rnd() * 0.8);
+        const x0 = d * rnd() * 0.6;
+        const len = d * (0.1 + rnd() * 0.3);
+        g.strokeStyle = rnd() < 0.6 ? "rgba(30,28,25,0.22)" : "rgba(255,255,255,0.14)";
+        g.lineWidth = Math.max(0.6, w * 0.016);
+        g.beginPath();
+        g.moveTo(x0, y);
+        g.lineTo(x0 + len, y + (rnd() - 0.5) * w * 0.04);
+        g.stroke();
+    }
+
+    const fold = g.createLinearGradient(d * 0.66, 0, d * 0.9, 0);
+    fold.addColorStop(0, "rgba(35,33,30,0)");
+    fold.addColorStop(1, "rgba(35,33,30,0.38)");
+    g.fillStyle = fold;
+    g.fillRect(d * 0.66, 0, d * 0.24, w);
+    g.fillStyle = "rgba(236,232,224,0.3)";
+    g.fillRect(d * 0.86, 0, Math.max(0.6, d * 0.03), w);
+    g.fillStyle = "rgba(45,43,39,0.6)";
+    g.fillRect(d * 0.9, 0, Math.max(1, d * 0.05), w);
+    g.fillStyle = "rgba(255,255,255,0.12)";
+    g.fillRect(d * 0.96, 0, Math.max(0.6, d * 0.03), w);
+
+    g.globalCompositeOperation = "destination-in";
+    const taper = g.createLinearGradient(0, 0, 0, w);
+    taper.addColorStop(0, "rgba(0,0,0,0)");
+    taper.addColorStop(0.1, "rgba(0,0,0,1)");
+    taper.addColorStop(0.9, "rgba(0,0,0,1)");
+    taper.addColorStop(1, "rgba(0,0,0,0)");
+    g.fillStyle = taper;
+    g.fillRect(0, 0, d, w);
+    g.globalCompositeOperation = "source-over";
+    return c;
+}
+
+// The head, facing right: the cut end of the tube, not a ball. The flanks flare a
+// little to the rim, the corners are chamfered back and the nose is nearly flat, so
+// it reads as planes meeting at angles. Shut, the mouth is a ragged red crescent along
+// the nose. Reared, the same cornered plate faces the eye with the cavern open in it.
+function makeHead(w, open) {
+    const size = w * 2.6;
+    const { c, g } = makeCanvas(size, size);
+    g.translate(size / 2, size / 2);
+    const rnd = mulberry32(seed + (open ? 5 : 3));
+
+    const L = open ? w * 1.3 : w * 1.25;
+    const B = open ? w * 1.4 : w;
+    const F = open ? w * 1.4 : w * 1.14;
+    const hull = open
+        ? [[-0.5, -0.36], [-0.32, -0.5], [0.32, -0.5], [0.5, -0.36], [0.5, 0.36], [0.32, 0.5], [-0.32, 0.5], [-0.5, 0.36]]
+        : [[-0.5, -0.5 * B / F], [0.12, -0.5], [0.4, -0.36], [0.5, -0.12], [0.5, 0.12], [0.4, 0.36], [0.12, 0.5], [-0.5, 0.5 * B / F]];
+    const shape = new Path2D();
+    hull.forEach(([hx, hy], i) => {
+        if (i === 0) {
+            shape.moveTo(hx * L, hy * F);
+        } else {
+            shape.lineTo(hx * L, hy * F);
+        }
+    });
+    shape.closePath();
+
+    const hide = g.createRadialGradient(-L * 0.3, -F * 0.4, L * 0.1, 0, 0, L * 0.9);
+    hide.addColorStop(0, "#d2cfc5");
+    hide.addColorStop(0.55, "#a6a399");
+    hide.addColorStop(1, "#5f5c54");
+    g.fillStyle = hide;
+    g.fill(shape);
+
+    g.save();
+    g.clip(shape);
+
+    // Round it across the width like the body, then cut the planes: the near flank and
+    // the lower chamfer fall into shade, the upper chamfer and the nose catch the light.
+    const lateral = g.createLinearGradient(0, -F / 2, 0, F / 2);
+    lateral.addColorStop(0, "rgba(35,33,30,0.5)");
+    lateral.addColorStop(0.2, "rgba(35,33,30,0.06)");
+    lateral.addColorStop(0.42, "rgba(255,253,248,0.1)");
+    lateral.addColorStop(0.7, "rgba(35,33,30,0.05)");
+    lateral.addColorStop(1, "rgba(35,33,30,0.55)");
+    g.fillStyle = lateral;
+    g.fillRect(-L, -F, L * 2, F * 2);
+
+    if (!open) {
+        g.fillStyle = "rgba(255,255,255,0.13)";
+        g.beginPath();
+        g.moveTo(L * 0.12, -F * 0.5);
+        g.lineTo(L * 0.4, -F * 0.36);
+        g.lineTo(L * 0.5, -F * 0.12);
+        g.lineTo(L * 0.22, -F * 0.16);
+        g.closePath();
+        g.fill();
+        g.fillStyle = "rgba(0,0,0,0.2)";
+        g.beginPath();
+        g.moveTo(L * 0.12, F * 0.5);
+        g.lineTo(L * 0.4, F * 0.36);
+        g.lineTo(L * 0.5, F * 0.12);
+        g.lineTo(L * 0.22, F * 0.16);
+        g.closePath();
+        g.fill();
+        g.fillStyle = "rgba(0,0,0,0.1)";
+        g.fillRect(L * 0.4, -F, L * 0.2, F * 2);
+        g.strokeStyle = "rgba(0,0,0,0.22)";
+        g.lineWidth = Math.max(1, w * 0.02);
+        g.beginPath();
+        g.moveTo(L * 0.12, -F * 0.5);
+        g.lineTo(L * 0.22, -F * 0.16);
+        g.lineTo(L * 0.22, F * 0.16);
+        g.lineTo(L * 0.12, F * 0.5);
+        g.stroke();
+    } else {
+        g.fillStyle = "rgba(255,255,255,0.1)";
+        g.beginPath();
+        g.moveTo(-L * 0.5, -F * 0.36);
+        g.lineTo(-L * 0.32, -F * 0.5);
+        g.lineTo(L * 0.32, -F * 0.5);
+        g.lineTo(L * 0.2, -F * 0.34);
+        g.lineTo(-L * 0.2, -F * 0.34);
+        g.lineTo(-L * 0.36, -F * 0.24);
+        g.closePath();
+        g.fill();
+        g.fillStyle = "rgba(0,0,0,0.2)";
+        g.beginPath();
+        g.moveTo(L * 0.5, F * 0.36);
+        g.lineTo(L * 0.32, F * 0.5);
+        g.lineTo(-L * 0.32, F * 0.5);
+        g.lineTo(-L * 0.2, F * 0.34);
+        g.lineTo(L * 0.2, F * 0.34);
+        g.lineTo(L * 0.36, F * 0.24);
+        g.closePath();
+        g.fill();
+    }
+
+    for (let i = 0; i < 30; i++) {
+        g.fillStyle = rnd() < 0.5 ? "rgba(30,28,25,0.07)" : "rgba(255,255,255,0.06)";
+        disc(g, (rnd() - 0.5) * L, (rnd() - 0.5) * F, w * (0.04 + rnd() * 0.1));
+        g.fill();
+    }
+    if (!open) {
+        // Seams across the top, the body's rings carrying on to the rim.
+        g.strokeStyle = "rgba(40,38,34,0.3)";
+        g.lineWidth = Math.max(1, w * 0.02);
+        for (let k = 0; k < 3; k++) {
+            const x = -L * (0.4 - k * 0.17);
+            g.beginPath();
+            g.moveTo(x, -F);
+            g.quadraticCurveTo(x + L * 0.05, 0, x, F);
+            g.stroke();
+        }
+    }
+    g.restore();
+
+    if (!open) {
+        // The nose as a polyline from one chamfer to the other; the crescent hangs off it.
+        const nose = [[0.12, -0.5], [0.4, -0.36], [0.5, -0.12], [0.5, 0.12], [0.4, 0.36], [0.12, 0.5]]
+            .map(([hx, hy]) => [hx * L, hy * F]);
+        const along = t => {
+            const seg = Math.min(nose.length - 2, Math.floor(t * (nose.length - 1)));
+            const f = t * (nose.length - 1) - seg;
+            return [nose[seg][0] + (nose[seg + 1][0] - nose[seg][0]) * f, nose[seg][1] + (nose[seg + 1][1] - nose[seg][1]) * f];
+        };
+        const cx = L * 0.08;
+        const steps = 16;
+        const mouth = new Path2D();
+        for (let i = 0; i <= steps; i++) {
+            const [x, y] = along(0.08 + 0.84 * i / steps);
+            const px = cx + (x - cx) * 0.95;
+            const py = y * 0.95;
+            if (i === 0) {
+                mouth.moveTo(px, py);
+            } else {
+                mouth.lineTo(px, py);
+            }
+        }
+        for (let i = steps; i >= 0; i--) {
+            const t = i / steps;
+            const [x, y] = along(0.08 + 0.84 * t);
+            const f = 0.52 - 0.14 * (1 - Math.abs(2 * t - 1)) + rnd() * 0.08;
+            mouth.lineTo(cx + (x - cx) * f, y * f);
+        }
+        mouth.closePath();
+        const cavern = g.createRadialGradient(L * 0.35, 0, 0, L * 0.35, 0, L * 0.4);
+        cavern.addColorStop(0, "#7a2a15");
+        cavern.addColorStop(0.45, "#4a170d");
+        cavern.addColorStop(1, "#22090a");
+        g.fillStyle = cavern;
+        g.fill(mouth);
+        g.save();
+        g.clip(mouth);
+        const glow = g.createRadialGradient(L * 0.4, 0, 0, L * 0.4, 0, L * 0.22);
+        glow.addColorStop(0, "rgba(230,115,45,0.42)");
+        glow.addColorStop(1, "rgba(230,115,45,0)");
+        g.fillStyle = glow;
+        g.fillRect(-L, -F, L * 2, F * 2);
+        g.strokeStyle = "rgba(238,232,220,0.75)";
+        g.lineWidth = Math.max(0.6, w * 0.018);
+        for (let k = 0; k < 16; k++) {
+            const [x, y] = along(0.1 + 0.8 * (k + 0.5) / 16);
+            const dx = cx - x;
+            const dy = -y;
+            const len = Math.hypot(dx, dy) || 1;
+            const reach = w * (0.08 + rnd() * 0.07);
+            g.beginPath();
+            g.moveTo(cx + (x - cx) * 0.95, y * 0.95);
+            g.lineTo(cx + (x - cx) * 0.95 + dx / len * reach, y * 0.95 + dy / len * reach);
+            g.stroke();
+        }
+        g.restore();
+        g.strokeStyle = "rgba(220,216,206,0.8)";
+        g.lineWidth = Math.max(1, w * 0.03);
+        g.beginPath();
+        for (let i = 0; i <= steps; i++) {
+            const [x, y] = along(0.08 + 0.84 * i / steps);
+            if (i === 0) {
+                g.moveTo(cx + (x - cx) * 0.95, y * 0.95);
+            } else {
+                g.lineTo(cx + (x - cx) * 0.95, y * 0.95);
+            }
+        }
+        g.stroke();
+    } else {
+        const cx = L * 0.02;
+        const mrx = L * 0.38;
+        const mry = F * 0.36;
+        const steps = 30;
+        const mouth = new Path2D();
+        for (let i = 0; i < steps; i++) {
+            const a = i / steps * TAU;
+            const j = 0.94 + rnd() * 0.1;
+            const x = cx + Math.cos(a) * mrx * j;
+            const y = Math.sin(a) * mry * j;
+            if (i === 0) {
+                mouth.moveTo(x, y);
+            } else {
+                mouth.lineTo(x, y);
+            }
+        }
+        mouth.closePath();
+        const cavern = g.createRadialGradient(cx, 0, 0, cx, 0, mrx);
+        cavern.addColorStop(0, "#3a0f08");
+        cavern.addColorStop(0.5, "#8a2c14");
+        cavern.addColorStop(0.85, "#4a1a10");
+        cavern.addColorStop(1, "#22090a");
+        g.fillStyle = cavern;
+        g.fill(mouth);
+        g.save();
+        g.clip(mouth);
+        // The chemical furnace behind the teeth: a warm ring of breath.
+        const glow = g.createRadialGradient(cx, 0, mrx * 0.25, cx, 0, mrx * 0.6);
+        glow.addColorStop(0, "rgba(240,130,50,0)");
+        glow.addColorStop(0.5, "rgba(240,130,50,0.38)");
+        glow.addColorStop(1, "rgba(240,130,50,0)");
+        g.fillStyle = glow;
+        g.fillRect(-L, -F, L * 2, F * 2);
+        g.strokeStyle = "rgba(0,0,0,0.28)";
+        g.lineWidth = Math.max(1, w * 0.02);
+        for (let k = 0; k < 26; k++) {
+            const a = k / 26 * TAU;
+            g.beginPath();
+            g.moveTo(cx + Math.cos(a) * mrx * 0.98, Math.sin(a) * mry * 0.98);
+            g.lineTo(cx + Math.cos(a) * mrx * 0.55, Math.sin(a) * mry * 0.55);
+            g.stroke();
+        }
+        teeth(g, rnd, cx, mrx * 0.96, mry * 0.96, w * 0.2, 26, "rgba(236,230,218,0.85)");
+        teeth(g, rnd, cx, mrx * 0.62, mry * 0.62, w * 0.12, 18, "rgba(226,218,204,0.7)");
+        g.restore();
+        g.strokeStyle = "rgba(222,218,208,0.85)";
+        g.lineWidth = Math.max(1, w * 0.035);
+        g.stroke(mouth);
+    }
+
+    // The edges: a dark line all round, and light along the top and the rim.
+    g.strokeStyle = "rgba(30,28,25,0.45)";
+    g.lineWidth = Math.max(1, w * 0.035);
+    g.stroke(shape);
+    g.strokeStyle = "rgba(255,255,255,0.22)";
+    g.lineWidth = Math.max(1, w * 0.025);
+    g.beginPath();
+    g.moveTo(hull[0][0] * L, hull[0][1] * F);
+    for (let i = 1; i <= 3; i++) {
+        g.lineTo(hull[i][0] * L, hull[i][1] * F);
+    }
+    g.stroke();
+    return { c: c, size: size };
+}
+
+// Crystalline teeth around an oval rim: milky wedges pointing into the throat, each with
+// a translucent core, and a third of them throwing a glint from the tip.
+function teeth(g, rnd, cx, mrx, mry, len, count, color) {
+    for (let k = 0; k < count; k++) {
+        const a = (k / count) * TAU + rnd() * 0.1;
+        const bx = cx + Math.cos(a) * mrx;
+        const by = Math.sin(a) * mry;
+        const reach = len * (0.8 + rnd() * 0.4);
+        const tx = bx - Math.cos(a) * reach;
+        const ty = by - Math.sin(a) * reach;
+        const hw = len * 0.2;
+        const px = -Math.sin(a) * hw;
+        const py = Math.cos(a) * hw;
+        g.fillStyle = color;
+        g.beginPath();
+        g.moveTo(bx + px, by + py);
+        g.lineTo(tx, ty);
+        g.lineTo(bx - px, by - py);
+        g.closePath();
+        g.fill();
+        g.strokeStyle = "rgba(255,255,255,0.3)";
+        g.lineWidth = Math.max(0.5, len * 0.07);
+        g.beginPath();
+        g.moveTo(bx, by);
+        g.lineTo(tx, ty);
+        g.stroke();
+        if (rnd() < 0.3) {
+            g.fillStyle = "rgba(255,255,255,0.9)";
+            disc(g, tx, ty, Math.max(0.5, len * 0.07));
+            g.fill();
+        }
+    }
+}
+
+function disc(g, x, y, r) {
+    g.beginPath();
+    g.arc(x, y, r, 0, TAU);
+}
+
 // ---- the round -------------------------------------------------------------------
 
 function begin() {
@@ -529,6 +1019,8 @@ function begin() {
     rings = [];
     grains = [];
     fell = null;
+    strike = 0;
+    slamAt = -1e9;
     tally = 0;
     setCount(hud.tally, 0);
 
@@ -603,8 +1095,9 @@ function tick() {
 
 function swallow() {
     const c = cellCenter(food);
-    rings.push({ x: c.x, y: c.y, at: clock, span: 520, size: cell * 1.3, color: "244,192,124" });
-    puff(c.x, c.y, 26, cell * 0.11, SAND);
+    rings.push({ x: c.x, y: c.y, at: clock, span: 560, size: cell * 1.5, color: "244,192,124" });
+    puff(c.x, c.y, 42, cell * 0.14, SAND);
+    slamAt = clock;
     food = null;
     tally++;
     setCount(hud.tally, tally);
@@ -623,6 +1116,7 @@ function die(cause) {
     thopters = [];
     food = null;
     queue = [];
+    strike = 0;
     saveBest();
 }
 
@@ -825,6 +1319,7 @@ function frame(now) {
         rupture();
     }
 
+    updateStrike(dt);
     ageGrains(dt);
     render(now);
 }
@@ -857,7 +1352,7 @@ function render(now) {
 
 // ---- the worm --------------------------------------------------------------------
 
-// The ridge as one line through the cells, head and tail eased by how far the tick has
+// The body as one line through the cells, head and tail eased by how far the tick has
 // come. Between ticks the body holds still: the head mounds forward, the tail sinks.
 function wormPoints(alpha) {
     const n = snake.length;
@@ -879,84 +1374,259 @@ function lerpCell(a, b, f) {
     return { x: ca.x + (cb.x - ca.x) * f, y: ca.y + (cb.y - ca.y) * f };
 }
 
-function curveThrough(pts, dx, dy) {
-    ctx.beginPath();
-    if (pts.length === 1) {
-        ctx.moveTo(pts[0].x + dx, pts[0].y + dy);
-        return;
+function headPoint() {
+    return lerpCell(prev[0] || snake[0], snake[0], clamp(acc / tickMs, 0, 1));
+}
+
+// The smoothed body curve, flattened to points so the outline and the seams can be
+// placed by distance along it. Head first, so distances count back from the mouth.
+const flat = [];
+function flattenCurve(pts) {
+    flat.length = 0;
+    if (!pts.length) {
+        return flat;
     }
-    ctx.moveTo(pts[0].x + dx, pts[0].y + dy);
+    let px = pts[0].x;
+    let py = pts[0].y;
+    flat.push(px, py);
     for (let i = 1; i < pts.length - 1; i++) {
-        const mx = (pts[i].x + pts[i + 1].x) / 2 + dx;
-        const my = (pts[i].y + pts[i + 1].y) / 2 + dy;
-        ctx.quadraticCurveTo(pts[i].x + dx, pts[i].y + dy, mx, my);
+        const cx = pts[i].x;
+        const cy = pts[i].y;
+        const ex = (pts[i].x + pts[i + 1].x) / 2;
+        const ey = (pts[i].y + pts[i + 1].y) / 2;
+        for (let k = 1; k <= 5; k++) {
+            const t = k / 5;
+            const u = 1 - t;
+            flat.push(u * u * px + 2 * u * t * cx + t * t * ex, u * u * py + 2 * u * t * cy + t * t * ey);
+        }
+        px = ex;
+        py = ey;
     }
-    const end = pts[pts.length - 1];
-    ctx.lineTo(end.x + dx, end.y + dy);
+    const last = pts[pts.length - 1];
+    flat.push(last.x, last.y);
+    return flat;
+}
+
+// The body's outline: the flattened curve walked at a fine step, each stop keeping its
+// position, its normal, its distance from the mouth and the body's width there. The
+// arrays are reused frame to frame so nothing piles up for the GC.
+const outline = { n: 0, L: 0, x: [], y: [], nx: [], ny: [], s: [], w: [] };
+
+function buildOutline() {
+    let L = 0;
+    for (let i = 2; i < flat.length; i += 2) {
+        L += Math.hypot(flat[i] - flat[i - 2], flat[i + 1] - flat[i - 1]);
+    }
+    const step = Math.max(2, cell * 0.15);
+    let n = 0;
+    let next = 0;
+    let dist = 0;
+    let lnx = 0;
+    let lny = 1;
+    for (let i = 2; i < flat.length; i += 2) {
+        const x0 = flat[i - 2];
+        const y0 = flat[i - 1];
+        const dx = flat[i] - x0;
+        const dy = flat[i + 1] - y0;
+        const len = Math.hypot(dx, dy);
+        if (len === 0) {
+            continue;
+        }
+        lnx = -dy / len;
+        lny = dx / len;
+        while (next <= dist + len) {
+            const f = (next - dist) / len;
+            outline.x[n] = x0 + dx * f;
+            outline.y[n] = y0 + dy * f;
+            outline.nx[n] = lnx;
+            outline.ny[n] = lny;
+            outline.s[n] = next;
+            outline.w[n] = widthAt(next, L);
+            n++;
+            next += step;
+        }
+        dist += len;
+    }
+    // The tip itself, so the tail always reaches the end of its cell.
+    outline.x[n] = flat[flat.length - 2];
+    outline.y[n] = flat[flat.length - 1];
+    outline.nx[n] = lnx;
+    outline.ny[n] = lny;
+    outline.s[n] = L;
+    outline.w[n] = widthAt(L, L);
+    n++;
+    outline.n = n;
+    outline.L = L;
+}
+
+// The width along the body: near full behind the head, thinning a little down the
+// length, then drawing in over the last third to a blunt tail. A faint swell every
+// ring keeps it a hose rather than a pipe.
+function widthAt(s, L) {
+    const W = sprites.w;
+    let w = W * (1 - 0.1 * s / Math.max(L, 1));
+    const tailStart = Math.max(0, L - Math.max(cell * 1.6, L * 0.3));
+    if (s > tailStart && L > tailStart) {
+        const f = (s - tailStart) / (L - tailStart);
+        w *= 1 - 0.72 * Math.pow(f, 1.4);
+    }
+    w *= 1 + 0.04 * Math.sin(s / (cell * RING) * Math.PI);
+    return Math.max(w, cell * 0.12);
+}
+
+// One closed path around the outline, the width scaled and the whole thing shifted.
+// The body is the plain one; the bands of shade, light and sand are the rest.
+function bandPath(dx, dy, scale) {
+    const p = new Path2D();
+    const n = outline.n;
+    for (let i = 0; i < n; i++) {
+        const hw = outline.w[i] * scale / 2;
+        const x = outline.x[i] + dx + outline.nx[i] * hw;
+        const y = outline.y[i] + dy + outline.ny[i] * hw;
+        if (i === 0) {
+            p.moveTo(x, y);
+        } else {
+            p.lineTo(x, y);
+        }
+    }
+    for (let i = n - 1; i >= 0; i--) {
+        const hw = outline.w[i] * scale / 2;
+        p.lineTo(outline.x[i] + dx - outline.nx[i] * hw, outline.y[i] + dy - outline.ny[i] * hw);
+    }
+    p.closePath();
+    return p;
+}
+
+// The body. Sand banked along the flanks, a cast shadow, the pale hide, then a shaded
+// flank and a lit one clipped inside it to round it, and the seam tiles stamped along
+// it, each turned to the body and scaled to the width where it sits.
+function drawTube(pts) {
+    const W = sprites.w;
+    flattenCurve(pts);
+    buildOutline();
+
+    ctx.fillStyle = "rgba(240,212,166,0.12)";
+    ctx.fill(bandPath(-cell * 0.03, -cell * 0.03, 1.7));
+    ctx.fillStyle = "rgba(240,212,166,0.14)";
+    ctx.fill(bandPath(-cell * 0.02, -cell * 0.02, 1.4));
+    ctx.fillStyle = "rgba(110,70,30,0.1)";
+    ctx.fill(bandPath(cell * 0.08, cell * 0.12, 1.55));
+    ctx.fillStyle = "rgba(45,30,15,0.45)";
+    ctx.fill(bandPath(cell * 0.09, cell * 0.13, 1.06));
+
+    const body = bandPath(0, 0, 1);
+    ctx.fillStyle = "#aeaba2";
+    ctx.fill(body);
+
+    ctx.save();
+    ctx.clip(body);
+    ctx.fillStyle = "rgba(60,58,52,0.5)";
+    ctx.fill(bandPath(W * 0.2, W * 0.24, 0.7));
+    ctx.fillStyle = "rgba(242,240,234,0.42)";
+    ctx.fill(bandPath(-W * 0.16, -W * 0.19, 0.62));
+    ctx.fillStyle = "rgba(255,255,255,0.22)";
+    ctx.fill(bandPath(-W * 0.09, -W * 0.11, 0.2));
+
+    const pitch = sprites.pitch;
+    const step = Math.max(2, cell * 0.15);
+    let k = 0;
+    for (let s = pitch * 0.9; s < outline.L; s += pitch) {
+        const i = Math.min(outline.n - 1, Math.round(s / step));
+        const tile = sprites.rings[k++ % 3];
+        const w = outline.w[i];
+        // The tile's own x axis points at the head, so the normal turns it the other way.
+        ctx.setTransform(-dpr * outline.ny[i], dpr * outline.nx[i], -dpr * outline.nx[i], -dpr * outline.ny[i],
+            dpr * outline.x[i], dpr * outline.y[i]);
+        ctx.drawImage(tile, -pitch / 2, -w / 2, pitch, w);
+    }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.restore();
+}
+
+function headAngle() {
+    if (flat.length >= 4) {
+        return Math.atan2(flat[1] - flat[3], flat[0] - flat[2]);
+    }
+    return Math.atan2(dir.y, dir.x);
 }
 
 function drawWorm(alpha) {
-    const pts = wormPoints(alpha);
-    const w = cell * 0.62;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-
-    ctx.strokeStyle = "rgba(60,34,12,0.45)";
-    ctx.lineWidth = w + cell * 0.16;
-    curveThrough(pts, cell * 0.1, cell * 0.13);
-    ctx.stroke();
-
-    ctx.strokeStyle = "#dcae70";
-    ctx.lineWidth = w;
-    curveThrough(pts, 0, 0);
-    ctx.stroke();
-
-    ctx.strokeStyle = "rgba(255,232,190,0.55)";
-    ctx.lineWidth = w * 0.26;
-    curveThrough(pts, -cell * 0.09, -cell * 0.1);
-    ctx.stroke();
-
-    // Ribs ride forward one cell per tick, which is what makes the ridge look like it
-    // is moving rather than growing at one end and shrinking at the other.
-    ctx.strokeStyle = "rgba(90,55,25,0.38)";
-    ctx.lineWidth = Math.max(1, cell * 0.05);
-    ctx.beginPath();
-    for (let i = 2; i < snake.length; i++) {
-        const p = lerpCell(snake[i], snake[i - 1], alpha);
-        const a = cellCenter(snake[i - 1]);
-        const b = cellCenter(snake[i]);
-        const dx = a.x - b.x;
-        const dy = a.y - b.y;
-        const len = Math.hypot(dx, dy) || 1;
-        const px = -dy / len * w * 0.36;
-        const py = dx / len * w * 0.36;
-        ctx.moveTo(p.x - px, p.y - py);
-        ctx.lineTo(p.x + px, p.y + py);
+    if (!sprites) {
+        return;
     }
-    ctx.stroke();
+    const pts = wormPoints(alpha);
+    drawTube(pts);
 
-    drawHead(pts[0]);
+    const since = clock - slamAt;
+    const slam = since < 160 ? 0.22 * (1 - since / 160) : 0;
+    drawHead(pts[0], headAngle(), 1 + 0.5 * strike - slam, strike);
 }
 
-function drawHead(p) {
-    const r = cell * 0.42;
-    ctx.fillStyle = "rgba(60,34,12,0.45)";
+// The head stamped over the front of the body. Reared, it rises toward the eye: the
+// shadow slides out from under it and the open mouth fades in over the shut dome.
+function drawHead(p, angle, scale, open) {
+    const W = sprites.w;
+    ctx.save();
+    ctx.translate(p.x + cell * 0.1 + open * cell * 0.4, p.y + cell * 0.13 + open * cell * 0.45);
+    ctx.rotate(angle);
+    ctx.fillStyle = "rgba(45,30,15,0.42)";
     ctx.beginPath();
-    ctx.arc(p.x + cell * 0.1, p.y + cell * 0.13, r + cell * 0.06, 0, TAU);
+    ctx.ellipse(0, 0, W * 0.7 * scale, W * 0.62 * scale, 0, 0, TAU);
     ctx.fill();
-    ctx.fillStyle = "#e2b579";
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, r, 0, TAU);
-    ctx.fill();
-    ctx.fillStyle = "rgba(255,236,200,0.55)";
-    ctx.beginPath();
-    ctx.arc(p.x - cell * 0.1, p.y - cell * 0.11, r * 0.45, 0, TAU);
-    ctx.fill();
-    ctx.strokeStyle = "rgba(90,55,25,0.35)";
-    ctx.lineWidth = Math.max(1, cell * 0.04);
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, r * 0.72, 0, TAU);
-    ctx.stroke();
+    ctx.restore();
+
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(angle);
+    ctx.scale(scale, scale);
+    const shut = sprites.shut;
+    const opened = sprites.open;
+    if (open < 1) {
+        ctx.globalAlpha = 1 - open;
+        ctx.drawImage(shut.c, -shut.size / 2, -shut.size / 2, shut.size, shut.size);
+    }
+    if (open > 0) {
+        ctx.globalAlpha = open;
+        ctx.drawImage(opened.c, -opened.size / 2, -opened.size / 2, opened.size, opened.size);
+    }
+    ctx.globalAlpha = 1;
+    ctx.restore();
+}
+
+// A soldier straight ahead draws the strike: the head rears over the next two cells
+// and comes down as it takes him. Turning away lets it sink back.
+function foodAhead() {
+    if (!food || !snake.length) {
+        return 0;
+    }
+    const h = snake[0];
+    for (let k = 1; k <= 2; k++) {
+        if (food.x === h.x + dir.x * k && food.y === h.y + dir.y * k) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+function updateStrike(dt) {
+    // A pause holds the pose it froze in; only the sand stops pouring.
+    const target = state === "hunting" || state === "paused" ? foodAhead() : 0;
+    const rate = target > strike ? 0.16 : 0.09;
+    strike += (target - strike) * Math.min(1, rate * dt / 16.7);
+    if (strike < 0.002) {
+        strike = 0;
+    }
+    // Sand pouring off the reared head.
+    if (strike > 0.35 && state === "hunting" && sprites) {
+        const p = headPoint();
+        const radius = sprites.w * 0.6 * (1 + 0.55 * strike);
+        for (let i = 0; i < 2; i++) {
+            const a = Math.random() * TAU;
+            addGrain(p.x + Math.cos(a) * radius, p.y + Math.sin(a) * radius,
+                Math.cos(a) * cell * 0.05, Math.sin(a) * cell * 0.05 + cell * 0.03,
+                300 + Math.random() * 250, SAND[(Math.random() * SAND.length) | 0]);
+        }
+    }
 }
 
 // Grains flung off the head every frame, the wake of a ridge pushing through sand.
@@ -964,7 +1634,7 @@ function spray() {
     if (!snake.length || acc < 0) {
         return;
     }
-    const p = lerpCell(prev[0] || snake[0], snake[0], acc / tickMs);
+    const p = headPoint();
     for (let i = 0; i < 2; i++) {
         const side = i === 0 ? 1 : -1;
         const vx = -dir.y * side * (0.4 + Math.random() * 0.9) + dir.x * 0.3;
@@ -992,21 +1662,16 @@ function rupture() {
 }
 
 function drawRupture() {
+    if (!sprites) {
+        return;
+    }
     const n = snake.length;
     if (fell.sunk < n) {
-        const remaining = snake.slice(fell.sunk);
-        const pts = remaining.map(cellCenter);
-        const w = cell * 0.62;
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-        ctx.strokeStyle = "rgba(60,34,12,0.45)";
-        ctx.lineWidth = w + cell * 0.16;
-        curveThrough(pts, cell * 0.1, cell * 0.13);
-        ctx.stroke();
-        ctx.strokeStyle = "#dcae70";
-        ctx.lineWidth = w;
-        curveThrough(pts, 0, 0);
-        ctx.stroke();
+        const pts = snake.slice(fell.sunk).map(cellCenter);
+        drawTube(pts);
+        if (fell.sunk === 0) {
+            drawHead(pts[0], headAngle(), 1, 0);
+        }
     }
     for (let i = 0; i < fell.sunk; i++) {
         const c = cellCenter(snake[i]);
@@ -1022,6 +1687,8 @@ function drawRupture() {
 
 // ---- soldiers and thopters -------------------------------------------------------
 
+// A Sardaukar from above: helmet, shoulders in gray plate, boots, and the drawn blade
+// catching the light. He is small against the worm, which is the point.
 function drawSoldier(now) {
     const c = cellCenter(food);
     const s = cell;
@@ -1030,41 +1697,54 @@ function drawSoldier(now) {
     ctx.translate(c.x, c.y);
     ctx.scale(land, land);
 
-    ctx.fillStyle = "rgba(20,10,4,0.35)";
+    ctx.fillStyle = "rgba(25,12,4,0.38)";
     ctx.beginPath();
-    ctx.ellipse(s * 0.06, s * 0.3, s * 0.2, s * 0.07, 0, 0, TAU);
+    ctx.ellipse(s * 0.05, s * 0.06, s * 0.21, s * 0.13, 0, 0, TAU);
     ctx.fill();
 
-    ctx.strokeStyle = "#5c5a55";
-    ctx.lineWidth = s * 0.07;
-    ctx.lineCap = "round";
+    ctx.fillStyle = "#26262a";
     ctx.beginPath();
-    ctx.moveTo(-s * 0.07, s * 0.1);
-    ctx.lineTo(-s * 0.1, s * 0.3);
-    ctx.moveTo(s * 0.07, s * 0.1);
-    ctx.lineTo(s * 0.1, s * 0.3);
+    ctx.ellipse(-s * 0.06, s * 0.1, s * 0.04, s * 0.03, 0, 0, TAU);
+    ctx.ellipse(s * 0.06, s * 0.1, s * 0.04, s * 0.03, 0, 0, TAU);
+    ctx.fill();
+
+    ctx.fillStyle = "#3a3a3e";
+    ctx.beginPath();
+    ctx.ellipse(0, 0, s * 0.19, s * 0.12, 0, 0, TAU);
+    ctx.fill();
+    ctx.fillStyle = "#5c5c62";
+    ctx.beginPath();
+    ctx.ellipse(-s * 0.15, 0, s * 0.06, s * 0.05, 0, 0, TAU);
+    ctx.ellipse(s * 0.15, 0, s * 0.06, s * 0.05, 0, 0, TAU);
+    ctx.fill();
+    ctx.strokeStyle = "rgba(255,255,255,0.09)";
+    ctx.lineWidth = Math.max(1, s * 0.02);
+    ctx.beginPath();
+    ctx.moveTo(-s * 0.12, -s * 0.03);
+    ctx.lineTo(s * 0.12, -s * 0.03);
     ctx.stroke();
 
-    ctx.fillStyle = "#8b8a84";
-    ctx.fillRect(-s * 0.13, -s * 0.16, s * 0.26, s * 0.3);
-    ctx.strokeStyle = "#3d3c39";
-    ctx.lineWidth = 1;
-    ctx.strokeRect(-s * 0.13, -s * 0.16, s * 0.26, s * 0.3);
-    ctx.fillStyle = "#65645f";
-    ctx.fillRect(-s * 0.15, -s * 0.16, s * 0.3, s * 0.06);
-
-    ctx.fillStyle = "#47464a";
+    ctx.fillStyle = "#4e4e54";
     ctx.beginPath();
-    ctx.arc(0, -s * 0.25, s * 0.09, 0, TAU);
+    ctx.arc(0, -s * 0.02, s * 0.085, 0, TAU);
+    ctx.fill();
+    ctx.fillStyle = "rgba(255,255,255,0.18)";
+    ctx.beginPath();
+    ctx.arc(-s * 0.025, -s * 0.05, s * 0.03, 0, TAU);
     ctx.fill();
 
     const glint = 0.5 + 0.5 * Math.sin(now * 0.006 + food.x);
-    ctx.strokeStyle = "rgba(240,232,214," + (0.45 + 0.55 * glint) + ")";
-    ctx.lineWidth = Math.max(1, s * 0.035);
+    ctx.strokeStyle = "rgba(236,230,214," + (0.5 + 0.5 * glint) + ")";
+    ctx.lineWidth = Math.max(1, s * 0.03);
+    ctx.lineCap = "round";
     ctx.beginPath();
-    ctx.moveTo(s * 0.14, s * 0.02);
-    ctx.lineTo(s * 0.3, -s * 0.3);
+    ctx.moveTo(s * 0.14, s * 0.03);
+    ctx.lineTo(s * 0.34, -s * 0.2);
     ctx.stroke();
+    ctx.fillStyle = "rgba(255,255,255," + (0.9 * glint) + ")";
+    ctx.beginPath();
+    ctx.arc(s * 0.3, -s * 0.16, Math.max(1, s * 0.02), 0, TAU);
+    ctx.fill();
     ctx.restore();
 }
 
@@ -1081,6 +1761,8 @@ function drawThopterShadow(th) {
     ctx.restore();
 }
 
+// The ornithopter: four beating wings with a translucent membrane behind each leading
+// edge, a tapered hull, a tail fin, and a glint off the canopy.
 function drawThopter(th, now) {
     const p = th.pose;
     const s = cell * (0.95 - p.alt * 0.25);
@@ -1090,33 +1772,59 @@ function drawThopter(th, now) {
     ctx.rotate(p.angle);
     ctx.lineCap = "round";
 
-    // Four wings, each drawn twice: where it is and where it just was, so the beat
-    // blurs the way a real one does at this distance.
+    // Each wing drawn twice, where it is and where it just was, so the beat blurs.
     for (const side of [-1, 1]) {
         for (const pair of [0, 1]) {
             for (const ghost of [0, 1]) {
                 const flap = (ghost ? -beat : beat) * 0.16 * side;
                 const a = side * (2.45 - pair * 0.5) + flap;
-                ctx.strokeStyle = ghost ? "rgba(70,56,42,0.25)" : "rgba(70,56,42,0.7)";
-                ctx.lineWidth = Math.max(1, s * 0.06);
+                const rootX = -s * 0.05 + pair * s * 0.06;
+                const len = s * 0.55;
+                ctx.save();
+                ctx.translate(rootX, 0);
+                ctx.rotate(a);
+                ctx.globalAlpha = ghost ? 0.1 : 0.26;
+                ctx.fillStyle = "#c9b898";
                 ctx.beginPath();
-                ctx.moveTo(-s * 0.05 + pair * s * 0.06, 0);
-                ctx.lineTo(Math.cos(a) * s * 0.55 - s * 0.05, Math.sin(a) * s * 0.55);
+                ctx.ellipse(len / 2, 0, len / 2, s * 0.05, 0, 0, TAU);
+                ctx.fill();
+                ctx.globalAlpha = ghost ? 0.25 : 0.7;
+                ctx.strokeStyle = "#463a2e";
+                ctx.lineWidth = Math.max(1, s * 0.05);
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(len, 0);
                 ctx.stroke();
+                ctx.restore();
             }
         }
     }
+    ctx.globalAlpha = 1;
 
-    ctx.fillStyle = "#2c231b";
+    ctx.fillStyle = "#2a221b";
     ctx.beginPath();
-    ctx.ellipse(0, 0, s * 0.24, s * 0.09, 0, 0, TAU);
+    ctx.moveTo(s * 0.32, 0);
+    ctx.quadraticCurveTo(s * 0.1, -s * 0.11, -s * 0.26, -s * 0.06);
+    ctx.lineTo(-s * 0.32, 0);
+    ctx.lineTo(-s * 0.26, s * 0.06);
+    ctx.quadraticCurveTo(s * 0.1, s * 0.11, s * 0.32, 0);
+    ctx.closePath();
     ctx.fill();
     ctx.strokeStyle = "rgba(244,192,124,0.3)";
     ctx.lineWidth = 1;
     ctx.stroke();
-    ctx.fillStyle = "rgba(244,192,124,0.5)";
+
+    ctx.fillStyle = "#3a2f26";
     ctx.beginPath();
-    ctx.arc(s * 0.13, 0, s * 0.035, 0, TAU);
+    ctx.moveTo(-s * 0.2, 0);
+    ctx.lineTo(-s * 0.34, -s * 0.12);
+    ctx.lineTo(-s * 0.3, 0);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = "rgba(244,222,180,0.55)";
+    ctx.beginPath();
+    ctx.ellipse(s * 0.12, -s * 0.01, s * 0.06, s * 0.035, 0, 0, TAU);
     ctx.fill();
     ctx.restore();
 }
@@ -1124,7 +1832,7 @@ function drawThopter(th, now) {
 // ---- grains and rings ------------------------------------------------------------
 
 function addGrain(x, y, vx, vy, life, color) {
-    if (grains.length >= 260) {
+    if (grains.length >= 320) {
         grains.shift();
     }
     grains.push({ x, y, vx, vy, life, age: 0, color, size: 0.8 + Math.random() * 1.4 });
