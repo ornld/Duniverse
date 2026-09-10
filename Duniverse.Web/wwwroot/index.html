@@ -70,6 +70,8 @@
         })();
     </script>
     <link rel="preload" id="webassembly" />
+    <!-- The sheet keeps its plain name: the SDK only fingerprints scripts. The prerenderer
+         gives its URL a version from its bytes at deploy instead, so the same cache rule holds. -->
     <link rel="stylesheet" href="css/app.css" />
     <!-- If you add any scoped CSS files, uncomment the following to load them
     <link href="Duniverse.Web.styles.css" rel="stylesheet" /> -->
@@ -101,10 +103,13 @@
         <a href="." class="reload">Reload</a>
         <span class="dismiss">🗙</span>
     </div>
-    <script src="js/nav-sand.js"></script>
-    <script src="js/universe-pan.js"></script>
-    <script src="js/deep-link.js"></script>
-    <script src="js/chart-reveal.js"></script>
+    <!-- The placeholders become a content hash at publish, so a changed script gets a new
+         name and no browser keeps serving the old one from its cache. The .site suffix is
+         what the project file's fingerprint rule keys on. -->
+    <script src="js/nav-sand#[.{fingerprint}].site.js"></script>
+    <script src="js/universe-pan#[.{fingerprint}].site.js"></script>
+    <script src="js/deep-link#[.{fingerprint}].site.js"></script>
+    <script src="js/chart-reveal#[.{fingerprint}].site.js"></script>
     <script src="_framework/blazor.webassembly#[.{fingerprint}].js" autostart="false"></script>
     <!-- GitHub Pages won't compress the framework: 7 MB cold, cached ten minutes. My build
          writes .br copies a third that size; decode.min.js, Google's MIT-licensed decoder,

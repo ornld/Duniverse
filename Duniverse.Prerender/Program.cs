@@ -1,4 +1,5 @@
 using System.Net;
+using System.Security.Cryptography;
 using System.Text;
 using Duniverse.Data;
 using Duniverse.Models;
@@ -27,6 +28,25 @@ if (!File.Exists(templatePath))
 // The published copy, not the source one: publish rewrites the framework script's filename to
 // its fingerprinted form, and a shell pointing at the unfingerprinted name would never boot.
 var template = File.ReadAllText(templatePath);
+
+// The sheet keeps a plain name, so a version rides on its URL instead: a hash of its bytes.
+// A changed sheet fetches fresh on the next visit and an unchanged one stays cached. The
+// 404 shell is a copy taken before this runs, so it gets the same treatment.
+var sheetPath = Path.Combine(root, "css", "app.css");
+if (File.Exists(sheetPath))
+{
+    var version = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(sheetPath)))[..10].ToLowerInvariant();
+    const string SheetLink = "href=\"css/app.css\"";
+    var versionedLink = $"href=\"css/app.css?v={version}\"";
+    template = template.Replace(SheetLink, versionedLink);
+
+    var fallbackPath = Path.Combine(root, "404.html");
+    if (File.Exists(fallbackPath))
+    {
+        File.WriteAllText(fallbackPath, File.ReadAllText(fallbackPath).Replace(SheetLink, versionedLink));
+    }
+}
+
 var registry = RegistryFactory.CreateSeeded();
 
 // The site's own default posture, and therefore the face it shows the public: protection on at

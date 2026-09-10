@@ -262,7 +262,7 @@ window.duneNav = {
             // Matched to the cap's CSS slam: 0.7 s a beat, the strike just before the middle.
             const slams = [320, 1020, 1720];
             const crossAt = 1900;
-            const crossSpan = 1400;
+            let crossSpan = 1400;
             const start = performance.now();
             let slamsDone = 0;
             const rings = [];
@@ -288,13 +288,16 @@ window.duneNav = {
             // The worm is the game's animal, drawn small: a pale tapered tube with dark seams
             // riding a wave along the crest, and the cut, angled head with the red crescent.
             const W = 30 * s * dpr;
-            const LEN = W * 7;
+            const LEN = W * 28;
+            // The crossing runs until the tail has cleared the far edge, at the same pace
+            // whatever the body's length, so a long worm simply takes longer to pass.
+            crossSpan = Math.round(1400 * (1.2 * w + LEN) / (1.3 * w));
             function wave(x) {
                 return base.y + Math.sin(x / (w * 0.11) + phase) * 6 * s * dpr;
             }
 
             function drawWorm(headX) {
-                const n = 26;
+                const n = 104;
                 const xs = [];
                 const ys = [];
                 const nx = [];
@@ -506,7 +509,7 @@ window.duneNav = {
 
                 if (t >= crossAt) {
                     const p = Math.min(1, (t - crossAt) / crossSpan);
-                    const headX = (-0.15 + 1.3 * p) * w;
+                    const headX = -0.15 * w + p * (1.2 * w + LEN);
                     kick(headX, wave(headX), 3, 0.5);
                     drawWorm(headX);
                 }

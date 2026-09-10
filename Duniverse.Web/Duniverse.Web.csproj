@@ -19,4 +19,14 @@
     <ProjectReference Include="../Duniverse.Core/Duniverse.Core.csproj" />
   </ItemGroup>
 
+  <!-- The four page scripts carry a .site suffix, and this rule puts the content hash in
+       their published names, so a fresh deploy never meets a browser's stale copy. The SDK
+       takes everything after the star as the extension and puts the hash in front of it,
+       which is why the suffix has to be a real one, and it only rewrites scripts, so the
+       sheet is versioned by the prerenderer instead. Files loaded by plain name from
+       scripts (the worker, the decoder, the game) stay unfingerprinted. -->
+  <ItemGroup>
+    <StaticWebAssetFingerprintPattern Include="SiteScripts" Pattern="*.site.js" Expression="#[.{fingerprint}]!" />
+  </ItemGroup>
+
 </Project>

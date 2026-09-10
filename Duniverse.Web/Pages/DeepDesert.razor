@@ -94,8 +94,12 @@
     // The game only downloads when someone stands here. A script tag in index.html
     // would ship it to every reader of every record.
 
-    // Editing the module means a rebuild: the import map pins its fingerprint and
-    // hash, and a stale hash makes the browser refuse the file outright.
+    // The build's own id rides on the URL, so every publish fetches the module fresh and
+    // no cache serves last week's worm. The query also keeps the import map out of it,
+    // and with it the stale-hash refusal that used to need a rebuild after every edit.
+    private static readonly string ModuleUrl =
+        "./js/deep-desert.js?v=" + typeof(DeepDesert).Assembly.ManifestModule.ModuleVersionId.ToString("N");
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender)
@@ -105,7 +109,7 @@
 
         try
         {
-            var loaded = await JS.InvokeAsync<IJSObjectReference>("import", "./js/deep-desert.js");
+            var loaded = await JS.InvokeAsync<IJSObjectReference>("import", ModuleUrl);
             if (gone)
             {
                 // They left during the download. Nothing to start, only something to drop.

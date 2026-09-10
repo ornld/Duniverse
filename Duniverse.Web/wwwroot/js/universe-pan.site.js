@@ -1,5 +1,5 @@
 // The camera for the whole-Duniverse graph. Blazor calls attach after render, like
-// nav-sand.js. I move one <g> with a CSS transform, so nothing goes back through
+// nav-sand.site.js. I move one <g> with a CSS transform, so nothing goes back through
 // Blazor. A drag swallows its click, so panning never opens a star.
 window.duneUniverse = (function () {
     let svg = null;
