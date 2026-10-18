@@ -4135,7 +4135,8 @@ button.chip {
 
     /* Hover: the frame lights and catches the spice once, the card lifts, the fill stays
        opaque and the text stays light. The old spice wash turned the text dark and
-       measured under AA over the busiest gradient. */
+       measured under AA over the busiest gradient. I keep card-deal in the list so
+       leaving a card doesn't replay the deal and blink it out. */
     .category-tile:hover,
     .category-tile:focus-visible {
         transform: translateY(-2px);
@@ -4145,7 +4146,7 @@ button.chip {
             var(--spice-border-gradient) border-box;
         background-size: 100% 100%, 300% 300%;
         box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35), 0 0 16px rgba(var(--dune-accent-rgb), 0.35);
-        animation: spice-shimmer 1.4s ease-in-out;
+        animation: card-deal 0.3s ease-out calc(var(--i, 0) * 0.04s) backwards, spice-shimmer 1.4s ease-in-out;
     }
 
         .category-tile:hover::after,
