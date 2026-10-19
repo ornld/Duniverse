@@ -92,6 +92,11 @@
 </div>
 
 @code {
+    // The search lives in the address too, so Back from a record, a refresh, or a shared
+    // link all land on the same results.
+    [Parameter, SupplyParameterFromQuery(Name = "q")]
+    public string? Q { get; set; }
+
     private string query = "";
     private string lastQuery = "";
     private List<DuneEntity> everyRecord = new();
@@ -127,6 +132,20 @@
         everyRecord = Registry.GetAllEntities<DuneEntity>().ToList();
     }
 
+    protected override void OnParametersSet()
+    {
+        var fromAddress = Q?.Trim() ?? "";
+        if (fromAddress == lastQuery)
+        {
+            return;
+        }
+
+        // A search coming back from the address never jumps to a record. If it did, Back
+        // would land here and bounce straight to the record again.
+        query = fromAddress;
+        HandleSearch(allowJump: false);
+    }
+
     private void HandleKeyUp(KeyboardEventArgs e)
     {
         if (e.Key == "Enter")
@@ -144,7 +163,9 @@
         }
     }
 
-    private void HandleSearch()
+    private void HandleSearch() => HandleSearch(allowJump: true);
+
+    private void HandleSearch(bool allowJump)
     {
         notFound = false;
         rawCandidates = new List<DuneEntity>();
@@ -155,6 +176,7 @@
 
         if (string.IsNullOrWhiteSpace(lastQuery))
         {
+            WriteQueryToAddress();
             return;
         }
 
@@ -167,20 +189,26 @@
         // Resolve ignores spoilers and matches substrings and typos, so a sealed record can
         // land as the confident hit. I don't navigate there: the ID is the name, so the URL
         // spells it out. The filter drops it instead.
-        if (result.Entity is not null && Spoiler.IsVisible(result.Entity))
+        if (allowJump && result.Entity is not null && Spoiler.IsVisible(result.Entity))
         {
             Nav.NavigateTo($"/entity/{result.Entity.Id}");
             return;
         }
 
+        // Typed searches only reach this line when they list results, so the address
+        // only ever holds a search that shows a list.
+        WriteQueryToAddress();
+
         // A record the query actually names beats one that just contains it in a longer
         // title, so "Muad'Dib" leads with the man, not the church built around him.
-        // Without this I get whatever order the databank hands back.
-        rawCandidates = result.Candidates
-            .OrderByDescending(entity => ExactlyNamed(entity, lastQuery))
-            .ThenBy(entity => entity.Name.Length)
-            .ThenBy(entity => entity.Name)
-            .ToList();
+        // A confident hit restored from the address lists alone, the way a chip click does.
+        rawCandidates = result.Entity is not null
+            ? new List<DuneEntity> { result.Entity }
+            : result.Candidates
+                .OrderByDescending(entity => ExactlyNamed(entity, lastQuery))
+                .ThenBy(entity => entity.Name.Length)
+                .ThenBy(entity => entity.Name)
+                .ToList();
 
         // A record already listed by name doesn't get listed again as a text match.
         var alreadyNamed = new HashSet<string>(rawCandidates.Select(c => c.Id), StringComparer.OrdinalIgnoreCase);
@@ -189,6 +217,20 @@
             .ToList();
 
         ApplySpoilerFilter();
+    }
+
+    // I swap the current history entry instead of adding one, so Back skips past every
+    // search typed here and leaves the page in one step.
+    private void WriteQueryToAddress()
+    {
+        var target = string.IsNullOrEmpty(lastQuery)
+            ? "/archives"
+            : $"/archives?q={Uri.EscapeDataString(lastQuery)}";
+
+        if (Nav.ToBaseRelativePath(Nav.Uri) != target.TrimStart('/'))
+        {
+            Nav.NavigateTo(target, replace: true);
+        }
     }
 
     // Changing reading progress moves two things at once: which results survive, and how much

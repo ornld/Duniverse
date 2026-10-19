@@ -1390,6 +1390,76 @@ html {
     }
 }
 
+/* ---- The record pager ----
+   Previous and next in the drawer, under hairlines like a ledger's last line. The
+   direction sits small in caps, the name in Marcellus, and both turn gold on hover. */
+.record-pager {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--sp-4);
+    margin-top: var(--sp-6);
+    padding: var(--sp-4) 0;
+    border-top: var(--rule-hair) solid var(--dune-border);
+    border-bottom: var(--rule-hair) solid var(--dune-border);
+}
+
+.record-pager-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+    max-width: 48%;
+    text-decoration: none;
+    color: var(--dune-text);
+    transition: color var(--dur-touch) ease, transform var(--dur-open) ease;
+}
+
+    /* A lone Next still sits on the right, where it would sit beside a Previous. */
+    .record-pager-link.is-next {
+        margin-left: auto;
+        text-align: right;
+    }
+
+.record-pager-dir {
+    font-size: var(--fs-label);
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--dune-muted);
+    transition: color var(--dur-touch) ease;
+}
+
+.record-pager-name {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+}
+
+.record-pager-link:hover,
+.record-pager-link:focus-visible {
+    color: var(--dune-accent-bright);
+}
+
+    .record-pager-link:hover .record-pager-dir,
+    .record-pager-link:focus-visible .record-pager-dir {
+        color: var(--dune-accent);
+    }
+
+    .record-pager-link.is-prev:hover {
+        transform: translateX(-3px);
+    }
+
+    .record-pager-link.is-next:hover {
+        transform: translateX(3px);
+    }
+
+@media (prefers-reduced-motion: reduce) {
+    .record-pager-link.is-prev:hover,
+    .record-pager-link.is-next:hover {
+        transform: none;
+    }
+}
+
 /* ---- The colophon ----
    Every record ends under the same faded hawk and one line about the whole archive.
    Uniform on purpose: a foot that varied by record would whisper which ones go on. */

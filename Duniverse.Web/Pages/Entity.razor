@@ -225,6 +225,28 @@ else if (entity is not null)
         </div>
     }
 
+    @* The neighbours in this record's drawer, in the same A to Z order as its category
+       page. Built from open records only, so a gap in the run never hints at a sealed one. *@
+    @if (previousRecord is not null || nextRecord is not null)
+    {
+        <nav class="record-pager dossier-item" style="--i: 7" aria-label="@($"More {GraphLayoutService.CategoryTitle(entity)}")">
+            @if (previousRecord is not null)
+            {
+                <a class="record-pager-link is-prev" href="@($"/entity/{previousRecord.Id}")">
+                    <span class="record-pager-dir">&larr; Previous</span>
+                    <span class="record-pager-name">@previousRecord.Name</span>
+                </a>
+            }
+            @if (nextRecord is not null)
+            {
+                <a class="record-pager-link is-next" href="@($"/entity/{nextRecord.Id}")">
+                    <span class="record-pager-dir">Next &rarr;</span>
+                    <span class="record-pager-name">@nextRecord.Name</span>
+                </a>
+            }
+        </nav>
+    }
+
     @* Every record ends under the same mark, so the foot of one page never says more
        than the foot of another. The line reads the whole archive's state, nothing about
        this record: presence here is not a hint that deeper layers exist. *@
@@ -377,6 +399,8 @@ else
         revealed = false;
         editionMarks = false;
         newlyOpened = Array.Empty<SpoilerTier>();
+        previousRecord = null;
+        nextRecord = null;
 
         var result = Registry.Resolve(Id);
         entity = result.Entity;
@@ -429,6 +453,34 @@ else
         glossary = GlossarySeeder.TermsByEntity.TryGetValue(entity.Id, out var terms)
             ? terms.Where(term => Spoiler.IsVisible(term.Tier)).ToList()
             : new List<GlossaryTerm>();
+
+        FindNeighbours(entity);
+    }
+
+    private DuneEntity? previousRecord;
+    private DuneEntity? nextRecord;
+
+    // The open records in this drawer, sorted the way Category.razor sorts its grid, so
+    // Next always means the card to the right.
+    private void FindNeighbours(DuneEntity current)
+    {
+        var slug = GraphLayoutService.CategorySlug(current);
+        var shelf = Registry.GetAllEntities<DuneEntity>()
+            .Where(e => GraphLayoutService.CategorySlug(e) == slug && Spoiler.IsVisible(e))
+            .OrderBy(e => e.Name)
+            .ToList();
+
+        var index = shelf.FindIndex(e => e.Id == current.Id);
+
+        // The run stops at A and Z, the way a drawer has a front and a back. A revealed
+        // sealed record isn't on the open shelf, so it gets no neighbours.
+        if (index < 0)
+        {
+            return;
+        }
+
+        previousRecord = index > 0 ? shelf[index - 1] : null;
+        nextRecord = index < shelf.Count - 1 ? shelf[index + 1] : null;
     }
 
     private bool sealBreaking;
