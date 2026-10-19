@@ -45,7 +45,7 @@
             }
         </div>
 
-        <ImperialSeal All="allInCategory" Scope="in this category" />
+        <ReadingShelf All="allInCategory" Scope="in this category" OnChanged="Refilter" />
     </div>
 }
 else
@@ -102,10 +102,17 @@ else
         // Kept unfiltered as well as filtered: the seal line needs to know how many records the
         // drawer actually holds, which is the one thing the filtered list can no longer say.
         allInCategory = found.ToList();
-        items = allInCategory.Where(Spoiler.IsVisible).OrderBy(item => item.Name).ToList();
+        Refilter();
 
         heroStyle = CategoryBackgrounds.TryGetValue(slug, out var file)
             ? $"background-image: var(--scrim-soft), url('/images/categories/{file}');"
             : "";
+    }
+
+    // The shelf's spines move reading progress right here, so I re-filter the cards in
+    // place instead of waiting for a fresh visit.
+    private void Refilter()
+    {
+        items = allInCategory.Where(Spoiler.IsVisible).OrderBy(item => item.Name).ToList();
     }
 }

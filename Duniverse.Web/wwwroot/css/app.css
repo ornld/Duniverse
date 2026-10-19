@@ -281,7 +281,7 @@ h1, h2, .tagline, .short-desc {
     text-wrap: pretty;
 }
 
-.timeline-date, .imperial-seal, .entity-meta dd, .pager-status {
+.timeline-date, .reading-shelf, .entity-meta dd, .pager-status {
     font-variant-numeric: tabular-nums;
 }
 
@@ -1129,41 +1129,265 @@ html {
    How much of a drawer is still shut. Reads as a footnote the archive is admitting rather
    than a feature announcing itself, so it sits quiet: small, muted, one hairline above it. */
 
-/* The gate's hawk, whole. The colophon and the count stamps both wear it; whoever
-   mounts it sets the size, and currentColor sets the ink. */
+/* The gate's hawk, whole. The colophon wears it; whoever mounts it sets the size,
+   and currentColor sets the ink. */
 .seal-mark {
     display: block;
     width: 100%;
     height: auto;
 }
 
-/* One stamp per sealed record, none named, none openable: a drawer of unopened
-   letters. The sentence below them carries the count for anyone not looking. */
-.imperial-seal-stamps {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-    margin-top: var(--sp-5);
-    color: rgba(var(--dune-accent-rgb), 0.38);
+/* ---- The reading shelf ----
+   The six novels stand as spines on a dark plate. Read ones catch the lamp, unread ones
+   stay dark with their count underneath. The other books stand apart, dashed. */
+/* The shelf's latch: quiet text with a small caret, the same muted voice as the
+   spoiler note above it. It lights gold on hover. */
+.rshelf-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-top: var(--sp-4);
+    padding: var(--sp-1) 0;
+    background: none;
+    border: 0;
+    color: var(--dune-muted-lit);
+    font-size: var(--fs-small);
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: color var(--dur-touch) ease;
 }
 
-    .imperial-seal-stamps .seal-mark {
-        width: 0.95rem;
+    .rshelf-toggle:hover {
+        color: var(--dune-accent-bright);
     }
 
-    /* When the stamps lead, the sentence is their caption: it closes the gap and keeps
-       its hairline as the plate's lower rule. */
-    .imperial-seal-stamps + .imperial-seal {
-        margin-top: var(--sp-2);
+.rshelf-chevron {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: translateY(-2px) rotate(45deg);
+    transition: transform var(--dur-open) ease;
+}
+
+    .rshelf-toggle[aria-expanded="true"] .rshelf-chevron {
+        transform: translateY(2px) rotate(-135deg);
     }
 
-.imperial-seal {
-    margin: var(--sp-5) 0 0;
-    padding-top: 0.85rem;
-    border-top: 1px solid var(--dune-border);
-    font-size: var(--fs-caption);
+/* It unfolds downward when opened, the plate settling into place. */
+@keyframes rshelf-unfold {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+}
+
+.reading-shelf {
+    margin-top: var(--sp-3);
+    animation: rshelf-unfold var(--dur-settle) ease-out;
+    padding: var(--sp-5) var(--sp-5) var(--sp-4);
+    background: rgba(15, 13, 12, 0.82);
+    border: var(--rule-hair) solid var(--dune-border);
+    border-radius: var(--r-sharp);
+}
+
+.rshelf-kicker {
+    margin: 0;
+    font-size: var(--fs-label);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
     color: var(--dune-muted);
-    letter-spacing: 0.01em;
+}
+
+.rshelf-count {
+    margin: var(--sp-2) 0 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.3rem, 1.1rem + 0.9vw, 1.65rem);
+    line-height: 1.3;
+    color: var(--dune-text);
+}
+
+    .rshelf-count strong {
+        font-weight: 400;
+        color: var(--dune-accent-bright);
+    }
+
+/* A hairline that fills with the share you can read. */
+.rshelf-bar {
+    height: 2px;
+    margin: var(--sp-3) 0 var(--sp-5);
+    background: #2e241b;
+}
+
+    .rshelf-bar span {
+        display: block;
+        height: 100%;
+        background: var(--dune-accent);
+        transition: width var(--dur-settle) ease;
+    }
+
+.rshelf-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 0.6rem;
+}
+
+.rshelf-book {
+    flex: 1;
+    min-width: 0;
+    max-width: 5rem;
+    padding: 0;
+    background: none;
+    border: 0;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    text-align: center;
+}
+
+    /* I give the other books a little air on the shelf, so they read as a separate set. */
+    .rshelf-book.is-other {
+        margin-left: var(--sp-3);
+    }
+
+.rshelf-face {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 9.5rem;
+    padding: 0.6rem 0 0.55rem;
+    background: #1a1410;
+    border: var(--rule-hair) solid var(--dune-border);
+    transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease, transform var(--dur-open) ease;
+}
+
+.rshelf-num {
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    color: var(--dune-border-strong);
+}
+
+/* Set sideways the way a real spine reads, bottom to top. */
+.rshelf-title {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    color: var(--dune-muted);
+}
+
+.rshelf-foot {
+    width: 60%;
+    border-top: var(--rule-hair) solid var(--dune-border);
+}
+
+.rshelf-tally {
+    display: block;
+    height: 1.1rem;
+    margin-top: 0.4rem;
+    font-size: var(--fs-label);
+    letter-spacing: 0.04em;
+    color: var(--dune-muted);
+}
+
+.rshelf-book:hover .rshelf-face {
+    transform: translateY(-3px);
+    border-color: var(--dune-border-strong);
+}
+
+.rshelf-book:focus-visible {
+    outline: none;
+}
+
+    .rshelf-book:focus-visible .rshelf-face {
+        outline: 2px solid var(--dune-accent);
+        outline-offset: 2px;
+    }
+
+.rshelf-book.is-read .rshelf-face {
+    background: #2a1f15;
+    border-color: var(--dune-accent);
+    box-shadow: 0 0 14px rgba(var(--dune-accent-rgb), 0.18);
+}
+
+.rshelf-book.is-read .rshelf-num,
+.rshelf-book.is-read .rshelf-title {
+    color: var(--dune-accent-bright);
+}
+
+.rshelf-book.is-read .rshelf-foot {
+    border-color: var(--dune-accent);
+}
+
+.rshelf-book.is-read .rshelf-tally {
+    color: var(--dune-accent);
+}
+
+.rshelf-book.is-other .rshelf-face {
+    background: transparent;
+    border-style: dashed;
+}
+
+.rshelf-book.is-other.is-read .rshelf-face {
+    background: rgba(var(--dune-accent-rgb), 0.08);
+}
+
+.rshelf-caption {
+    margin: var(--sp-4) 0 0;
+    padding-top: var(--sp-3);
+    border-top: var(--rule-hair) solid #2e241b;
+    font-size: var(--fs-small);
+    line-height: 1.55;
+    color: var(--dune-muted);
+}
+
+    .rshelf-caption em {
+        font-style: normal;
+        color: var(--dune-muted-lit);
+    }
+
+/* On a phone seven spines share about 340px, so I shorten them and tighten the gaps. */
+@media (max-width: 560px) {
+    .reading-shelf {
+        padding: var(--sp-4) var(--sp-3) var(--sp-3);
+    }
+
+    .rshelf-row {
+        gap: 0.3rem;
+    }
+
+    .rshelf-book.is-other {
+        margin-left: var(--sp-2);
+    }
+
+    .rshelf-face {
+        height: 8.75rem;
+    }
+
+    .rshelf-title {
+        font-size: 0.68rem;
+        letter-spacing: 0.03em;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rshelf-book:hover .rshelf-face {
+        transform: none;
+    }
+
+    .rshelf-bar span,
+    .rshelf-chevron {
+        transition: none;
+    }
+
+    .reading-shelf {
+        animation: none;
+    }
 }
 
 /* ---- The colophon ----
@@ -1184,12 +1408,6 @@ html {
         margin: 0;
         font-size: var(--fs-small);
         font-style: italic;
-    }
-
-    .imperial-seal span {
-        /* The nudge toward the next book earns a little more light than the count itself. */
-        color: var(--dune-text);
-        opacity: 0.75;
     }
 
 /* ---- The Unexpurgated View ----

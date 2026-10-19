@@ -85,17 +85,17 @@
         <button class="surprise-btn" @onclick="RandomJump">Let the archive choose</button>
     </p>
 
-    @* Keyed to the epoch so changing reading progress recounts the seals straight away, rather
-       than leaving a stale number sitting under the control that just changed it. *@
-    <SpoilerControl OnChanged="OnProgressChanged" />
-    <ImperialSeal All="everyRecord" Scope="in the archive" @key="sealEpoch" />
+    @* The shelf recounts on every render, so I don't key it, or it'd snap shut. I hand
+       the chips the epoch, so a spine press redraws them and lights the right one. *@
+    <SpoilerControl OnChanged="OnProgressChanged" Epoch="progressEpoch" />
+    <ReadingShelf All="everyRecord" Scope="in the archive" OnChanged="OnProgressChanged" />
 </div>
 
 @code {
     private string query = "";
     private string lastQuery = "";
     private List<DuneEntity> everyRecord = new();
-    private int sealEpoch;
+    private int progressEpoch;
     private int searchEpoch;
     private bool notFound;
     private List<DuneEntity> rawCandidates = new();
@@ -196,7 +196,7 @@
     // never lag behind the control the reader just moved.
     private void OnProgressChanged()
     {
-        sealEpoch++;
+        progressEpoch++;
         RefilterCandidates();
     }
 

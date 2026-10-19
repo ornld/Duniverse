@@ -1,0 +1,167 @@
+@inject SpoilerSettings Spoiler
+
+@*
+    How much of the archive is open, laid out as the six novels on a shelf. Read books
+    glow, unread ones say how many records they'd open. It never names a sealed record.
+*@
+
+@if (Spoiler.Enabled && total > 0)
+{
+    @* I keep the shelf shut until someone asks for it, so the page doesn't open on a
+       wall of books. The toggle sits right under the spoiler note. *@
+    <button type="button" class="rshelf-toggle" aria-expanded="@(open ? "true" : "false")"
+            aria-controls="@shelfId" @onclick="() => open = !open">
+        @(open ? "Hide your reading shelf" : "Show your reading shelf")
+        <span class="rshelf-chevron" aria-hidden="true"></span>
+    </button>
+}
+
+@if (Spoiler.Enabled && total > 0 && open)
+{
+    <section class="reading-shelf" id="@shelfId" aria-label="Your reading shelf">
+        <p class="rshelf-kicker">Your reading shelf</p>
+
+        @* I made the count a status region, so a screen reader hears it change when a
+           spine gets pressed. *@
+        <p class="rshelf-count" role="status" aria-live="polite">
+            <strong>@openCount</strong> of @total @(total == 1 ? "record" : "records") @Scope
+            @(openCount == 1 ? "is" : "are") open to you
+        </p>
+
+        <div class="rshelf-bar" aria-hidden="true">
+            <span style="width: @(openPercent)%"></span>
+        </div>
+
+        <div class="rshelf-row">
+            @foreach (var book in Novels)
+            {
+                var read = book.Tier <= Spoiler.NovelProgress;
+                var current = book.Tier == Spoiler.NovelProgress;
+                var opens = sealedByTier.GetValueOrDefault(book.Tier);
+                <button type="button"
+                        class="rshelf-book @(read ? "is-read" : "")"
+                        aria-pressed="@(current ? "true" : "false")"
+                        aria-label="@($"I've read up to {book.Title}")"
+                        @onclick="() => SetProgress(book.Tier)">
+                    <span class="rshelf-face">
+                        <span class="rshelf-num">@book.Numeral</span>
+                        <span class="rshelf-title">@book.Title</span>
+                        <span class="rshelf-foot"></span>
+                    </span>
+                    <span class="rshelf-tally">@(current ? "Read" : read ? "" : opens > 0 ? $"+{opens}" : "none")</span>
+                </button>
+            }
+
+            @* The prequels and sequels stand apart, dashed. Reading on never opens them, so
+               this spine is its own switch. *@
+            <button type="button"
+                    class="rshelf-book is-other @(Spoiler.IncludeExpandedUniverse ? "is-read" : "")"
+                    aria-pressed="@(Spoiler.IncludeExpandedUniverse ? "true" : "false")"
+                    aria-label="Include the books outside the six novels"
+                    @onclick="ToggleExpandedUniverse">
+                <span class="rshelf-face">
+                    <span class="rshelf-num">+</span>
+                    <span class="rshelf-title">Other books</span>
+                    <span class="rshelf-foot"></span>
+                </span>
+                <span class="rshelf-tally">@(Spoiler.IncludeExpandedUniverse ? "Shown" : expandedOnly > 0 ? $"+{expandedOnly}" : "none")</span>
+            </button>
+        </div>
+
+        @* Razor eats whitespace between a closing brace and the next block, so I write the
+           spaces out. *@
+        <p class="rshelf-caption">
+            @if (sealedCount == 0)
+            {
+                <span>Every record @Scope is open to you.</span>
+            }
+            else
+            {
+                <em>@sealedCount @(sealedCount == 1 ? "record is" : "records are") sealed</em>
+                @(" so nothing spoils a book you haven't read.")
+                @if (nextBook is not null)
+                {
+                    @(" Read ")<em>@nextBook.Title</em>@($" and {nextOpens} more {(nextOpens == 1 ? "opens" : "open")}.")
+                }
+                @if (expandedOnly > 0 && !Spoiler.IncludeExpandedUniverse)
+                {
+                    @($" {expandedOnly} {(expandedOnly == 1 ? "belongs" : "belong")} to books outside the six novels.")
+                }
+            }
+        </p>
+    </section>
+}
+
+@code {
+    /// <summary>Every record this scope covers, before any spoiler filtering.</summary>
+    [Parameter]
+    public IEnumerable<DuneEntity> All { get; set; } = Array.Empty<DuneEntity>();
+
+    /// <summary>Reads into the sentences after the count, e.g. "in this category".</summary>
+    [Parameter]
+    public string Scope { get; set; } = "in the archive";
+
+    /// <summary>I raise this after a spine changes progress, so the host page can re-filter.</summary>
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    private record Novel(string Numeral, string Title, SpoilerTier Tier);
+
+    private static readonly Novel[] Novels =
+    {
+        new("I", "Dune", SpoilerTier.Dune),
+        new("II", "Dune Messiah", SpoilerTier.DuneMessiah),
+        new("III", "Children of Dune", SpoilerTier.ChildrenOfDune),
+        new("IV", "God Emperor", SpoilerTier.GodEmperorOfDune),
+        new("V", "Heretics", SpoilerTier.HereticsOfDune),
+        new("VI", "Chapterhouse", SpoilerTier.Chapterhouse),
+    };
+
+    private bool open;
+    private readonly string shelfId = $"reading-shelf-{Guid.NewGuid():N}";
+
+    private int total;
+    private int openCount;
+    private int openPercent;
+    private int sealedCount;
+    private int expandedOnly;
+    private Novel? nextBook;
+    private int nextOpens;
+    private Dictionary<SpoilerTier, int> sealedByTier = new();
+
+    protected override void OnParametersSet() => Recount();
+
+    private void Recount()
+    {
+        var all = All.ToList();
+        var hidden = all.Where(e => !Spoiler.IsVisible(e)).ToList();
+
+        total = all.Count;
+        sealedCount = hidden.Count;
+        openCount = total - sealedCount;
+        openPercent = total == 0 ? 0 : (int)Math.Round(openCount * 100.0 / total);
+        sealedByTier = hidden.GroupBy(e => e.SpoilerTier).ToDictionary(g => g.Key, g => g.Count());
+
+        // I count these apart. Reading on never opens them, so rolled into the next book's
+        // number they'd promise something the next novel can't deliver.
+        expandedOnly = sealedByTier.GetValueOrDefault(SpoilerTier.ExpandedUniverse);
+
+        // The nearest novel along the spine that would actually open something.
+        nextBook = Novels.FirstOrDefault(n => sealedByTier.GetValueOrDefault(n.Tier) > 0);
+        nextOpens = nextBook is null ? 0 : sealedByTier[nextBook.Tier];
+    }
+
+    private async Task SetProgress(SpoilerTier tier)
+    {
+        await Spoiler.UpdateAsync(Spoiler.Enabled, tier, Spoiler.IncludeExpandedUniverse);
+        Recount();
+        await OnChanged.InvokeAsync();
+    }
+
+    private async Task ToggleExpandedUniverse()
+    {
+        await Spoiler.UpdateAsync(Spoiler.Enabled, Spoiler.NovelProgress, !Spoiler.IncludeExpandedUniverse);
+        Recount();
+        await OnChanged.InvokeAsync();
+    }
+}

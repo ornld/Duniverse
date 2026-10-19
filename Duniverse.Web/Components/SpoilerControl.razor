@@ -37,6 +37,10 @@
     // Raised after any change so a hosting page can re-filter content it's already showing.
     [Parameter] public EventCallback OnChanged { get; set; }
 
+    // I never read this. A host bumps it when progress moves somewhere else (the reading
+    // shelf), and the new value is what makes Blazor redraw the chips.
+    [Parameter] public int Epoch { get; set; }
+
     private record Novel(string Title, SpoilerTier Tier);
 
     private static readonly Novel[] Novels =
